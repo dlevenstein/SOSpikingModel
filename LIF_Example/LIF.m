@@ -1,83 +1,128 @@
+%LIF forward euler simulation
+%by Jonathan Gornet
+%Last update: 7/31/2017
+
+%need to make into a function
+
+%--------------------------------------------------------------------------
 %Simulation Parameters
-SimTime     = 1000;
-PopNum      = 100;
-Iterations  = 1000;
+SimTime     = 500;    %Simulation Time
+TimeLength  = 100000; %Time Steps
+TimeSpace   = linspace(0,SimTime,TimeLength);  %Time Space
+dt          = TimeSpace(2); %differential
+PopNum      = 100;    %Population of neurons
 
-TimeSpace   = linspace(0,SimTime,Iterations);
+%--------------------------------------------------------------------------
+%Simulation Variables
+V           = -65.*ones(PopNum,TimeLength) + randi([0,100],[PopNum,1]); %Membrane Potential
 
-dt = TimeSpace(2);
-%%
+a_e         = zeros(PopNum,TimeLength); %a term of alpha synapse
+b_e         = zeros(PopNum,TimeLength); %b term of alpha synapse
+g_e         = zeros(PopNum,TimeLength); %conductance of synapse
 
-%Variables
-V       = -65.*ones(PopNum,Iterations);
-g_e     = zeros(PopNum,Iterations);
-g_i     = zeros(PopNum,Iterations);
-a       = zeros(PopNum,Iterations);
+a_i         = zeros(PopNum,TimeLength); %a term of alpha synapse
+b_i         = zeros(PopNum,TimeLength); %b term of alpha synapse
+g_i         = zeros(PopNum,TimeLength); %conductance of synapse
 
+a           = zeros(PopNum,TimeLength); %adaptation
+
+%--------------------------------------------------------------------------
+%Simulation Parameters
 %LIF Parameters
-I_e     = 1.7;
-g       = 0.1;
-E_L     = -65;
-V_reset = -80;
+E_L         = -65;   %Reversal potential
+g_L         = 30.0;  %conductance
+C           = 281.0; %capacitance
+I_e         = 700;   %current
+V_th        = -55;   %spike threshhold
+V_spike     = -30;   %spike release
+V_reset     = -85;   %reset value
 
-%Synapse Leak Values
-E_e   = 0;
-E_i   = -80;
+%--------------------------------------------------------------------------
+%Excitatory Synapse Parameters
+tau_e       = 10;    %time constance of excitatory synapse
+E_e         = 0;     %Excitatory reversal potential
 
-%Time Constants
-tau_V       = 1;
-tau_a       = 100;
-tau_syn     = 10;
+%--------------------------------------------------------------------------
+%Inhibitory Synapse Parameters
+tau_i       = 10;    %time constance of inhibitory synapse
+E_i         = -80;   %Inhibitory reversal potential
 
+%--------------------------------------------------------------------------
+%Weight Matrices
+E_mat = randi([0,1000],[PopNum,1]);  %Excitatory Weights, needs work
+I_mat = randi([0,1000],[PopNum,1]);  %Inhibitory Weights, needs work
+
+%--------------------------------------------------------------------------
 %Adaptation
-adapt       = 0.005;
-
-%Synaptic Weights
-EWeightMat   = 0.1.*rand(PopNum,1);
-IWeightMat   = 0.2.*rand(PopNum,1);
-
+adapt = 1000.*ones(PopNum,1);    %Threshhold adaptation
+tau_a = 50;                      %adaptation time constant
 %%
-%%Simulation
-for t=1:Iterations
-    
-    %LIF equation
-    V(:,t+1)        = V(:,t)./tau_V + (-g.*(V(:,t) - E_L) - g_e(:,t).*(V(:,t) - E_e) - g_i(:,t).*(V(:,t) - E_i) - 10.*a(:,t) + I_e).*dt;
-    %Excitatory Exponential Synapse
-    g_e(:,t+1)      = g_e(:,t)      + -g_e(:,t).*dt;
-    %Inhibibitory Exponential Synapse
-    g_i(:,t+1)      = g_i(:,t)      + -g_i(:,t).*dt;
-    %Adaptation (doesn't work)
-    a(:,t+1)        = a(:,t)        + adapt.*(V(:,t)-E_L)-a(:,t).*dt;
-    
-    %Jump Function
-    if V(:,t+1) > -55
-        
-        V(:,t+1)     = V_reset;
-        g_e(:,t+1) = g_e(:,t)  + EWeightMat;
-        g_i(:,t+1) = g_i(:,t)  + IWeightMat;
-        
-    end
-    
+
+for t=1:TimeLength
+
+%forward euler method 
+
+%differential   prior value    LIF Equation                   excitatory synapse           inhibitory synapse            adaptation   current
+V(:,t+1)        = V(:,t)        + (-g_L.*(V(:,t) - E_L)./C   + -g_e(:,t).*(V(:,t)-E_e)./C  + -g_i(:,t).*(V(:,t)-E_i)./C + -a(:,t)./C + I_e./C).*dt;
+
+%--------------------------------------------------------------------------
+
+%alpha synapses, excitatory
+a_e(:,t+1)      = a_e(:,t)      + -a_e(:,t).*dt./tau_e;
+b_e(:,t+1)      = b_e(:,t)      + -b_e(:,t).*dt;
+
+%conductance term
+g_e(:,t+1)      = (a_e(:,t) - b_e(:,t)).*dt;
+
+%--------------------------------------------------------------------------
+
+%alpha synapses, excitatory
+a_i(:,t+1)      = a_i(:,t)      + -a_i(:,t).*dt./tau_i;
+b_i(:,t+1)      = b_i(:,t)      + -b_i(:,t).*dt;
+
+%conductance term
+g_i(:,t+1)      = (a_i(:,t) - b_i(:,t)).*dt;
+
+%--------------------------------------------------------------------------
+
+%adaptation
+a(:,t+1)        = a(:,t)   + -a(:,t).*dt./tau_a;
+
+%--------------------------------------------------------------------------
+
+if V(:,t) > V_th
+
+%V(:,t)     = V_spike;
+V(:,t+1)   = V_reset;
+
+%excitory synapse
+a_e(:,t+1)  = a_e(:,t+1) + E_mat;
+b_e(:,t+1)  = b_e(:,t+1) + E_mat;
+
+%inhibitory synapse
+a_i(:,t+1)  = a_i(:,t+1) + I_mat;
+b_i(:,t+1)  = b_i(:,t+1) + I_mat;
+
+%adaptation
+a(:,t+1)    = a(:,t+1)   + adapt;
+
+end
+
+%--------------------------------------------------------------------------
+
 end
 
 %%
-%Figures
+figure
+plot(linspace(0,SimTime,TimeLength + 1),V)
+xlabel('Time (ms)');ylabel('Membrane Potential (mV)');title('LIF Membrane Potential');
 
 figure
-plot(linspace(0,SimTime,length(V)),V)
-xlabel('Time (ms)');ylabel('Membrane Potential (mV)');title('Membrane Potential of Population')
-
-figure
-imagesc(V)
-xlabel('Time (ms)');ylabel('Membrane Potential (mV)');title('Heatmap of Population')
-colorbar
-
-figure
-plot(a)
-xlabel('Time (ms)');ylabel('Adaptation (pA)');title('Adaptation of Population')
-
-figure
-plot(g_e,'b')
+plot(linspace(0,SimTime,TimeLength + 1),g_e,'b')
 hold on
-plot(g_i,'r')
-xlabel('Time (ms)');ylabel('Conductance (Ohm/cm^2)^-1');title('Synaptic Conductance of Population')
+plot(linspace(0,SimTime,TimeLength + 1),g_i,'r')
+xlabel('Time (ms)');ylabel('Conductance (S/cm^2)?)');title('LIF Conductance');
+
+figure
+plot(linspace(0,SimTime,TimeLength + 1),a,'b')
+xlabel('Time (ms)');ylabel('Adaptation (pA)');title('LIF Adaptation');
