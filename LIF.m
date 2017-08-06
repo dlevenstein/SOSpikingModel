@@ -6,11 +6,12 @@
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
-SimTime     = 500;    %Simulation Time
-TimeLength  = 100000; %Time Steps
-TimeSpace   = linspace(0,SimTime,TimeLength);  %Time Space
-dt          = TimeSpace(2); %differential
+SimTime     = 500;    %Simulation Time (ms)
+dt          = 0.1; %differential (ms)
 PopNum      = 100;    %Population of neurons
+%Calcualte time vector from time parameters
+TimeSpace   = [0:dt:SimTime];  %Time Space
+TimeLength  = length(TimeSpace); %Time Steps
 
 %--------------------------------------------------------------------------
 %Simulation Variables
