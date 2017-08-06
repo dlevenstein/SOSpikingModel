@@ -14,7 +14,7 @@ PopNum      = 100;    %Population of neurons
 
 %--------------------------------------------------------------------------
 %Simulation Variables
-V           = -65.*ones(PopNum,TimeLength) + randi([0,100],[PopNum,1]); %Membrane Potential
+V           = zeros(PopNum,TimeLength); %Membrane Potential
 
 a_e         = zeros(PopNum,TimeLength); %a term of alpha synapse
 b_e         = zeros(PopNum,TimeLength); %b term of alpha synapse
@@ -56,6 +56,11 @@ I_mat = randi([0,1000],[PopNum,1]);  %Inhibitory Weights, needs work
 %Adaptation
 adapt = 1000.*ones(PopNum,1);    %Threshhold adaptation
 tau_a = 50;                      %adaptation time constant
+
+%--------------------------------------------------------------------------
+%Initial Conditions
+V0range = [V_reset V_spike];
+V(:,1) =  randi(V0range,[PopNum,1]);
 %%
 
 for t=1:TimeLength
