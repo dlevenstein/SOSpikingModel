@@ -124,7 +124,7 @@ if any(V(:,t) > V_th)  %Previous code would have implemented spike only if ALL n
     %excitatory... which is not physiologically realistic.
     %See https://en.wikipedia.org/wiki/Dale%27s_principle
     %Removing inhibitory synapses for now, we'll put in an inhibitory
-    %population once the code is working correctly.
+    %population next
 %     a_i(:,t+1)  = a_i(:,t+1) + I_mat;
 %     b_i(:,t+1)  = b_i(:,t+1) + I_mat;
 
