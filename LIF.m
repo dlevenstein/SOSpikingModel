@@ -116,6 +116,8 @@ if any(V(:,t) > V_th)  %Previous code would have implemented spike only if ALL n
     V(spikeneurons,t+1)   = V_reset; %only reset the neurons that spiked
 
     %excitory synapse - postsynaptic effects
+    %DL: Jonathan can you check this implementation? Not quite sure how to
+    %think about this in terms of the a/b variables
     a_e(:,t+1)  = a_e(:,t+1) + sum(E_mat(:,spikeneurons),2);
     b_e(:,t+1)  = b_e(:,t+1) + sum(E_mat(:,spikeneurons),2);
 
@@ -129,7 +131,7 @@ if any(V(:,t) > V_th)  %Previous code would have implemented spike only if ALL n
 %     b_i(:,t+1)  = b_i(:,t+1) + I_mat;
 
     %adaptation
-    a(:,t+1)    = a(:,t+1)   + adapt;
+    a(spikeneurons,t+1)    = a(spikeneurons,t+1)   + adapt;
 
 end
 
