@@ -6,7 +6,7 @@
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
-PopNum      = 2;    %Number of excitatory neurons
+PopNum      = 5;    %Number of excitatory neurons
 SimTime     = 500;    %Simulation Time (ms)
 dt          = 0.1; %differential (ms)
 %Calcualte time vector from time parameters
@@ -15,20 +15,25 @@ TimeLength  = length(TimeSpace); %Time Steps
 
 %--------------------------------------------------------------------------
 %Weight Matrices
-E_mat = randi([0,1000],[PopNum,PopNum]);  %Excitatory Weights, needs work
+%for now, uniform weights
+Wee = 100;   %Units?
+%1/root N scaling a la sompolinsky (may not be appropriate here...)
+E_mat = Wee.*ones(PopNum)./sqrt(PopNum);  %Excitatory Weights, needs work
 %E_mat(i,j) is the weight of synapse from neuron j to neuron i
-%I_mat = randi([0,1000],[PopNum,1]);  %Inhibitory Weights, needs work
 E_mat(diag(diag(true(size(E_mat)))))=0; %Remove selfconnections
+
+%I_mat = randi([0,1000],[PopNum,1]);  %Inhibitory Weights, needs work
+
 %--------------------------------------------------------------------------
 %Simulation Parameters
 %LIF Parameters
-E_L         = -65;   %Reversal potential
-g_L         = 30.0;  %conductance
-C           = 281.0; %capacitance
-I_e         = 1000;   %current
-V_th        = -55;   %spike threshhold
+E_L         = -65;   %Reversal potential (mV)
+g_L         = 30.0;  %conductance (units?)
+C           = 281.0; %capacitance (units?)
+I_e         = 500;   %current (units?)
+V_th        = -55;   %spike threshhold (mV)
 V_spike     = -30;   %spike release  (DL: what does this parameter supposed to do?)
-V_reset     = -85;   %reset value
+V_reset     = -85;   %reset value (mV)
 
 %--------------------------------------------------------------------------
 %Excitatory Synapse Parameters
@@ -42,7 +47,7 @@ E_i         = -80;   %Inhibitory reversal potential
 
 %--------------------------------------------------------------------------
 %Adaptation
-adapt = 1000;    %Threshhold adaptation (parameter b)
+adapt = 200;    %Threshhold adaptation (parameter b)
 tau_a = 50;                      %adaptation time constant
 
 
@@ -53,13 +58,13 @@ V           = zeros(PopNum,TimeLength); %Membrane Potential
 
 a_e         = zeros(PopNum,TimeLength); %a term of alpha synapse
 b_e         = zeros(PopNum,TimeLength); %b term of alpha synapse
-g_e         = zeros(PopNum,TimeLength); %conductance of synapse
+g_e         = zeros(PopNum,TimeLength); %conductance of synapse 
 
 a_i         = zeros(PopNum,TimeLength); %a term of alpha synapse
-b_i         = zeros(PopNum,TimeLength); %b term of alpha synapse
-g_i         = zeros(PopNum,TimeLength); %conductance of synapse
+b_i         = zeros(PopNum,TimeLength); %b term of alpha synapse 
+g_i         = zeros(PopNum,TimeLength); %conductance of synapse 
 
-a           = zeros(PopNum,TimeLength); %adaptation
+a           = zeros(PopNum,TimeLength); %adaptation 
 
 spikes = [];
 
@@ -87,7 +92,7 @@ g_e(:,t+1)      = (a_e(:,t) - b_e(:,t)).*dt;
 
 %--------------------------------------------------------------------------
 
-%alpha synapses, excitatory
+%alpha synapses, inhibitory
 a_i(:,t+1)      = a_i(:,t)      + -a_i(:,t).*dt./tau_i;
 b_i(:,t+1)      = b_i(:,t)      + -b_i(:,t).*dt;
 
@@ -132,27 +137,52 @@ end
 
 end
 
+%Catch for no spiking in simulation error
+if isempty(spikes); spikes = [nan nan]; end
+
+%% Figures
+%Mean Population Dynamics Figure
+figure
+    subplot(3,1,1)
+    plot(spikes(:,1),spikes(:,2),'.','MarkerSize',10)
+    ylim([0 PopNum+1]);xlim(TimeSpace([1 end]))
+    xlabel('Time (ms)');ylabel(['Cell (',num2str(PopNum),')'])
+    box off; set(gca,'ytick',[])
+
+    subplot(3,1,2)
+    plot(TimeSpace,mean(V,1),'k')
+    xlabel('Time (ms)');ylabel('Mean V')
+
+    subplot(3,1,3)
+    plot(TimeSpace,mean(a,1),'k')
+    xlabel('Time (ms)');ylabel('Mean A')
+
+%Example Neuron Figure
+exneuron = randi(PopNum,1);
+exspiketimes = spikes(spikes(:,2)==exneuron,1);
+figure
+    subplot(2,1,1)
+    plot(TimeSpace,V(exneuron,:),'k')
+    hold on
+    plot(exspiketimes,V_th.*(ones(size(exspiketimes))),'r+')
+    xlabel('Time (ms)');ylabel('Example Neuron: V')
+    
+    subplot(2,1,2)
+    plot(TimeSpace,g_e(exneuron,:))
+    hold on
+    plot(TimeSpace,g_i(exneuron,:))
+    xlabel('Time (ms)');ylabel('Example Neuron: g_s_y_n')
 %%
-figure
-subplot(2,1,1)
-plot(spikes(:,1),spikes(:,2),'.')
-ylim([0 PopNum+1]);xlim(TimeSpace([1 end]))
-xlabel('Time (ms)');ylabel(['Cell (',num2str(PopNum),')'])
-box off; set(gca,'ytick',[])
-
-subplot(2,1,2)
-plot(TimeSpace,mean(V,1),'k')
-xlabel('Time (ms)');ylabel('Mean Vm')
-%%
-plot(linspace(0,SimTime,TimeLength + 1),V)
-xlabel('Time (ms)');ylabel('Membrane Potential (mV)');title('LIF Membrane Potential');
-
-figure
-plot(linspace(0,SimTime,TimeLength + 1),g_e,'b')
-hold on
-plot(linspace(0,SimTime,TimeLength + 1),g_i,'r')
-xlabel('Time (ms)');ylabel('Conductance (S/cm^2)?)');title('LIF Conductance');
-
-figure
-plot(linspace(0,SimTime,TimeLength + 1),a,'b')
-xlabel('Time (ms)');ylabel('Adaptation (pA)');title('LIF Adaptation');
+%Old Figures
+% plot(linspace(0,SimTime,TimeLength + 1),V)
+% xlabel('Time (ms)');ylabel('Membrane Potential (mV)');title('LIF Membrane Potential');
+% 
+% figure
+% plot(linspace(0,SimTime,TimeLength + 1),g_e,'b')
+% hold on
+% plot(linspace(0,SimTime,TimeLength + 1),g_i,'r')
+% xlabel('Time (ms)');ylabel('Conductance (S/cm^2)?)');title('LIF Conductance');
+% 
+% figure
+% plot(linspace(0,SimTime,TimeLength + 1),a,'b')
+% xlabel('Time (ms)');ylabel('Adaptation (pA)');title('LIF Adaptation');
