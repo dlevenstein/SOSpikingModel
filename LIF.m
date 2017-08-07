@@ -163,17 +163,21 @@ figure
 exneuron = randi(PopNum,1);
 exspiketimes = spikes(spikes(:,2)==exneuron,1);
 figure
-    subplot(2,1,1)
+    subplot(3,1,1)
     plot(TimeSpace,V(exneuron,:),'k')
     hold on
     plot(exspiketimes,V_th.*(ones(size(exspiketimes))),'r+')
     xlabel('Time (ms)');ylabel('Example Neuron: V')
     
-    subplot(2,1,2)
+    subplot(3,1,2)
     plot(TimeSpace,g_e(exneuron,:))
     hold on
     plot(TimeSpace,g_i(exneuron,:))
     xlabel('Time (ms)');ylabel('Example Neuron: g_s_y_n')
+    
+    subplot(3,1,3)
+    plot(TimeSpace,a(exneuron,:))
+    xlabel('Time (ms)');ylabel('Example Neuron: a')
 %%
 %Old Figures
 % plot(linspace(0,SimTime,TimeLength + 1),V)
