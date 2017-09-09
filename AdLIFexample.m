@@ -24,15 +24,15 @@ PopParams.Wie   = 10;
 PopParams.Wei   = 100;
 
 PopParams.Pee   = 0.1;
-PopParams.Pii   = 0.1;
+PopParams.Pii   = 0.5;
 PopParams.Pie   = 0.1;
-PopParams.Pei   = 0.1;
+PopParams.Pei   = 0.5;
 
 TimeParams.dt      = 0.1;
-TimeParams.SimTime = 1000;
+TimeParams.SimTime = 10;
 
-%[SimValues] = RK4AdLIFfunction(PopParams,TimeParams)
-[SimValues] = AdLIFfunction(PopParams,TimeParams,'showfig',true)
+[SimValues] = RK4AdLIFfunction(PopParams,TimeParams,'showfig',true)
+%[SimValues] = AdLIFfunction(PopParams,TimeParams,'showfig',true)
 %%
 figure
 plot(SimValues.spikes(:,1),SimValues.spikes(:,2),'.','MarkerSize',10)
