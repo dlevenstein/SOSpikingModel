@@ -1,6 +1,6 @@
-%AdLIF forward euler simulation
+%AdLIF RK4 
 %by Jonathan Gornet and DLevenstein
-%Last update: 8/25/2017
+%Last update: 9/8/2017
 
 %INPUTS
 %   PopParams       a structure that gives all the parameters of the population
@@ -18,6 +18,8 @@
 %       .E_i        Reversal potential of inhibitory synapses
 %       .adapt      Adaptation current jump
 %       .tau_a      Adaptation time constant
+%       .t_ref      Refractory period
+%       .delta_T    Threshold softness
 %
 %                   SYNAPTIC WEIGHT (what are the units?)
 %       .Wee        E->E synapse weight
@@ -35,7 +37,7 @@
 %   'showfig'       (optional) show the figure? (default:true)
 %
 %--------------------------------------------------------------------------
-function [SimValues] = AdLIFfunction(PopParams,TimeParams,varargin)
+function [SimValues] = RK4AdLIFfunction(PopParams,TimeParams,varargin)
 
 %--------------------------------------------------------------------------
 %Parse optional inputs
@@ -52,7 +54,7 @@ IPopNum     = PopParams.IPopNum;    %Number of excitatory neurons
 PopNum      = EPopNum + IPopNum;    %Number of all neurons
 
 SimTime     = TimeParams.SimTime;   %Simulation Time (ms)
-dt          = TimeParams.dt;         %differential (ms)
+dt          = TimeParams.dt;        %differential (ms)
 
 %Calculate time vector from time parameters
 TimeSpace   = [0:dt:SimTime];       %Time Space
@@ -75,13 +77,13 @@ Iconnect = EPopNum+1:PopNum;
 %NOTE: I have adjusted this be such that presynaptic neurons are columns and
 %postsynaptic neurons are rows.
 
-Wee = PopParams.Wee; 
+Wee = PopParams.Wee;
 Pee = PopParams.Pee;
 %1/root N scaling a la sompolinsky (may not be appropriate here...)
 EE_mat(Econnect,Econnect) = Wee.*rand(EPopNum)<=Pee;  
 EE_mat(diag(diag(true(size(EE_mat)))))=0; %Remove selfconnections
 
-Wii = PopParams.Wii; 
+Wii = PopParams.Wii;
 Pii = PopParams.Pii;
 %1/root N scaling a la sompolinsky (may not be appropriate here...)
 II_mat(Iconnect,Iconnect) = Wii.*rand(IPopNum)<=Pii;  
@@ -93,9 +95,9 @@ Pie = PopParams.Pie;
 IE_mat(Iconnect,Econnect) = Wie.*rand(IPopNum,EPopNum)<=Pie;  
 IE_mat(diag(diag(true(size(IE_mat)))))=0; %Remove selfconnections
 
-Wei = PopParams.Wei;  
+Wei = PopParams.Wei;
 Pei = PopParams.Pei;
-%1/root N scaling a la sompolinsky (may not be appropriate here...) 
+%1/root N scaling a la sompolinsky (may not be appropriate here...)
 EI_mat(Econnect,Iconnect) = Wei.*rand(EPopNum,IPopNum)<=Pei;  
 EI_mat(diag(diag(true(size(EI_mat)))))=0; %Remove selfconnections
 
@@ -108,6 +110,8 @@ C           = PopParams.C;       %capacitance (nF)
 I_e         = PopParams.I_e;     %current (nA)
 V_th        = PopParams.V_th;    %spike threshhold (mV)
 V_reset     = PopParams.V_reset; %reset value (mV)
+t_ref       = PopParams.t_ref;   %refractory period (ms)
+delta_T     = PopParams.delta_T; %threshhold softness
 
 %--------------------------------------------------------------------------
 %Excitatory Synapse Parameters
@@ -116,19 +120,18 @@ E_e         = PopParams.E_e;     %Excitatory reversal potential
 
 %--------------------------------------------------------------------------
 %Inhibitory Synapse Parameters
-tau_i       = PopParams.tau_i; %time constance of inhibitory synapse (ms)
-E_i         = PopParams.E_i;   %Inhibitory reversal potential
+tau_i       = PopParams.tau_i;   %time constance of inhibitory synapse (ms)
+E_i         = PopParams.E_i;     %Inhibitory reversal potential
 
 %--------------------------------------------------------------------------
 %Adaptation
 adapt = PopParams.adapt;    %Threshhold adaptation (parameter b)
 tau_a = PopParams.tau_a;    %adaptation time constant
 
-
-%% The Simulation Loop
+%% Variables
 %--------------------------------------------------------------------------
 %Simulation Variables
-V           = zeros(PopNum,TimeLength); %Membrane Potential
+v           = zeros(PopNum,TimeLength); %Membrane Potential
 
 a_e         = zeros(PopNum,TimeLength); %a term of alpha synapse
 b_e         = zeros(PopNum,TimeLength); %b term of alpha synapse
@@ -140,76 +143,139 @@ g_i         = zeros(PopNum,TimeLength); %conductance of synapse
 
 a           = zeros(PopNum,TimeLength); %adaptation 
 
+tperiod = 10.*ones(PopNum,1);
+
 spikes = [];
 
 %--------------------------------------------------------------------------
 %Initial Conditions
 V0range = [V_reset V_th+10];
-V(:,1) =  randi(V0range,[PopNum,1]);
+v(:,1) =  randi(V0range,[PopNum,1]);
 
+%% Differential Equations
 
-for t=1:TimeLength-1
+syms V A A_e B_e A_i B_i G_e G_i
 
-%forward euler method 
+dV(V,G_e,G_i,A) = - g_L.*(V-E_L)./C - G_e.*(V-E_e)./C - G_i.*(V-E_i)./C - A./C + 10000./C;
+dA(A) = - A./tau_a;
 
-%differential   prior value    LIF Equation                   excitatory synapse           inhibitory synapse            adaptation   current
-V(:,t+1)        = V(:,t)        + (-g_L.*(V(:,t) - E_L)./C   + -g_e(:,t).*(V(:,t)-E_e)./C  + -g_i(:,t).*(V(:,t)-E_i)./C + -a(:,t)./C + I_e./C).*dt;
+dA_e(A_e) = -A_e;
+dB_e(B_e) = -B_e.*tau_e;
 
-%--------------------------------------------------------------------------
+dA_i(A_i) = -A_i;
+dB_i(B_i) = -B_i.*tau_i;
 
-%alpha synapses, excitatory
-a_e(:,t+1)      = a_e(:,t)      + -a_e(:,t).*dt./tau_e;
-b_e(:,t+1)      = b_e(:,t)      + -b_e(:,t).*dt;
+%%
 
-%conductance term
-g_e(:,t+1)      = (a_e(:,t) - b_e(:,t)).*dt;
-
-%--------------------------------------------------------------------------
-
-%alpha synapses, inhibitory
-a_i(:,t+1)      = a_i(:,t)      + -a_i(:,t).*dt./tau_i;
-b_i(:,t+1)      = b_i(:,t)      + -b_i(:,t).*dt;
-
-%conductance term
-g_i(:,t+1)      = (a_i(:,t) - b_i(:,t)).*dt;
+for n=1:TimeLength-1
 
 %--------------------------------------------------------------------------
-
-%adaptation
-a(:,t+1)        = a(:,t)   + -a(:,t).*dt./tau_a;
-
-%--------------------------------------------------------------------------
-
-if any(V(:,t) > V_th)  %If any neurons have spiked in the timestep, 
-                       %initiate synaptic effects and adjust Vm
-    spikeneurons = find(V(:,t) > V_th);
     
-    %Record the spike times and neuron identity of spikers
-    spikes = [spikes; [TimeSpace(t).*ones(size(spikeneurons)),spikeneurons]];
+v1 = dV(v(:,n),g_e(:,n),g_i(:,n),a(:,n));
+v2 = dV(v(:,n) + v1.*dt./2,g_e(:,n) + v1.*dt./2,g_i(:,n) + v1.*dt./2,a(:,n) + v1.*dt./2);
+v3 = dV(v(:,n) + v2.*dt./2,g_e(:,n) + v2.*dt./2,g_i(:,n) + v2.*dt./2,a(:,n) + v2.*dt./2);
+v4 = dV(v(:,n) + v3.*dt,g_e(:,n) + v3.*dt,g_i(:,n) + v3.*dt,a(:,n) + v3.*dt);
 
-    %V(:,t)     = V_spike;
-    V(spikeneurons,t+1)   = V_reset; %only reset the neurons that spiked
+v(:,n+1) = v(:,n) + dt./6.*(v1 + 2.*v2 + 2.*v3 + v4);
 
-    %excitory synapse - postsynaptic effects
-    a_e(:,t+1)  = a_e(:,t+1) + sum(EE_mat(:,spikeneurons),2);
-    b_e(:,t+1)  = b_e(:,t+1) + sum(EE_mat(:,spikeneurons),2);
+%--------------------------------------------------------------------------
 
-    a_e(:,t+1)  = a_e(:,t+1) + sum(IE_mat(:,spikeneurons),2);
-    b_e(:,t+1)  = b_e(:,t+1) + sum(IE_mat(:,spikeneurons),2);
+a1 = dA(a(:,n));
+a2 = dA(a(:,n) + a1.*dt./2);
+a3 = dA(a(:,n) + a2.*dt./2);
+a4 = dA(a(:,n) + a3.*dt);
 
-    %inhibitory synapse
-    a_i(:,t+1)  = a_i(:,t+1) + sum(II_mat(:,spikeneurons),2);
-    b_i(:,t+1)  = b_i(:,t+1) + sum(II_mat(:,spikeneurons),2);
+a(:,n+1) = a(:,n) + dt./6.*(a1 + 2.*a2 + 2.*a3 + a4);
 
-    a_i(:,t+1)  = a_i(:,t+1) + sum(EI_mat(:,spikeneurons),2);
-    b_i(:,t+1)  = b_i(:,t+1) + sum(EI_mat(:,spikeneurons),2);
+%--------------------------------------------------------------------------
 
-    %adaptation
-    a(spikeneurons,t+1)    = a(spikeneurons,t+1)   + adapt;
+a_e1 = dA_e(a_e(:,n));
+a_e2 = dA_e(a_e(:,n) + a_e1.*dt./2);
+a_e3 = dA_e(a_e(:,n) + a_e2.*dt./2);
+a_e4 = dA_e(a_e(:,n) + a_e3.*dt);
+
+a_e(:,n+1) = a_e(:,n) + dt./6.*(a_e1 + 2.*a_e2 + 2.*a_e3 + a_e4);
+
+%--------------------------------------------------------------------------
+
+b_e1 = dB_e(b_e(:,n));
+b_e2 = dB_e(b_e(:,n) + b_e1.*dt./2);
+b_e3 = dB_e(b_e(:,n) + b_e2.*dt./2);
+b_e4 = dB_e(b_e(:,n) + b_e3.*dt);
+
+b_e(:,n+1) = b_e(:,n) + dt./6.*(b_e1 + 2.*b_e2 + 2.*b_e3 + b_e4);
+
+%--------------------------------------------------------------------------
+
+a_i1 = dA_i(a_i(:,n));
+a_i2 = dA_i(a_i(:,n) + a_i1.*dt./2);
+a_i3 = dA_i(a_i(:,n) + a_i2.*dt./2);
+a_i4 = dA_i(a_i(:,n) + a_i3.*dt);
+
+a_i(:,n+1) = a_i(:,n) + dt./6.*(a_i1 + 2.*a_i2 + 2.*a_i3 + a_i4);
+
+%--------------------------------------------------------------------------
+
+b_i1 = dB_i(b_i(:,n));
+b_i2 = dB_i(b_i(:,n) + b_i1.*dt./2);
+b_i3 = dB_i(b_i(:,n) + b_i2.*dt./2);
+b_i4 = dB_i(b_i(:,n) + b_i3.*dt);
+
+b_i(:,n+1) = b_i(:,n) + dt./6.*(b_i1 + 2.*b_i2 + 2.*b_i3 + b_i4);
+
+%--------------------------------------------------------------------------
+
+g_e(:,n+1) = g_e(n+1) + (a_e(:,n+1) - b_e(:,n+1));
+g_i(:,n+1) = g_i(n+1) + (a_i(:,n+1) - b_i(:,n+1));
+
+%--------------------------------------------------------------------------
+
+tperiod = tperiod + dt;
+
+%--------------------------------------------------------------------------
+
+if any(exprnd(exp(v(:,n) - V_th)./delta_T) > 1)
+    
+spikeneurons = find(v(:,n) > V_th);
+
+spikes = [spikes; [TimeSpace(n).*ones(size(spikeneurons)),spikeneurons]];
+
+%--------------------------------------------------------------------------
+
+v(spikeneurons,n+1) = E_L;
+
+a(spikeneurons,n+1) = a(spikeneurons,n+1) + adapt;
+
+%--------------------------------------------------------------------------
+
+a_e(:,n+1) = a_e(:,n+1) + sum(EE_mat(:,spikeneurons),2);
+b_e(:,n+1) = b_e(:,n+1) + sum(EE_mat(:,spikeneurons),2);
+
+a_e(:,n+1) = a_e(:,n+1) + sum(IE_mat(:,spikeneurons),2);
+b_e(:,n+1) = b_e(:,n+1) + sum(IE_mat(:,spikeneurons),2);
+
+%--------------------------------------------------------------------------
+
+a_i(:,n+1) = a_i(:,n+1) + sum(II_mat(:,spikeneurons),2);
+b_i(:,n+1) = b_i(:,n+1) + sum(II_mat(:,spikeneurons),2);
+
+a_i(:,n+1) = a_i(:,n+1) + sum(EI_mat(:,spikeneurons),2);
+b_i(:,n+1) = b_i(:,n+1) + sum(EI_mat(:,spikeneurons),2);
+
+%--------------------------------------------------------------------------
+
+tperiod(spikeneurons) = 0;
+
+%--------------------------------------------------------------------------
 
 end
 
-%--------------------------------------------------------------------------
+if any(tperiod <= t_ref)
+
+refractoryneurons = find(tperiod <= t_ref);
+v(refractoryneurons,n+1) = E_L;
+
+end
 
 end
 
@@ -220,13 +286,10 @@ exneuron = randi(PopNum,1);
 exspiketimes = spikes(spikes(:,2)==exneuron,1);
 
 SimValues.TimeSpace       = TimeSpace;
-SimValues.V               = V;
+SimValues.v               = v;
 SimValues.g_e             = g_e;
 SimValues.g_i             = g_i;
 SimValues.spikes          = spikes;
-
-
-
 
 %% Figure
 if SHOWFIG

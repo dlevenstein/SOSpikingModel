@@ -1,3 +1,5 @@
+
+
 PopParams.EPopNum = 500;
 PopParams.IPopNum = 100;
 
@@ -13,22 +15,25 @@ PopParams.tau_i   = 10;
 PopParams.E_i     = -80;
 PopParams.adapt   = 0;
 PopParams.tau_a   = 50;
+PopParams.t_ref   = 0.2;
+PopParams.delta_T = 10;
 
-PopParams.Wee   = 50;
-PopParams.Wii   = 50;
-PopParams.Wie   = 50;
-PopParams.Wei   = 50;
+PopParams.Wee   = 10;
+PopParams.Wii   = 100;
+PopParams.Wie   = 10;
+PopParams.Wei   = 100;
 
 PopParams.Pee   = 0.1;
-PopParams.Pii   = 0.1;
+PopParams.Pii   = 0.5;
 PopParams.Pie   = 0.1;
-PopParams.Pei   = 0.1;
+PopParams.Pei   = 0.5;
 
 TimeParams.dt      = 0.1;
-TimeParams.SimTime = 1000;
+TimeParams.SimTime = 10;
 
-[SimValues] = AdLIFfunction(PopParams,TimeParams,'showfig',true)
+[SimValues] = RK4AdLIFfunction(PopParams,TimeParams,'showfig',true)
+%[SimValues] = AdLIFfunction(PopParams,TimeParams,'showfig',true)
 %%
 figure
-plot(SimValues.TimeSpace,SimValues.V,'k')
-xlabel('Time (ms)');ylabel('Voltage (mV)');title('EI Pop');
+plot(SimValues.spikes(:,1),SimValues.spikes(:,2),'.','MarkerSize',10)
+xlabel('Time (ms)');ylabel('Neuron ID'), title('Raster Plot')
