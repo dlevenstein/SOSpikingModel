@@ -2,8 +2,41 @@
 %by Jonathan Gornet and DLevenstein
 %Last update: 8/25/2017
 
+%INPUTS
+%   PopParams       a structure that gives all the parameters of the population
+%       .EPopNum	Number of excitatory neurons
+%       .IPopNum	Number of inhibitory neurons
+%       .E_L     	Reversal potential of the leak current (i.e. Vrest)
+%       .g_L     	Conductance of the leak current 
+%       .C          Membrane Capacitance
+%       .I_e        Input current to the E population
+%       .V_th       Membrane Threshold
+%       .V_reset    Reset Potential
+%       .tau_e      Time constant of excitatory synapses
+%       .E_e        Reversal potential of excitatory synapses
+%       .tau_i      Time constant of inhibitory synapses
+%       .E_i        Reversal potential of inhibitory synapses
+%       .adapt      Adaptation current jump
+%       .tau_a      Adaptation time constant
+
+%       .Wee        E->E synapse weight
+%       .Wii        I->I synapse weight
+%       .Wie        E->I synapse weight
+%       .Wei        I->E synapse weight
+%   TimeParams
+%       .dt        timestep (ms)
+%       .SimTime   total simulation time (s)
+%   'showfig'       (optional) show the figure? (default:true)
+%
 %--------------------------------------------------------------------------
-function [SimValues] = AdLIFfunction(PopParams,TimeParams)
+function [SimValues] = AdLIFfunction(PopParams,TimeParams,varargin)
+
+%--------------------------------------------------------------------------
+%Parse optional inputs
+p = inputParser;
+addParameter(p,'showfig',true,@islogical)
+parse(p,varargin{:})
+SHOWFIG = p.Results.showfig;
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
@@ -59,7 +92,7 @@ EI_mat(diag(diag(true(size(EI_mat)))))=0; %Remove selfconnections
 %--------------------------------------------------------------------------
 %Simulation Parameters
 %LIF Parameters
-E_L         = PopParams.E_L      %Reversal potential (mV)
+E_L         = PopParams.E_L;      %Reversal potential (mV)
 g_L         = PopParams.g_L;     %conductance (units?)
 C           = PopParams.C;       %capacitance (nF)
 I_e         = PopParams.I_e;     %current (nA)
@@ -137,7 +170,8 @@ a(:,t+1)        = a(:,t)   + -a(:,t).*dt./tau_a;
 
 %--------------------------------------------------------------------------
 
-if any(V(:,t) > V_th)  %Previous code would have implemented spike only if ALL neurons spiked
+if any(V(:,t) > V_th)  %If any neurons have spiked in the timestep, 
+                       %initiate synaptic effects and adjust Vm
     spikeneurons = find(V(:,t) > V_th);
     
     %Record the spike times and neuron identity of spikers
@@ -177,6 +211,15 @@ SimValues.V               = V;
 SimValues.g_e             = g_e;
 SimValues.g_i             = g_i;
 SimValues.spikes          = spikes;
+
+
+
+
+%% Figure
+if SHOWFIG
+figure
+plot(spikes(:,1),spikes(:,2),'k.')
+end
 
 end
 

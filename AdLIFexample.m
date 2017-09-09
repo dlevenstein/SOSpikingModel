@@ -1,5 +1,5 @@
-PopParams.EPopNum = 5;
-PopParams.IPopNum = 5;
+PopParams.EPopNum = 50;
+PopParams.IPopNum = 50;
 
 PopParams.E_L     = -65;
 PopParams.g_L     = 30;
@@ -22,8 +22,8 @@ PopParams.Wei   = 50;
 TimeParams.dt      = 0.1;
 TimeParams.SimTime = 500;
 
-[SimValues] = AdLIFfunction(PopParams,TimeParams)
-
+[SimValues] = AdLIFfunction(PopParams,TimeParams,'showfig',true)
+%%
 figure
 plot(SimValues.TimeSpace,SimValues.V,'k')
 xlabel('Time (ms)');ylabel('Voltage (mV)');title('EI Pop');
