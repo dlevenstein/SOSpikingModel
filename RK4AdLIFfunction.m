@@ -2,8 +2,49 @@
 %by Jonathan Gornet and DLevenstein
 %Last update: 9/8/2017
 
+%INPUTS
+%   PopParams       a structure that gives all the parameters of the population
+%       .EPopNum	Number of excitatory neurons
+%       .IPopNum	Number of inhibitory neurons
+%       .E_L     	Reversal potential of the leak current (i.e. Vrest)
+%       .g_L     	Conductance of the leak current 
+%       .C          Membrane Capacitance
+%       .I_e        Input current to the E population
+%       .V_th       Membrane Threshold
+%       .V_reset    Reset Potential
+%       .tau_e      Time constant of excitatory synapses
+%       .E_e        Reversal potential of excitatory synapses
+%       .tau_i      Time constant of inhibitory synapses
+%       .E_i        Reversal potential of inhibitory synapses
+%       .adapt      Adaptation current jump
+%       .tau_a      Adaptation time constant
+%       .t_ref      Refractory period
+%       .delta_T    Threshold softness
+%
+%                   SYNAPTIC WEIGHT (what are the units?)
+%       .Wee        E->E synapse weight
+%       .Wii        I->I synapse weight
+%       .Wie        E->I synapse weight
+%       .Wei        I->E synapse weight
+%                   CONNECTION PROBABILITY
+%       .Pee        E->E
+%       .Pii        I->I
+%       .Pie        E->I
+%       .Pei        I->E
+%   TimeParams
+%       .dt        timestep (ms)
+%       .SimTime   total simulation time (s)
+%   'showfig'       (optional) show the figure? (default:true)
+%
 %--------------------------------------------------------------------------
-function [SimValues] = RK4AdLIFfunction(PopParams,TimeParams)
+function [SimValues] = RK4AdLIFfunction(PopParams,TimeParams,varargin)
+
+%--------------------------------------------------------------------------
+%Parse optional inputs
+p = inputParser;
+addParameter(p,'showfig',true,@islogical)
+parse(p,varargin{:})
+SHOWFIG = p.Results.showfig;
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
@@ -13,7 +54,7 @@ IPopNum     = PopParams.IPopNum;    %Number of excitatory neurons
 PopNum      = EPopNum + IPopNum;    %Number of all neurons
 
 SimTime     = TimeParams.SimTime;   %Simulation Time (ms)
-dt          = TimeParams.dt;         %differential (ms)
+dt          = TimeParams.dt;        %differential (ms)
 
 %Calculate time vector from time parameters
 TimeSpace   = [0:dt:SimTime];       %Time Space
@@ -36,24 +77,28 @@ Iconnect = EPopNum+1:PopNum;
 %NOTE: I have adjusted this be such that presynaptic neurons are columns and
 %postsynaptic neurons are rows.
 
-Wee = PopParams.Wee;   
+Wee = PopParams.Wee;
+Pee = PopParams.Pee;
 %1/root N scaling a la sompolinsky (may not be appropriate here...)
-EE_mat(Econnect,Econnect) = Wee.*ones(EPopNum)./sqrt(PopNum);  
+EE_mat(Econnect,Econnect) = Wee.*rand(EPopNum)<=Pee;  
 EE_mat(diag(diag(true(size(EE_mat)))))=0; %Remove selfconnections
 
-Wii = PopParams.Wii;   
+Wii = PopParams.Wii;
+Pii = PopParams.Pii;
 %1/root N scaling a la sompolinsky (may not be appropriate here...)
-II_mat(Iconnect,Iconnect) = Wii.*ones(IPopNum)./sqrt(PopNum);  
+II_mat(Iconnect,Iconnect) = Wii.*rand(IPopNum)<=Pii;  
 II_mat(diag(diag(true(size(II_mat)))))=0; %Remove selfconnections
 
 Wie = PopParams.Wie;
+Pie = PopParams.Pie;
 %1/root N scaling a la sompolinsky (may not be appropriate here...)
-IE_mat(Iconnect,Econnect) = Wie.*ones(IPopNum,EPopNum)./sqrt(PopNum);  
+IE_mat(Iconnect,Econnect) = Wie.*rand(IPopNum,EPopNum)<=Pie;  
 IE_mat(diag(diag(true(size(IE_mat)))))=0; %Remove selfconnections
 
-Wei = PopParams.Wei;   
+Wei = PopParams.Wei;
+Pei = PopParams.Pei;
 %1/root N scaling a la sompolinsky (may not be appropriate here...)
-EI_mat(Econnect,Iconnect) = Wei.*ones(EPopNum,IPopNum)./sqrt(PopNum);  
+EI_mat(Econnect,Iconnect) = Wei.*rand(EPopNum,IPopNum)<=Pei;  
 EI_mat(diag(diag(true(size(EI_mat)))))=0; %Remove selfconnections
 
 %--------------------------------------------------------------------------
@@ -245,6 +290,12 @@ SimValues.v               = v;
 SimValues.g_e             = g_e;
 SimValues.g_i             = g_i;
 SimValues.spikes          = spikes;
+
+%% Figure
+if SHOWFIG
+figure
+plot(spikes(:,1),spikes(:,2),'k.')
+end
 
 end
 
