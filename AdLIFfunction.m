@@ -18,11 +18,17 @@
 %       .E_i        Reversal potential of inhibitory synapses
 %       .adapt      Adaptation current jump
 %       .tau_a      Adaptation time constant
-
+%
+%                   SYNAPTIC WEIGHT (what are the units?)
 %       .Wee        E->E synapse weight
 %       .Wii        I->I synapse weight
 %       .Wie        E->I synapse weight
 %       .Wei        I->E synapse weight
+%                   CONNECTION PROBABILITY
+%       .Pee        E->E
+%       .Pii        I->I
+%       .Pie        E->I
+%       .Pei        I->E
 %   TimeParams
 %       .dt        timestep (ms)
 %       .SimTime   total simulation time (s)
@@ -69,24 +75,28 @@ Iconnect = EPopNum+1:PopNum;
 %NOTE: I have adjusted this be such that presynaptic neurons are columns and
 %postsynaptic neurons are rows.
 
-Wee = PopParams.Wee;   
+Wee = PopParams.Wee; 
+Pee = PopParams.Pee;
 %1/root N scaling a la sompolinsky (may not be appropriate here...)
-EE_mat(Econnect,Econnect) = Wee.*ones(EPopNum)./sqrt(PopNum);  
+EE_mat(Econnect,Econnect) = Wee.*rand(EPopNum)<=Pee;  
 EE_mat(diag(diag(true(size(EE_mat)))))=0; %Remove selfconnections
 
-Wii = PopParams.Wii;   
+Wii = PopParams.Wii; 
+Pii = PopParams.Pii;
 %1/root N scaling a la sompolinsky (may not be appropriate here...)
-II_mat(Iconnect,Iconnect) = Wii.*ones(IPopNum)./sqrt(PopNum);  
+II_mat(Iconnect,Iconnect) = Wii.*rand(IPopNum)<=Pii;  
 II_mat(diag(diag(true(size(II_mat)))))=0; %Remove selfconnections
 
 Wie = PopParams.Wie;
+Pie = PopParams.Pie;
 %1/root N scaling a la sompolinsky (may not be appropriate here...)
-IE_mat(Iconnect,Econnect) = Wie.*ones(IPopNum,EPopNum)./sqrt(PopNum);  
+IE_mat(Iconnect,Econnect) = Wie.*rand(IPopNum,EPopNum)<=Pie;  
 IE_mat(diag(diag(true(size(IE_mat)))))=0; %Remove selfconnections
 
-Wei = PopParams.Wei;   
-%1/root N scaling a la sompolinsky (may not be appropriate here...)
-EI_mat(Econnect,Iconnect) = Wei.*ones(EPopNum,IPopNum)./sqrt(PopNum);  
+Wei = PopParams.Wei;  
+Pei = PopParams.Pei;
+%1/root N scaling a la sompolinsky (may not be appropriate here...) 
+EI_mat(Econnect,Iconnect) = Wei.*rand(EPopNum,IPopNum)<=Pei;  
 EI_mat(diag(diag(true(size(EI_mat)))))=0; %Remove selfconnections
 
 %--------------------------------------------------------------------------
