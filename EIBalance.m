@@ -2,8 +2,6 @@ function [] = EIBalance(i)
 
 x = 0:5:100;
 y = combvec(x,x);
-
-for j=1:length(y)
     
 PopParams.EPopNum = 500;
 PopParams.IPopNum = 100;
@@ -25,19 +23,21 @@ PopParams.delta_T = 10;
 
 PopParams.Wee   = y(1,i);
 PopParams.Wii   = y(2,i);
-PopParams.Wie   = y(1,j);
-PopParams.Wei   = y(2,j);
+PopParams.Wie   = y(1,i);
+PopParams.Wei   = y(2,i);
 
 PopParams.Pee   = 0.1;
 PopParams.Pii   = 0.1;
 PopParams.Pie   = 0.1;
 PopParams.Pei   = 0.1;
 
-TimeParams.dt      = 0.01;
+TimeParams.dt      = 0.1;
 TimeParams.SimTime = 500;
 
-[SimValues] = RK4AdLIFfunction(PopParams,TimeParams,'showfig',false)
+%[SimValues] = FEULERAdLIFfunction(PopParams,TimeParams,'showfig',false)
+[SimValues] = RK2AdLIFfunction(PopParams,TimeParams,'showfig',false)
+%[SimValues] = RK4AdLIFfunction(PopParams,TimeParams,'showfig',false)
 
-csvwrite(['EE_' num2str(z(1,i)) '_II_' num2str(z(2,i)) '_IE_' num2str(z(3,i)) '_EI_' num2str(z(4,i)) '.csv'], SimValues.spikes)
-end
+csvwrite(['EE_' num2str(y(1,i)) '_II_' num2str(y(2,i)) '_IE_' num2str(y(1,i)) '_EI_' num2str(y(2,i)) '.csv'], SimValues.spikes)
+
 end

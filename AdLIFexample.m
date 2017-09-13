@@ -31,7 +31,8 @@ PopParams.Pei   = 0.5;
 TimeParams.dt      = 0.1;
 TimeParams.SimTime = 10;
 
-[SimValues] = RK4AdLIFfunction(PopParams,TimeParams,'showfig',true)
+[SimValues] = RK2AdLIFfunction(PopParams,TimeParams,'showfig',true)
+%[SimValues] = RK4AdLIFfunction(PopParams,TimeParams,'showfig',true)
 %[SimValues] = AdLIFfunction(PopParams,TimeParams,'showfig',true)
 %%
 figure
