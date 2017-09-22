@@ -32,11 +32,9 @@ PopParams.Pie   = 0.1;
 PopParams.Pei   = 0.1;
 
 TimeParams.dt      = 0.1;
-TimeParams.SimTime = 500;
+TimeParams.SimTime = 1000;
 
-%[SimValues] = FEULERAdLIFfunction(PopParams,TimeParams,'showfig',false)
 [SimValues] = RK2AdLIFfunction(PopParams,TimeParams,'showfig',false)
-%[SimValues] = RK4AdLIFfunction(PopParams,TimeParams,'showfig',false)
 
 csvwrite(['EE_' num2str(y(1,i)) '_II_' num2str(y(2,i)) '_IE_' num2str(y(1,i)) '_EI_' num2str(y(2,i)) '.csv'], SimValues.spikes)
 
