@@ -13,11 +13,11 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange )
 %
 %% DEV
 simfunction = @EMAdLIFfunction;
-Irange = [150 600];
+Irange = [150 500];
 numI = 26;
-noiselevel = 0;
+noiselevel = 100;
 
-simtime = 1000; %ms
+simtime = 2000; %ms
 onsettransient = 500; %ms
 
 UPDOWN = false; %if looking for UP/DOWN bistability, simulate with ON and OFF initial conditions
@@ -78,9 +78,13 @@ PopParams.I_e     = Ivals(ii);
 [SimValues(ii)] = simfunction(PopParams,TimeParams,'showfig',false);
 end
 
-%% Calculate Rate
+%% Calculate Rate, Variable distributions
 %rate = zeros(1,numI);
+voltagebins = linspace(PopParams.V_reset,PopParams.V_th,100);
+conductancebins = linspace(0,1,100);
 totaltime = simtime-onsettransient;
+clear voltagedist
+clear adaptdist
 for ii = 1:numI
     afteronsetspikes = SimValues(ii).spikes(:,1)>onsettransient;
     Espikes = ismember(SimValues(ii).spikes(:,2),SimValues(ii).EcellIDX);
@@ -88,6 +92,12 @@ for ii = 1:numI
 
     rate.E(ii) = sum(afteronsetspikes&Espikes)./PopParams.EPopNum./(totaltime./1000); %units: spikes/cell/s
     rate.I(ii) = sum(afteronsetspikes&Ispikes)./PopParams.IPopNum./(totaltime./1000); %units: spikes/cell/s
+    
+    voltagedist.E(:,ii) = hist(SimValues(ii).V(SimValues(ii).EcellIDX,:),voltagebins);
+    voltagedist.I(:,ii) = hist(SimValues(ii).V(SimValues(ii).IcellIDX,:),voltagebins);
+    
+    adaptdist.E(:,ii) = hist(SimValues(ii).g_w(SimValues(ii).EcellIDX,:),conductancebins);
+    adaptdist.I(:,ii) = hist(SimValues(ii).g_w(SimValues(ii).IcellIDX,:),conductancebins);
 end
 
 %% Example Voltage Traces
@@ -104,14 +114,35 @@ for ii = 1:numextraces
 end
 %%
 figure
-subplot(3,2,1)
-plot(Ivals,rate.I,'ro--','markersize',4)
-hold on
-plot(Ivals,rate.E,'ko--','markersize',4)
-legend('I','E','location','northwest')
-xlabel('I (units?)');ylabel('Rate (spks/cell/s)')
-xlim([0 max(Ivals)])
+    subplot(3,2,1)
+        plot(Ivals,rate.I,'ro--','markersize',4)
+        hold on
+        plot(Ivals,rate.E,'ko--','markersize',4)
+        legend('I','E','location','northwest')
+        xlabel('I (units?)');ylabel('Rate (spks/cell/s)')
+        xlim(Ivals([1 end]))
 
+    subplot(6,2,5)
+    imagesc(Ivals,voltagebins,voltagedist.E)
+    axis xy
+    
+    subplot(6,2,7)
+    imagesc(Ivals,voltagebins,voltagedist.I)
+    axis xy
+    
+    subplot(6,2,9)
+    imagesc(Ivals,conductancebins,adaptdist.E)
+    axis xy
+    
+    subplot(6,2,11)
+    imagesc(Ivals,conductancebins,adaptdist.I)
+    axis xy
+
+    
+    
+
+%%
+figure
 for ee = 1:numextraces
 subplot(numextraces,2,ee.*2)
 plot(extime,exampletrace.E(:,ee),'k')
@@ -120,3 +151,8 @@ plot(extime,exampletrace.I(:,ee),'r')
 ylim([PopParams.V_reset PopParams.V_th])
 xlabel('t (ms)');ylabel(['V: ex.cell'])
 end
+
+
+%%
+%distribition/mean of Vm (single cell or pop?), E/I synaptic output, adaptation
+%as function of I
