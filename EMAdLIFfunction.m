@@ -210,12 +210,9 @@ end
 %--------------------------------------------------------------------------
 
 if any(t_r > 0)
-
-refractoryneurons = find(t_r > 0);
-V(refractoryneurons,n+1) = E_L;
-
-t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
-
+refractoryneurons = t_r>0;   %identify any refractory neurons
+V(refractoryneurons,n+1) = V_reset;  %hold their voltage at V_reset
+t_r(refractoryneurons) = t_r(refractoryneurons) - dt; %count down refractory timer
 end
 
 if any(t_s > 0)
