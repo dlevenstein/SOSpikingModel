@@ -112,7 +112,7 @@ for ii = 1:numextraces
     exampletrace.E(:,ii) = SimValues(extraces(ii)).V(excells(1),extimeIDX)';
     exampletrace.I(:,ii) = SimValues(extraces(ii)).V(excells(2),extimeIDX)';
 end
-%%
+%% 
 figure
     subplot(3,2,1)
         plot(Ivals,rate.I,'ro--','markersize',4)
@@ -121,36 +121,36 @@ figure
         legend('I','E','location','northwest')
         xlabel('I (units?)');ylabel('Rate (spks/cell/s)')
         xlim(Ivals([1 end]))
-
     subplot(6,2,5)
-    imagesc(Ivals,voltagebins,voltagedist.E)
-    axis xy
-    
+        imagesc(Ivals,voltagebins,voltagedist.E)
+        axis xy
+        xlabel('I (units?)');ylabel('V (E cells)');    
     subplot(6,2,7)
-    imagesc(Ivals,voltagebins,voltagedist.I)
-    axis xy
-    
+        imagesc(Ivals,voltagebins,voltagedist.I)
+        axis xy
+        xlabel('I (units?)');ylabel('V (I cells)');
     subplot(6,2,9)
-    imagesc(Ivals,conductancebins,adaptdist.E)
-    axis xy
-    
+        imagesc(Ivals,conductancebins,adaptdist.E)
+        axis xy
+        xlabel('I (units?)');ylabel('g_w (E cells)');
     subplot(6,2,11)
-    imagesc(Ivals,conductancebins,adaptdist.I)
-    axis xy
+        imagesc(Ivals,conductancebins,adaptdist.I)
+        axis xy
+        xlabel('I (units?)');ylabel('g_w (I cells)');
 
-    
+    %add synaptic conductance...
     
 
 %%
 figure
-for ee = 1:numextraces
-subplot(numextraces,2,ee.*2)
-plot(extime,exampletrace.E(:,ee),'k')
-hold on
-plot(extime,exampletrace.I(:,ee),'r')
-ylim([PopParams.V_reset PopParams.V_th])
-xlabel('t (ms)');ylabel(['V: ex.cell'])
-end
+    for ee = 1:numextraces
+    subplot(numextraces,2,ee.*2)
+        plot(extime,exampletrace.E(:,ee),'k')
+        hold on
+        plot(extime,exampletrace.I(:,ee),'r')
+        ylim([PopParams.V_reset PopParams.V_th])
+        xlabel('t (ms)');ylabel(['V: ex.cell'])
+    end
 
 
 %%
