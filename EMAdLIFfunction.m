@@ -234,7 +234,7 @@ end
 if any(t_r > 0)
 
 refractoryneurons = find(t_r > 0);
-V(refractoryneurons,n+1) = E_L;
+V(refractoryneurons,n+1) = V_reset;
 
 t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
 
