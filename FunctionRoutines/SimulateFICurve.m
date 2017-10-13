@@ -1,19 +1,23 @@
-function [ output_args ] = SimulateFICurve( simfunction,parms, Irange )
+function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 %
 %INPUTS
-%   simfunction     function name. function must be formatted like XXX
-%   Irange
+%   simfunction     simulation function. function should be passed through 
+%                   as @SimFunctionName. And should have input/output:
+%                   SimValues = simfunction(PopParams,TimeParams)                   
+%   PopParams       population parameters structure to pass through to the
+%                   simulation function
+%   Irange          [min max] input current values
 %
 %
 %% DEV
-simfunction = 'EMAdLIFfunction';
-Irange = [0 1000];
-numI = 21;
+simfunction = @EMAdLIFfunction;
+Irange = [150 600];
+numI = 26;
 noiselevel = 0;
 
-simtime = 4000; %ms
+simtime = 1000; %ms
 onsettransient = 500; %ms
 
 UPDOWN = false; %if looking for UP/DOWN bistability, simulate with ON and OFF initial conditions
@@ -67,30 +71,52 @@ TimeParams.dt      = 0.01;
 TimeParams.SimTime = simtime;
 %% Run the simulations
 Ivals = linspace(Irange(1),Irange(2),numI);
-
+clear SimValues
 for ii = 1:numI
     ii
 PopParams.I_e     = Ivals(ii);
-[SimValues(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+[SimValues(ii)] = simfunction(PopParams,TimeParams,'showfig',false);
 end
 
 %% Calculate Rate
-rate = zeros(1,numI);
+%rate = zeros(1,numI);
 totaltime = simtime-onsettransient;
 for ii = 1:numI
-    usespikes = SimValues(ii).spikes(:,1);
-    usespikes(usespikes<onsettransient) = []; %remove onset transient
-    numspikes(ii) = length(usespikes);
-    rate(ii) = (numspikes(ii)./totaltime).*1000; %units: spikes/s
+    afteronsetspikes = SimValues(ii).spikes(:,1)>onsettransient;
+    Espikes = ismember(SimValues(ii).spikes(:,2),SimValues(ii).EcellIDX);
+    Ispikes = ismember(SimValues(ii).spikes(:,2),SimValues(ii).IcellIDX);
+
+    rate.E(ii) = sum(afteronsetspikes&Espikes)./PopParams.EPopNum./(totaltime./1000); %units: spikes/cell/s
+    rate.I(ii) = sum(afteronsetspikes&Ispikes)./PopParams.IPopNum./(totaltime./1000); %units: spikes/cell/s
 end
 
 %% Example Voltage Traces
-excell = 
-for ii = 1:numI
-    
+numextraces = 5;
+extraces = round(linspace(1,numI,numextraces));
+excells = [randsample(SimValues(1).EcellIDX,1) randsample(SimValues(1).IcellIDX,1)];
+exrange = onsettransient + [0 200]; 
+extimeIDX = SimValues(1).TimeSpace>=exrange(1) & SimValues(1).TimeSpace<=exrange(2);
+extime = SimValues(1).TimeSpace(extimeIDX);
+clear exampletrace
+for ii = 1:numextraces
+    exampletrace.E(:,ii) = SimValues(extraces(ii)).V(excells(1),extimeIDX)';
+    exampletrace.I(:,ii) = SimValues(extraces(ii)).V(excells(2),extimeIDX)';
 end
 %%
 figure
 subplot(3,2,1)
-plot(Ivals,rate,'ko--')
+plot(Ivals,rate.I,'ro--','markersize',4)
+hold on
+plot(Ivals,rate.E,'ko--','markersize',4)
+legend('I','E','location','northwest')
 xlabel('I (units?)');ylabel('Rate (spks/cell/s)')
+xlim([0 max(Ivals)])
+
+for ee = 1:numextraces
+subplot(numextraces,2,ee.*2)
+plot(extime,exampletrace.E(:,ee),'k')
+hold on
+plot(extime,exampletrace.I(:,ee),'r')
+ylim([PopParams.V_reset PopParams.V_th])
+xlabel('t (ms)');ylabel(['V: ex.cell'])
+end
