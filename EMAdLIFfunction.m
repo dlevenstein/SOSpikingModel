@@ -111,7 +111,7 @@ EI_mat(diag(diag(true(size(EI_mat)))))=0; %Remove selfconnections
 E_L         = PopParams.E_L;      %Reversal potential (mV)
 g_L         = PopParams.g_L;     %conductance (units?)
 C           = PopParams.C;       %capacitance (nF)
-I_e         = PopParams.I_e.*ones(PopNum,1);      %current (nA)
+I_e         = PopParams.I_e;%.*ones(PopNum,1);      %current (nA)
 V_th        = PopParams.V_th;    %spike threshhold (mV)
 V_reset     = PopParams.V_reset; %reset value (mV)
 
@@ -179,7 +179,11 @@ for n=1:TimeLength-1
 
 dW_t(:,n) = randn(PopNum,1).*sqrt(dt);
 
-V(:,n+1)   = V(:,n) + (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C  -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C + I_e./C).*dt + sigma.*dW_t(:,n)./C;
+V(:,n+1)   = V(:,n) +...
+    (-g_L.*(V(:,n)-E_L)./C  -g_w(:,n).*(V(:,n)-E_w)./C...
+    -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C...
+                      + I_e./C).*dt...
+    + sigma.*dW_t(:,n)./C;
 
 s(:,n+1)   = s(:,n) + (a_s(:,n).*(1-s(:,n)) - b_s.*s(:,n)).*dt;
 
@@ -206,12 +210,9 @@ end
 %--------------------------------------------------------------------------
 
 if any(t_r > 0)
-
-refractoryneurons = find(t_r > 0);
-V(refractoryneurons,n+1) = E_L;
-
-t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
-
+refractoryneurons = t_r>0;   %identify any refractory neurons
+V(refractoryneurons,n+1) = V_reset;  %hold their voltage at V_reset
+t_r(refractoryneurons) = t_r(refractoryneurons) - dt; %count down refractory timer
 end
 
 if any(t_s > 0)
@@ -259,8 +260,10 @@ SimValues.g_e             = g_e;
 SimValues.g_i             = g_i;
 SimValues.s               = s;
 SimValues.spikes          = spikes;
+SimValues.EcellIDX        = Econnect;
+SimValues.IcellIDX         = Iconnect;
 
-SimValues.noise           = I_e + dW_t;
+SimValues.noise           = I_e + dW_t*sigma;
 
 %% Figure
 if SHOWFIG
