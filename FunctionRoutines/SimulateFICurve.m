@@ -1,4 +1,4 @@
-function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange )
+function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,varargin)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -9,13 +9,15 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange )
 %   PopParams       population parameters structure to pass through to the
 %                   simulation function
 %   Irange          [min max] input current values
+%   (options)
+%   'showfig'       default:true
 %
 %
 %% DEV
 simfunction = @EMAdLIFfunction;
 Irange = [150 500];
 numI = 26;
-noiselevel = 100;
+noiselevel = 200;
 
 simtime = 2000; %ms
 onsettransient = 500; %ms
@@ -62,8 +64,11 @@ PopParams.Pei   = 0.1;
 
 
 
-%[SimValues] = EMAdLIFfunction(PopParams,TimeParams,'showfig',true)
-
+%% Input options
+p = inputParser;
+addParameter(p,'showfig',true,@islogical)
+parse(p,varargin{:})
+SHOWFIG = p.Results.showfig;
 %% Set the parameters
 
 PopParams.noise   = noiselevel;
@@ -113,6 +118,7 @@ for ii = 1:numextraces
     exampletrace.I(:,ii) = SimValues(extraces(ii)).V(excells(2),extimeIDX)';
 end
 %% 
+if SHOWFIG
 figure
     subplot(3,2,1)
         plot(Ivals,rate.I,'ro--','markersize',4)
@@ -138,7 +144,7 @@ figure
         axis xy
         xlabel('I (units?)');ylabel('g_w (I cells)');
 
-    %add synaptic conductance...
+    %add synaptic conductances...
     
 
 %%
@@ -152,7 +158,5 @@ figure
         xlabel('t (ms)');ylabel(['V: ex.cell'])
     end
 
+end
 
-%%
-%distribition/mean of Vm (single cell or pop?), E/I synaptic output, adaptation
-%as function of I
