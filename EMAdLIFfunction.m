@@ -9,7 +9,8 @@
 %       .E_L     	Reversal potential of the leak current (i.e. Vrest)
 %       .g_L     	Conductance of the leak current 
 %       .C          Membrane Capacitance
-%       .I_e        Input current to the E population
+%       .I_e        Input current to the population (constant and same for
+%                                                    all cells.... for now)
 %       .V_th       Membrane Threshold
 %       .V_reset    Reset Potential
 %
@@ -36,7 +37,7 @@
 %       .Wii        I->I synapse weight
 %       .Wie        E->I synapse weight
 %       .Wei        I->E synapse weight
-%                   CONNECTION PROBABILITY
+%                   CONNECTION PROBABILITY (Expected In-Degree)
 %       .Kee        E->E
 %       .Kii        I->I
 %       .Kie        E->I
@@ -126,14 +127,14 @@ EI_mat(diag(diag(true(size(EI_mat)))))=0; %Remove selfconnections
 E_L         = PopParams.E_L;      %Reversal potential (mV)
 g_L         = PopParams.g_L;     %conductance (units?)
 C           = PopParams.C;       %capacitance (nF)
-I_e         = PopParams.I_e.*ones(PopNum,1);      %current (nA)
+I_e         = PopParams.I_e;      %current (nA)
 V_th        = PopParams.V_th;    %spike threshhold (mV)
 V_reset     = PopParams.V_reset; %reset value (mV)
 
 t_ref       = PopParams.t_ref;   %refractory period (ms)
 
 sigma       = PopParams.sigma;   %Standard deviation of noise
-theta       = PopParams.theta;   %Strength to mean
+theta       = PopParams.theta;   %Strength to mean (time scale of noise, ms^-1)
 
 %--------------------------------------------------------------------------
 %Adaptation
@@ -161,6 +162,12 @@ b_s         = PopParams.b_s;     %Synaptic decay (1/ms)
 ds          = PopParams.ds;      %Time synapses are activated (ms)
 
 a           = PopParams.a;
+
+%% Input
+%--------------------------------------------------------------------------
+if isequal(size(I_e),[1 1]);
+    I_e = I_e.*ones(PopNum,TimeLength);
+end
 
 %% Variables
 %--------------------------------------------------------------------------
@@ -201,7 +208,7 @@ for n=1:TimeLength-1
 
 %--------------------------------------------------------------------------
 
-X_t(:,n+1) = X_t(:,n) + -theta.*X_t(:,n) + sigma(:,n).*randn(PopNum,1).*sqrt(dt);
+X_t(:,n+1) = X_t(:,n) + -theta.*X_t(:,n) + sigma.*randn(PopNum,1).*sqrt(dt);
 
 V(:,n+1)   = V(:,n) +...
     (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
@@ -262,7 +269,7 @@ end
 
 %--------------------------------------------------------------------------
 
-g_w(:,n+1) = w(:,n+1);
+g_w(:,n+1) = gwnorm.*w(:,n+1);
 
 g_e(:,n+1) = EE_mat*s(:,n+1);
 g_e(:,n+1) = IE_mat*s(:,n+1);
