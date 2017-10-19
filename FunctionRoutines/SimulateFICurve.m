@@ -17,7 +17,7 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,noiseleve
 simfunction = @EMAdLIFfunction;
 Irange = [150 500];
 numI = 26;
-noiselevel = 50;
+noiselevel = 0;
 
 simtime = 2000; %ms
 onsettransient = 500; %ms
@@ -57,11 +57,16 @@ PopParams.Wii   = 0;
 PopParams.Wie   = 0;
 PopParams.Wei   = 0; 
 
-PopParams.Pee   = 0.1;
-PopParams.Pii   = 0.1;
-PopParams.Pie   = 0.1;
-PopParams.Pei   = 0.1;
+PopParams.Kee   = 0;
+PopParams.Kii   = 0;
+PopParams.Kie   = 0;
+PopParams.Kei   = 0;
 
+PopParams.theta = 1/10;
+
+PopParams.gwnorm = 0;
+
+PopParams.w_r = 0.1;
 
 
 %% Input options
@@ -75,7 +80,7 @@ SHOWFIG = p.Results.showfig;
 end
 %% Set the parameters
 
-PopParams.noise   = noiselevel;
+PopParams.sigma   = noiselevel;
 TimeParams.dt      = 0.01;
 TimeParams.SimTime = simtime;
 %% Run the simulations
@@ -114,8 +119,8 @@ numextraces = 5;
 extraces = round(linspace(1,numI,numextraces));
 excells = [randsample(SimValues(1).EcellIDX,1) randsample(SimValues(1).IcellIDX,1)];
 exrange = onsettransient + [0 200]; 
-extimeIDX = SimValues(1).TimeSpace>=exrange(1) & SimValues(1).TimeSpace<=exrange(2);
-extime = SimValues(1).TimeSpace(extimeIDX);
+extimeIDX = SimValues(1).t>=exrange(1) & SimValues(1).t<=exrange(2);
+extime = SimValues(1).t(extimeIDX);
 clear exampletrace
 for ii = 1:numextraces
     exampletrace.E(:,ii) = SimValues(extraces(ii)).V(excells(1),extimeIDX)';
