@@ -1,6 +1,6 @@
-%AdLIF RK4 
+%AdLIF Euler Mayurama  
 %by Jonathan Gornet and DLevenstein
-%Last update: 9/8/2017
+%Last update: 10/13/2017
 
 %INPUTS
 %   PopParams       a structure that gives all the parameters of the population
@@ -12,14 +12,24 @@
 %       .I_e        Input current to the E population
 %       .V_th       Membrane Threshold
 %       .V_reset    Reset Potential
-%       .tau_e      Time constant of excitatory synapses
+%
+%       .sigma      Standard deviation of noise
+%       .theta      TimeScale of noise
+% 
 %       .E_e        Reversal potential of excitatory synapses
-%       .tau_i      Time constant of inhibitory synapses
 %       .E_i        Reversal potential of inhibitory synapses
-%       .adapt      Adaptation current jump
+%       .a          Synaptic activation strength
+%       .bs         Time of synaptic decay
+%       .ds         Time synapses are activated
+% 
 %       .tau_a      Adaptation time constant
 %       .t_ref      Refractory period
-%       .delta_T    Threshold softness
+%       .delta_T    Adaptation threshold softness
+%       .gwnorm     Adaptation normalizer
+%       .b          Adaptation activation strength
+%       .bw         Time of adaptative decay
+%       .dw         Time adaptation is activated
+%       .w_r        Adaptation Rest
 %
 %                   SYNAPTIC WEIGHT (what are the units?)
 %       .Wee        E->E synapse weight
@@ -27,15 +37,16 @@
 %       .Wie        E->I synapse weight
 %       .Wei        I->E synapse weight
 %                   CONNECTION PROBABILITY
-%       .Pee        E->E
-%       .Pii        I->I
-%       .Pie        E->I
-%       .Pei        I->E
+%       .Kee        E->E
+%       .Kii        I->I
+%       .Kie        E->I
+%       .Kei        I->E
 %   TimeParams
 %       .dt        timestep (ms)
 %       .SimTime   total simulation time (s)
 %   'showfig'       (optional) show the figure? (default:true)
 %
+
 %--------------------------------------------------------------------------
 function [SimValues] = EMAdLIFfunction(PopParams,TimeParams,varargin)
 
@@ -57,8 +68,8 @@ SimTime     = TimeParams.SimTime;   %Simulation Time (ms)
 dt          = TimeParams.dt;        %differential (ms)
 
 %Calculate time vector from time parameters
-TimeSpace   = [0:dt:SimTime];       %Time Space
-TimeLength  = length(TimeSpace);    %Time Steps
+t           = [0:dt:SimTime];       %Time Space
+TimeLength  = length(t);    %Time Steps
 
 %--------------------------------------------------------------------------
 %Weight Matrices
@@ -78,28 +89,32 @@ Iconnect = EPopNum+1:PopNum;
 %postsynaptic neurons are rows.
 
 Wee = PopParams.Wee;
-Pee = PopParams.Pee;
+Kee = PopParams.Kee;
+Pee = Kee./PopNum;
 
 EE_mat(Econnect,Econnect) = rand(EPopNum)<=Pee;
 EE_mat = EE_mat.*Wee;
 EE_mat(diag(diag(true(size(EE_mat)))))=0; %Remove selfconnections
 
 Wii = PopParams.Wii;
-Pii = PopParams.Pii;
+Kii = PopParams.Kii;
+Pii = Kii./PopNum;
 
 II_mat(Iconnect,Iconnect) = rand(IPopNum)<=Pii;
 II_mat = II_mat.*Wii;
 II_mat(diag(diag(true(size(II_mat)))))=0; %Remove selfconnections
 
 Wie = PopParams.Wie;
-Pie = PopParams.Pie;
+Kie = PopParams.Kie;
+Pie = Kie./PopNum;
 
 IE_mat(Iconnect,Econnect) = rand(IPopNum,EPopNum)<=Pie;
 IE_mat = IE_mat.*Wie;
 IE_mat(diag(diag(true(size(IE_mat)))))=0; %Remove selfconnections
 
 Wei = PopParams.Wei;
-Pei = PopParams.Pei;
+Kei = PopParams.Kei;
+Pei = Kei./PopNum;
 
 EI_mat(Econnect,Iconnect) = rand(EPopNum,IPopNum)<=Pei;
 EI_mat = EI_mat.*Wei;
@@ -111,35 +126,41 @@ EI_mat(diag(diag(true(size(EI_mat)))))=0; %Remove selfconnections
 E_L         = PopParams.E_L;      %Reversal potential (mV)
 g_L         = PopParams.g_L;     %conductance (units?)
 C           = PopParams.C;       %capacitance (nF)
-I_e         = PopParams.I_e;%.*ones(PopNum,1);      %current (nA)
+I_e         = PopParams.I_e.*ones(PopNum,1);      %current (nA)
 V_th        = PopParams.V_th;    %spike threshhold (mV)
 V_reset     = PopParams.V_reset; %reset value (mV)
 
 t_ref       = PopParams.t_ref;   %refractory period (ms)
-dw          = PopParams.dw;   
-ds          = PopParams.ds;   
 
-delta_T     = PopParams.delta_T; %threshhold softness
-
-sigma       = PopParams.noise; %noise
+sigma       = PopParams.sigma;   %Standard deviation of noise
+theta       = PopParams.theta;   %Strength to mean
 
 %--------------------------------------------------------------------------
 %Adaptation
-E_w         = PopParams.E_w;     
-b_w         = PopParams.b_w;
+E_w         = PopParams.E_w;     %Adaptation leakage, (mV)
+b_w         = PopParams.b_w;     %Adaptation decay (1/ms)
+
+delta_T     = PopParams.delta_T; %threshhold softness
+dw          = PopParams.dw;      %Time adaptation is activated (ms)
+
+gwnorm      = PopParams.gwnorm;  %Adaptation norm (nS)
+w_r         = PopParams.w_r;     %Adaptation rest
+
+b           = PopParams.b;       %Spike Adaptation (nS)
 
 %--------------------------------------------------------------------------
 %Excitatory Synapse Parameters
-E_e         = PopParams.E_e;     %Excitatory reversal potential
+E_e         = PopParams.E_e;     %Excitatory reversal potential (mV)
 
 %--------------------------------------------------------------------------
 %Inhibitory Synapse Parameters
-E_i         = PopParams.E_i;     %Inhibitory reversal potential
+E_i         = PopParams.E_i;     %Inhibitory reversal potential (mV)
 
 %--------------------------------------------------------------------------
-b_s         = PopParams.b_s;
+b_s         = PopParams.b_s;     %Synaptic decay (1/ms)
+ds          = PopParams.ds;      %Time synapses are activated (ms)
+
 a           = PopParams.a;
-b           = PopParams.b;
 
 %% Variables
 %--------------------------------------------------------------------------
@@ -150,15 +171,16 @@ V            = zeros(PopNum,TimeLength); %Membrane Potential
 g_e          = zeros(PopNum,TimeLength); %conductance of synapse 
 g_i          = zeros(PopNum,TimeLength); %conductance of synapse 
 
-g_w          = zeros(PopNum,TimeLength); %conductance of synapse 
+g_w          = zeros(PopNum,TimeLength); %conductance of adaptation 
 
-a_s          = zeros(PopNum,TimeLength); %adaptation 
-a_w          = zeros(PopNum,TimeLength); %adaptation 
+a_s          = zeros(PopNum,TimeLength); %synaptic rise (1/ms)
+a_w          = zeros(PopNum,TimeLength); %adaptation rise (1/ms)
 
-s            = zeros(PopNum,TimeLength); %adaptation 
-w            = zeros(PopNum,TimeLength);
+s            = zeros(PopNum,TimeLength); %synapse 
+w            = zeros(PopNum,TimeLength); %adaptation
 
-dW_t         = zeros(PopNum,TimeLength);
+X_t          = zeros(PopNum,TimeLength); %OU noise
+dW_t         = zeros(PopNum,TimeLength); %Stochastic Process
 
 t_r = zeros(PopNum,1);
 t_s = zeros(PopNum,1);
@@ -169,7 +191,7 @@ spikes = [];
 %--------------------------------------------------------------------------
 %Initial Conditions
 V0range = [V_reset V_th+10];
-V(:,1) =  randi(V0range,[PopNum,1]);
+V(:,1) =  V_reset + (V_th+10-V_reset).*rand(PopNum,1);
 
 %%
 
@@ -177,19 +199,19 @@ for n=1:TimeLength-1
 
 %--------------------------------------------------------------------------
 
-dW_t(:,n) = randn(PopNum,1).*sqrt(dt);
+X_t(:,n+1) = X_t(:,n) + -theta.*X_t(:,n) + sigma(:,n).*randn(PopNum,1).*sqrt(dt);
 
 V(:,n+1)   = V(:,n) +...
-    (-g_L.*(V(:,n)-E_L)./C  -g_w(:,n).*(V(:,n)-E_w)./C...
-    -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C...
-                      + I_e./C).*dt...
-    + sigma.*dW_t(:,n)./C;
+    (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
+    -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C + ...
+            I_e(:,n)./C).*dt + ...
+    X_t(:,n)./C;
 
 s(:,n+1)   = s(:,n) + (a_s(:,n).*(1-s(:,n)) - b_s.*s(:,n)).*dt;
 
 w(:,n+1)   = w(:,n) + (a_w(:,n).*(1-w(:,n)) - b_w.*w(:,n)).*dt;
 
-a_w(:,n+1) = exp((V(:,n+1)-V_th)./delta_T) + (1./(3.*b_w));
+a_w(:,n+1) = w_r.*b_w./(1 - w_r).*exp((V(:,n+1)-V_reset)./delta_T);
 
 %--------------------------------------------------------------------------
 
@@ -197,7 +219,7 @@ if any(V(:,n) > V_th)
 
 spikeneurons = find(V(:,n+1) > V_th);
 
-spikes = [spikes; [TimeSpace(n).*ones(size(spikeneurons)),spikeneurons]];
+spikes = [spikes; [t(n).*ones(size(spikeneurons)),spikeneurons]];
 
 %--------------------------------------------------------------------------
 
@@ -210,9 +232,12 @@ end
 %--------------------------------------------------------------------------
 
 if any(t_r > 0)
-refractoryneurons = t_r>0;   %identify any refractory neurons
-V(refractoryneurons,n+1) = V_reset;  %hold their voltage at V_reset
-t_r(refractoryneurons) = t_r(refractoryneurons) - dt; %count down refractory timer
+
+refractoryneurons = find(t_r > 0);
+V(refractoryneurons,n+1) = V_reset;
+
+t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
+
 end
 
 if any(t_s > 0)
@@ -247,23 +272,26 @@ g_i(:,n+1) = EI_mat*s(:,n+1);
 
 end
 
+%%
 %Catch for no spiking in simulation error
 if isempty(spikes); spikes = [nan nan]; end
 
 exneuron = randi(PopNum,1);
 exspiketimes = spikes(spikes(:,2)==exneuron,1);
 
-SimValues.TimeSpace       = TimeSpace;
+SimValues.t               = t;
 SimValues.V               = V;
 SimValues.g_w             = g_w;
 SimValues.g_e             = g_e;
 SimValues.g_i             = g_i;
 SimValues.s               = s;
+SimValues.w               = w;
+SimValues.a_w             = a_w;
 SimValues.spikes          = spikes;
 SimValues.EcellIDX        = Econnect;
-SimValues.IcellIDX         = Iconnect;
+SimValues.IcellIDX        = Iconnect;
 
-SimValues.noise           = I_e + dW_t*sigma;
+SimValues.noise           = I_e + X_t;
 
 %% Figure
 if SHOWFIG
@@ -273,6 +301,3 @@ xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
 end
 
 end
-
-
-
