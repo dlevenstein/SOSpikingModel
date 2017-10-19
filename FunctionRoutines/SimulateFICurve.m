@@ -1,4 +1,4 @@
-function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,varargin)
+function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,noiselevel,varargin)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -17,7 +17,7 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,varargin)
 simfunction = @EMAdLIFfunction;
 Irange = [150 500];
 numI = 26;
-noiselevel = 200;
+noiselevel = 50;
 
 simtime = 2000; %ms
 onsettransient = 500; %ms
@@ -65,10 +65,14 @@ PopParams.Pei   = 0.1;
 
 
 %% Input options
+if ~exist('varargin','var')
+    SHOWFIG=true;
+else
 p = inputParser;
 addParameter(p,'showfig',true,@islogical)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
+end
 %% Set the parameters
 
 PopParams.noise   = noiselevel;
@@ -145,6 +149,7 @@ figure
         xlabel('I (units?)');ylabel('g_w (I cells)');
 
     %add synaptic conductances...
+    %add noise etc parm text in figure
     
 
 %%

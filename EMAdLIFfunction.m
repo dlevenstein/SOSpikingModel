@@ -1,4 +1,4 @@
-%AdLIF Euler Mayurama  
+%Conductance-Based Addapting LIF Model, Euler Mayurama   implementation 
 %by Jonathan Gornet and DLevenstein
 %Last update: 10/13/2017
 
@@ -173,6 +173,7 @@ g_i          = zeros(PopNum,TimeLength); %conductance of synapse
 
 g_w          = zeros(PopNum,TimeLength); %conductance of adaptation 
 
+
 a_s          = zeros(PopNum,TimeLength); %synaptic rise (1/ms)
 a_w          = zeros(PopNum,TimeLength); %adaptation rise (1/ms)
 
@@ -181,6 +182,7 @@ w            = zeros(PopNum,TimeLength); %adaptation
 
 X_t          = zeros(PopNum,TimeLength); %OU noise
 dW_t         = zeros(PopNum,TimeLength); %Stochastic Process
+
 
 t_r = zeros(PopNum,1);
 t_s = zeros(PopNum,1);
