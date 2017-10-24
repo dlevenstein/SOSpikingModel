@@ -57,16 +57,18 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,vara
 %varargin = {};
 
 %% Input options
+figvalidation = @(x) @islogical || @isstring;
+
 p = inputParser;
 addParameter(p,'showfig',true,@islogical)
-addParameter(p,'bistableramp',true,@islogical)
+addParameter(p,'bistableramp',false,@islogical)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
-RAMP = p.Results.showfig;
+RAMP = p.Results.bistableramp;
 
 
-if ~RAMP
-    error('''bistableramp'' option is not yet functional... sorry :(')
+if RAMP
+    error('''bistableramp'' option is not yet functional... sorry :''(')
 end
 %% Set the parameters
 simtime = 2000; %put as input option...
@@ -120,7 +122,7 @@ end
 numextraces = 5;
 extraces = round(linspace(1,numI,numextraces));
 excells = [randsample(SimValues(1).EcellIDX,1) randsample(SimValues(1).IcellIDX,1)];
-exrange = onsettransient + [0 200]; 
+exrange = onsettransient + [0 300]; 
 extimeIDX = SimValues(1).t>=exrange(1) & SimValues(1).t<=exrange(2);
 extime = SimValues(1).t(extimeIDX);
 clear exampletrace
@@ -172,23 +174,22 @@ figure
     %add synaptic conductances...
     %add noise etc parm text in figure
     
-    
+    vmin = min([PopParams.V_reset,PopParams.E_i,PopParams.E_L,PopParams.E_w]);
     for ee = 1:numextraces
     subplot(numextraces,2,(ee.*2))
         plot(extime,exampletrace.E(:,ee),'color',Ecolor(end/2,:))
         hold on
         plot(extime,exampletrace.I(:,ee),'color',Icolor(end/2,:))
-        ylim([PopParams.V_reset PopParams.V_th])
-        xlabel('t (ms)');ylabel(['V: ex.cell'])
+        ylim([vmin PopParams.V_th])
+        xlabel('t (ms)');ylabel(['I = ',num2str(Ivals(extraces(ee)))])
         
         if ee==1
-            title('Example Traces')
+            title('V: Example Traces')
         end
     end
 
 
-%%
-figure
-
 end
 
+
+end
