@@ -9,7 +9,7 @@ addpath(genpath(repopath))
 
 %% Define the Population Parameters to feed the FI Cuve function
 
-PopParams.sigma = 50;
+PopParams.sigma = 10;
 
 %
 PopParams.EPopNum = 5;

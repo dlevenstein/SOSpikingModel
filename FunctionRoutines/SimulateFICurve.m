@@ -97,18 +97,26 @@ for ii = 1:numI
     rate.I(ii) = sum(afteronsetspikes&Ispikes)./PopParams.IPopNum./(totaltime./1000); %units: spikes/cell/s
     %Add rate distribution here
     
-    voltagedist.E(:,ii) = hist(SimValues(ii).V(SimValues(ii).EcellIDX,:),voltagebins);
+    %Calculating Voltage stats
+    allcellsvoltage.E = reshape(SimValues(ii).V(SimValues(ii).EcellIDX,:),1,[]);
+    allcellsvoltage.I = reshape(SimValues(ii).V(SimValues(ii).IcellIDX,:),1,[]);
+    voltagedist.E(:,ii) = hist(allcellsvoltage.E,voltagebins);
     voltagedist.E(:,ii) = voltagedist.E(:,ii)./max(voltagedist.E(:,ii));
-    voltagedist.I(:,ii) = hist(SimValues(ii).V(SimValues(ii).IcellIDX,:),voltagebins);
+    voltagedist.I(:,ii) = hist(allcellsvoltage.I,voltagebins);
     voltagedist.I(:,ii) = voltagedist.I(:,ii)./max(voltagedist.I(:,ii));
-    voltagemean.E(ii) = mean(SimValues(ii).V(SimValues(ii).EcellIDX,:));
-    voltagemean.I(ii) = mean(SimValues(ii).V(SimValues(ii).IcellIDX,:));
+    voltagemean.E(ii) = mean(allcellsvoltage.E);
+    voltagemean.I(ii) = mean(allcellsvoltage.I);
     
-    adaptdist.E(:,ii) = hist(SimValues(ii).g_w(SimValues(ii).EcellIDX,:),conductancebins);
-    adaptdist.I(:,ii) = hist(SimValues(ii).g_w(SimValues(ii).IcellIDX,:),conductancebins);
+    %Calculating Adaptation stats
+    allcellsadaptation.E = reshape(SimValues(ii).g_w(SimValues(ii).EcellIDX,:),1,[]);
+    allcellsadaptation.I = reshape(SimValues(ii).g_w(SimValues(ii).IcellIDX,:),1,[]);
+    adaptdist.E(:,ii) = hist(allcellsadaptation.E,conductancebins);
+    adaptdist.I(:,ii) = hist(allcellsadaptation.I,conductancebins);
+    adaptmean.E(ii) = mean(allcellsadaptation.E);
+    adaptmean.I(ii) = mean(allcellsadaptation.I);
 end
 
-%% Example Voltage Traces
+%% Example Voltage Tracess
 numextraces = 5;
 extraces = round(linspace(1,numI,numextraces));
 excells = [randsample(SimValues(1).EcellIDX,1) randsample(SimValues(1).IcellIDX,1)];
@@ -125,6 +133,7 @@ if SHOWFIG
     
 Ecolor = makeColorMap([1 1 1],[0 0.5 0],[0 0 0]);
 Icolor = makeColorMap([1 1 1],[0.8 0 0],[0 0 0]);
+adaptcolor = makeColorMap([1 1 1],[0 0 0.8],[0 0 0]);
     
 figure
     subplot(3,2,1)
@@ -135,27 +144,30 @@ figure
         xlabel('I (units?)');ylabel('Rate (spks/cell/s)')
         xlim(Ivals([1 end]))
     subplot(6,2,5)
-        imagesc(Ivals,voltagebins,voltagedist.E)
-        hold on
-        plot(Ivals,voltagemean.E,'o--','color',Ecolor(end/2,:),'markersize',4)
-        colormap(gca,Ecolor)
-        axis xy
-        xlabel('I (units?)');ylabel('V (E cells)');    
-    subplot(6,2,7)
         imagesc(Ivals,voltagebins,voltagedist.I)
         hold on
         plot(Ivals,voltagemean.I,'o--','color',Icolor(end/2,:),'markersize',4)
         colormap(gca,Icolor)
         axis xy
         xlabel('I (units?)');ylabel('V (I cells)');
+    subplot(6,2,7)
+        imagesc(Ivals,voltagebins,voltagedist.E)
+        hold on
+        plot(Ivals,voltagemean.E,'o--','color',Ecolor(end/2,:),'markersize',4)
+        colormap(gca,Ecolor)
+        axis xy
+        xlabel('I (units?)');ylabel('V (E cells)');    
     subplot(6,2,9)
         imagesc(Ivals,conductancebins,adaptdist.E)
+        hold on
+        plot(Ivals,adaptmean.E,'o--','color',adaptcolor(end/2,:),'markersize',4)
         axis xy
+        colormap(gca,adaptcolor)
         xlabel('I (units?)');ylabel('g_w (E cells)');
-    subplot(6,2,11)
-        imagesc(Ivals,conductancebins,adaptdist.I)
-        axis xy
-        xlabel('I (units?)');ylabel('g_w (I cells)');
+%     subplot(6,2,11)
+%         imagesc(Ivals,conductancebins,adaptdist.I)
+%         axis xy
+%         xlabel('I (units?)');ylabel('g_w (I cells)');
 
     %add synaptic conductances...
     %add noise etc parm text in figure
@@ -168,6 +180,10 @@ figure
         plot(extime,exampletrace.I(:,ee),'color',Icolor(end/2,:))
         ylim([PopParams.V_reset PopParams.V_th])
         xlabel('t (ms)');ylabel(['V: ex.cell'])
+        
+        if ee==1
+            title('Example Traces')
+        end
     end
 
 
