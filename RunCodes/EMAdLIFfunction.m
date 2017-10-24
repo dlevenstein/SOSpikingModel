@@ -79,8 +79,8 @@ II_mat = zeros(PopNum);
 IE_mat = zeros(PopNum);
 EI_mat = zeros(PopNum);
 
-Econnect = 1:EPopNum;
-Iconnect = EPopNum+1:PopNum;
+Ecells = 1:EPopNum;             EcellIDX = ismember(1:PopNum,Ecells);
+Icells = EPopNum+1:PopNum;      IcellIDX = ismember(1:PopNum,Icells);
 
 %Here we assign four 2x2 matrices of matrix (tensor?). There are positive values on the locations where there are connections.
 %For example, there are values for the EE connections on the 1x1 matrix, II
@@ -93,7 +93,7 @@ Wee = PopParams.Wee;
 Kee = PopParams.Kee;
 Pee = Kee./PopNum;
 
-EE_mat(Econnect,Econnect) = rand(EPopNum)<=Pee;
+EE_mat(Ecells,Ecells) = rand(EPopNum)<=Pee;
 EE_mat = EE_mat.*Wee;
 EE_mat(diag(diag(true(size(EE_mat)))))=0; %Remove selfconnections
 
@@ -101,7 +101,7 @@ Wii = PopParams.Wii;
 Kii = PopParams.Kii;
 Pii = Kii./PopNum;
 
-II_mat(Iconnect,Iconnect) = rand(IPopNum)<=Pii;
+II_mat(Icells,Icells) = rand(IPopNum)<=Pii;
 II_mat = II_mat.*Wii;
 II_mat(diag(diag(true(size(II_mat)))))=0; %Remove selfconnections
 
@@ -109,7 +109,7 @@ Wie = PopParams.Wie;
 Kie = PopParams.Kie;
 Pie = Kie./PopNum;
 
-IE_mat(Iconnect,Econnect) = rand(IPopNum,EPopNum)<=Pie;
+IE_mat(Icells,Ecells) = rand(IPopNum,EPopNum)<=Pie;
 IE_mat = IE_mat.*Wie;
 IE_mat(diag(diag(true(size(IE_mat)))))=0; %Remove selfconnections
 
@@ -117,7 +117,7 @@ Wei = PopParams.Wei;
 Kei = PopParams.Kei;
 Pei = Kei./PopNum;
 
-EI_mat(Econnect,Iconnect) = rand(EPopNum,IPopNum)<=Pei;
+EI_mat(Ecells,Icells) = rand(EPopNum,IPopNum)<=Pei;
 EI_mat = EI_mat.*Wei;
 EI_mat(diag(diag(true(size(EI_mat)))))=0; %Remove selfconnections
 
@@ -269,7 +269,7 @@ end
 
 %--------------------------------------------------------------------------
 
-g_w(:,n+1) = gwnorm.*w(:,n+1);
+g_w(:,n+1) = EcellIDX.*gwnorm.*w(:,n+1);
 
 g_e(:,n+1) = EE_mat*s(:,n+1);
 g_e(:,n+1) = IE_mat*s(:,n+1);
@@ -297,8 +297,8 @@ SimValues.s               = s;
 SimValues.w               = w;
 SimValues.a_w             = a_w;
 SimValues.spikes          = spikes;
-SimValues.EcellIDX        = Econnect;
-SimValues.IcellIDX        = Iconnect;
+SimValues.EcellIDX        = Ecells;
+SimValues.IcellIDX        = Icells;
 
 SimValues.noise           = I_e + X_t;
 
