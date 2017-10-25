@@ -151,7 +151,7 @@ figure
         hold on
         plot(Ivals,rate.E,'o--','color',Ecolor(end/2,:),'markersize',4)
         legend('I','E','location','northwest')
-        xlabel('I (units?)');ylabel('Rate (spks/cell/s)')
+        xlabel('I (pA)');ylabel('Rate (spks/cell/s)')
         xlim(Ivals([1 end]))
     subplot(6,2,5)
         imagesc(Ivals,voltagebins,voltagedist.I)
@@ -159,14 +159,14 @@ figure
         plot(Ivals,voltagemean.I,'o--','color',Icolor(end/2,:),'markersize',4)
         colormap(gca,Icolor)
         axis xy
-        xlabel('I (units?)');ylabel('V (I cells)');
+        xlabel('I (pA)');ylabel('V (I cells)');
     subplot(6,2,7)
         imagesc(Ivals,voltagebins,voltagedist.E)
         hold on
         plot(Ivals,voltagemean.E,'o--','color',Ecolor(end/2,:),'markersize',4)
         colormap(gca,Ecolor)
         axis xy
-        xlabel('I (units?)');ylabel('V (E cells)');    
+        xlabel('I (pA)');ylabel('V (E cells)');    
     subplot(6,2,9)
         imagesc(Ivals,conductancebins,adaptdist.E)
         hold on

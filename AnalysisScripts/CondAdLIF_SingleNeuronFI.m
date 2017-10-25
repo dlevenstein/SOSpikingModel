@@ -4,7 +4,9 @@
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
-repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+
+%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
 addpath(genpath(repopath))
 
 figfolder = [repopath,'/Figures'];
@@ -21,8 +23,8 @@ PopParams.IPopNum = 1;
 
 %Neuron properties
 PopParams.E_L     = -65;    %rev potential: leak (mV)
-PopParams.g_L     = 30;     %leak conductance (nS?)
-PopParams.C       = 281;    %capacitanve (pF?)
+PopParams.g_L     = 30;     %leak conductance (nS)
+PopParams.C       = 281;    %capacitance (pF)
 PopParams.V_th    = -55;    %spike threshold (mV)
 PopParams.V_reset = -85;    %reset potential (mV)
 PopParams.t_ref   = 0.2;    %refractory period (ms)
