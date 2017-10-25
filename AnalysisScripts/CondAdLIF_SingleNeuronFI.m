@@ -7,7 +7,7 @@
 repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
 addpath(genpath(repopath))
 
-figfolder = repopath
+figfolder = [repopath,'/Figures'];
 
 %% Define the Population Parameters to feed the FI Cuve function
 
@@ -55,8 +55,15 @@ PopParams.Kei   = 0;        %Expected I->E In Degree
 
 
 
-%% Run the FI Curve function
+%% Run the FI Curve function to calculate single neuron FI curves
 simfunction = @EMAdLIFfunction;
 Irange = [150 450];
 numI = 26;
-[ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI);
+[ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
+    'showfig','CondAdLIF_NoNoise','figfolder',figfolder);
+
+%% Run the FI curve function for low and high magnitutes of noise
+
+
+%% Summary plot: overlay the F-I curves for 3 representative magnitudes of noise (none low high)
+

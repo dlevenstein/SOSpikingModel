@@ -10,10 +10,12 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,vara
 %                   simulation function
 %   Irange          [min max] input current values
 %   (options)
-%   'showfig'       (true/false) default:true
+%   'showfig'       (true/false) default:true.  can also  pass through 
+%                   string to name the figure
+%   'figfolder'     name of folder to save the figure
 %   'bistableramp'  (true/false) an option to calculate FI curve with
 %                   increasing and decreasing input ramps, to test for
-%                   bistability/histeresis
+%                   bistability/histeresis (NOT YET FUNCTIONAL)
 %
 %
 
@@ -57,15 +59,21 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,vara
 %varargin = {};
 
 %% Input options
-figvalidation = @(x) @islogical || @isstring;
+figvalidation = @(x) islogical(x) || ischar(x);
 
 p = inputParser;
-addParameter(p,'showfig',true,@islogical)
+addParameter(p,'showfig',true,figvalidation)
+addParameter(p,'figfolder',[],@ischar)
 addParameter(p,'bistableramp',false,@islogical)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
+figfolder = p.Results.figfolder;
 RAMP = p.Results.bistableramp;
 
+if ischar(SHOWFIG)
+    figname=SHOWFIG;
+    SHOWFIG=true;
+end
 
 if RAMP
     error('''bistableramp'' option is not yet functional... sorry :''(')
@@ -188,6 +196,9 @@ figure
         end
     end
 
+if ~isempty(figfolder)
+    NiceSave('FICurve',figfolder,figname)
+end
 
 end
 
