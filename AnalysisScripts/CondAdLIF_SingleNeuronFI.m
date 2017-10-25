@@ -63,7 +63,12 @@ numI = 26;
     'showfig','CondAdLIF_NoNoise','figfolder',figfolder);
 
 %% Run the FI curve function for low and high magnitutes of noise
-
+%Jonathan: please run the FI curve function for two valules 
+%for noise here, one low and one high (find two good illustrative values)
 
 %% Summary plot: overlay the F-I curves for 3 representative magnitudes of noise (none low high)
-
+%Jonathan: please make a summary figure here that shows the input-output
+%functions for all three valules of noise (none,low,high) on the same plot.
+%Combine this with the saved figures showing Vm distirbutions and possibly
+%some example traces to make a final summary figure we can discuss with
+%John!
