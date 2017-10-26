@@ -202,39 +202,113 @@ spikes = [];
 V0range = [V_reset V_th+10];
 V(:,1) =  V_reset + (V_th+10-V_reset).*rand(PopNum,1);
 
+%% EI Parameter Adjustments
+
+if length(E_L) == 2 
+E_L         = [E_L(1).*ones(1,EPopNum),     E_L(2).*ones(1,EPopNum)];
+end
+if length(g_L) == 2 
+g_L         = [g_L(1).*ones(1,EPopNum),     g_L(2).*ones(1,EPopNum)];
+end
+if length(C) == 2 
+C           = [C(1).*ones(1,EPopNum),       C(2).*ones(1,EPopNum)];
+end
+if length(I_e) == 2 
+I_e         = [I_e(1).*ones(1,EPopNum),     I_e(2).*ones(1,EPopNum)];
+end
+if length(V_th) == 2 
+V_th        = [V_th(1).*ones(1,EPopNum),    V_th(2).*ones(1,EPopNum)];
+end
+if length(V_reset) == 2 
+V_reset     = [V_reset(1).*ones(1,EPopNum), V_reset(2).*ones(1,EPopNum)];
+end
+if length(t_ref) == 2 
+t_ref       = [t_ref(1).*ones(1,EPopNum),   t_ref(2).*ones(1,EPopNum)];
+end
+if length(sigma) == 2 
+sigma       = [sigma(1).*ones(1,EPopNum),   sigma(2).*ones(1,EPopNum)];
+end
+if length(theta) == 2 
+theta       = [theta(1).*ones(1,EPopNum),   theta(2).*ones(1,EPopNum)];
+end
+
+if length(E_w) == 2 
+E_w         = [E_w(1).*ones(1,EPopNum),     E_w(2).*ones(1,EPopNum)];
+end
+if length(b_w) == 2 
+b_w         = [b_w(1).*ones(1,EPopNum),     b_w(2).*ones(1,EPopNum)];
+end
+if length(delta_T) == 2 
+delta_T     = [delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,EPopNum)];
+end
+if length(dw) == 2 
+dw          = [dw(1).*ones(1,EPopNum),      dw(2).*ones(1,EPopNum)];
+end
+if length(gwnorm) == 2 
+gwnorm      = [gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,EPopNum)];
+end
+if length(w_r) == 2 
+w_r         = [w_r(1).*ones(1,EPopNum),     w_r(2).*ones(1,EPopNum)];
+end
+if length(b) == 2 
+b           = [b(1).*ones(1,EPopNum),       b(2).*ones(1,EPopNum)];
+end
+if length(b_s) == 2 
+b_s         = [b_s(1).*ones(1,EPopNum),     b_s(2).*ones(1,EPopNum)];
+end
+if length(ds) == 2 
+ds          = [ds(1).*ones(1,EPopNum),      ds(2).*ones(1,EPopNum)];
+end
+if length(a) == 2 
+a           = [a(1).*ones(1,EPopNum),       a(2).*ones(1,EPopNum)];
+end
 %%
 
 for n=1:TimeLength-1
 
 %--------------------------------------------------------------------------
 
-X_t(:,n+1) = X_t(:,n) + -theta.*X_t(:,n) + sigma.*randn(PopNum,1).*sqrt(dt);
+X_t(:,n+1) = X_t(:,n) + -theta(:).*X_t(:,n).*dt + sigma(:).*randn(PopNum,1).*sqrt(dt);
 
 V(:,n+1)   = V(:,n) +...
-    (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
-    -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C + ...
-            I_e(:,n)./C).*dt + ...
-    X_t(:,n)./C;
+    (-g_L(:).*(V(:,n)-E_L(:))./C(:) -g_w(:,n).*(V(:,n)-E_w(:))./C(:) ...
+    -g_e(:,n).*(V(:,n)-E_e)./C(:) -g_i(:,n).*(V(:,n)-E_i)./C(:) + ...
+            I_e(:,n)./C(:)).*dt + ...
+    X_t(:,n)./C(:);
 
-s(:,n+1)   = s(:,n) + (a_s(:,n).*(1-s(:,n)) - b_s.*s(:,n)).*dt;
+s(:,n+1)   = s(:,n) + (a_s(:,n).*(1-s(:,n)) - b_s(:).*s(:,n)).*dt;
 
-w(:,n+1)   = w(:,n) + (a_w(:,n).*(1-w(:,n)) - b_w.*w(:,n)).*dt;
+w(:,n+1)   = w(:,n) + (a_w(:,n).*(1-w(:,n)) - b_w(:).*w(:,n)).*dt;
 
-a_w(:,n+1) = w_r.*b_w./(1 - w_r).*exp((V(:,n+1)-V_reset)./delta_T);
+a_w(:,n+1) = w_r(:).*b_w(:)./(1 - w_r(:)).*exp((V(:,n+1)-V_reset(:))./delta_T(:));
 
 %--------------------------------------------------------------------------
 
 if any(V(:,n) > V_th)
 
-spikeneurons = find(V(:,n+1) > V_th);
+spikeneurons = find(V(:,n+1) > V_th(:));
 
 spikes = [spikes; [t(n).*ones(size(spikeneurons)),spikeneurons]];
 
 %--------------------------------------------------------------------------
 
+if length(t_ref) > 1
+t_r(spikeneurons) = t_ref(spikeneurons);
+else
 t_r(spikeneurons) = t_ref;
+end
+
+if length(dw) > 1
+t_w(spikeneurons) = dw(spikeneurons);
+else
 t_w(spikeneurons) = dw;
-t_s(spikeneurons) = ds;
+end
+
+if length(ds) > 1
+t_s(spikeneurons) = ds(spikeneurons);
+else
+t_s(spikeneurons) = ds;    
+end
 
 end
 
@@ -243,8 +317,12 @@ end
 if any(t_r > 0)
 
 refractoryneurons = find(t_r > 0);
+if length(V_reset) > 1
+V(refractoryneurons,n+1) = V_reset(refractoryneurons);
+else
 V(refractoryneurons,n+1) = V_reset;
-
+end
+    
 t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
 
 end
@@ -252,7 +330,11 @@ end
 if any(t_s > 0)
 
 synneurons = find(t_s > 0);
+if length(a) > 1
+a_s(synneurons,n+1) = a(synneurons);
+else
 a_s(synneurons,n+1) = a;
+end
 
 t_s(synneurons) = t_s(synneurons) - dt;
 
@@ -261,7 +343,11 @@ end
 if any(t_w > 0)
 
 adaptneurons = find(t_w > 0);
+if length(b) > 1
+a_w(adaptneurons,n+1) = b(adaptneurons);
+else
 a_w(adaptneurons,n+1) = b;
+end
 
 t_w(adaptneurons) = t_w(adaptneurons) - dt;
 
@@ -269,7 +355,7 @@ end
 
 %--------------------------------------------------------------------------
 
-g_w(:,n+1) = EcellIDX'.*gwnorm.*w(:,n+1);
+g_w(:,n+1) = EcellIDX'.*gwnorm(:).*w(:,n+1);
 
 g_e(:,n+1) = EE_mat*s(:,n+1);
 g_e(:,n+1) = IE_mat*s(:,n+1);
@@ -297,7 +383,7 @@ SimValues.s               = s;
 SimValues.w               = w;
 SimValues.a_w             = a_w;
 SimValues.spikes          = spikes;
-SimValues.EcellIDX        = Ecells;
+SimValues.EcellIDX        = EcellIDX;
 SimValues.IcellIDX        = Icells;
 
 SimValues.noise           = I_e + X_t;
