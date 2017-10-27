@@ -69,7 +69,7 @@ numI = 26;
 %for noise here, one low and one high (find two good illustrative values)
 
 %Input Noise
-PopParams.sigma = 0.01;       %niose magnitude: variance
+PopParams.sigma = 0.1;       %niose magnitude: variance
 PopParams.theta = 1/10;     %noise time scale (1/ms)
 
 simfunction = @EMAdLIFfunction;
@@ -80,7 +80,7 @@ numI = 26;
 
 %%
 %Input Noise
-PopParams.sigma = 0.1;      %niose magnitude: variance
+PopParams.sigma = 0.3;      %niose magnitude: variance
 PopParams.theta = 1/10;     %noise time scale (1/ms)
 
 simfunction = @EMAdLIFfunction;
@@ -104,15 +104,15 @@ plot(Ivals,rate.I,'o--','color',Icolor(end/2,:),'markersize',4)
 hold on
 plot(Ivals,rate.E,'o--','color',Ecolor(end/2,:),'markersize',4)
 hold on
-plot(Ivals,rate_low.I,'o--','color',Icolor(end/2,:),'markersize',4)
+plot(Ivals,rate_low.I,'-.','color',Icolor(end/2,:),'markersize',4)
 hold on
-plot(Ivals,rate_low.E,'o--','color',Ecolor(end/2,:),'markersize',4)
+plot(Ivals,rate_low.E,'-.','color',Ecolor(end/2,:),'markersize',4)
 hold on
-plot(Ivals,rate_high.I,'o--','color',Icolor(end/2,:),'markersize',4)
+plot(Ivals,rate_high.I,':','color',Icolor(end/2,:),'markersize',4)
 hold on
-plot(Ivals,rate_high.E,'o--','color',Ecolor(end/2,:),'markersize',4)
-%legend('I','E','location','northwest')
-xlabel('I (pA)');ylabel('Rate (spks/cell/s)');title('Sigma: 5')
+plot(Ivals,rate_high.E,':','color',Ecolor(end/2,:),'markersize',4)
+legend('I: No Noise','E: No Noise','I: 0.1','E: 0.1','I: 0.3','E: 0.3','location','northwest')
+xlabel('I (pA)');ylabel('Rate (spks/cell/s)');title('FI Comparisons')
 xlim(Ivals([1 end]))
 
 NiceSave('FI_Comparisons',figfolder,[]);
