@@ -130,6 +130,8 @@ end
 numextraces = 5;
 extraces = round(linspace(1,numI,numextraces));
 excells = [randsample(SimValues(1).EcellIDX,1) randsample(SimValues(1).IcellIDX,1)];
+if length(SimValues(1).EcellIDX)==1; excells(1)=SimValues(1).EcellIDX; end
+if length(SimValues(1).IcellIDX)==1; excells(1)=SimValues(1).IcellIDX; end
 exrange = onsettransient + [0 300]; 
 extimeIDX = SimValues(1).t>=exrange(1) & SimValues(1).t<=exrange(2);
 extime = SimValues(1).t(extimeIDX);
@@ -138,7 +140,7 @@ for ii = 1:numextraces
     exampletrace.E(:,ii) = SimValues(extraces(ii)).V(excells(1),extimeIDX)';
     exampletrace.I(:,ii) = SimValues(extraces(ii)).V(excells(2),extimeIDX)';
 end
-%% 
+%% Figure
 if SHOWFIG
     
 Ecolor = makeColorMap([1 1 1],[0 0.5 0],[0 0 0]);
@@ -164,6 +166,7 @@ figure
         imagesc(Ivals,voltagebins,voltagedist.E)
         hold on
         plot(Ivals,voltagemean.E,'o--','color',Ecolor(end/2,:),'markersize',4)
+        plot(Ivals(extraces),min(voltagebins),'k^')
         colormap(gca,Ecolor)
         axis xy
         xlabel('I (pA)');ylabel('V (E cells)');    
@@ -189,7 +192,7 @@ figure
         hold on
         plot(extime,exampletrace.I(:,ee),'color',Icolor(end/2,:))
         ylim([vmin PopParams.V_th])
-        xlabel('t (ms)');ylabel(['I = ',num2str(Ivals(extraces(ee)))])
+        xlabel('t (ms)');ylabel({['I = ',num2str(Ivals(extraces(ee)))],'V_m'})
         
         if ee==1
             title('V: Example Traces')
