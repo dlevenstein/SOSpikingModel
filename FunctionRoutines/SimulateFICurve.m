@@ -79,7 +79,7 @@ if RAMP
     error('''bistableramp'' option is not yet functional... sorry :''(')
 end
 %% Set the parameters
-simtime = 2000; %put as input option...
+simtime = 5000; %put as input option...
 onsettransient = 500; %Onset transient to ignore
 TimeParams.dt      = 0.01;
 TimeParams.SimTime = simtime;
@@ -128,7 +128,8 @@ end
 
 %% Example Voltage Tracess
 numextraces = 5;
-extraces = round(linspace(1,numI,numextraces));
+extraces = round(linspace((0.5./numextraces).*numI,...
+    ((numextraces-0.5)./numextraces).*numI,numextraces));
 excells = [randsample(SimValues(1).EcellIDX,1) randsample(SimValues(1).IcellIDX,1)];
 if length(SimValues(1).EcellIDX)==1; excells(1)=SimValues(1).EcellIDX; end
 if length(SimValues(1).IcellIDX)==1; excells(1)=SimValues(1).IcellIDX; end
@@ -166,7 +167,7 @@ figure
         imagesc(Ivals,voltagebins,voltagedist.E)
         hold on
         plot(Ivals,voltagemean.E,'o--','color',Ecolor(end/2,:),'markersize',4)
-        plot(Ivals(extraces),min(voltagebins),'k^')
+        plot(Ivals(extraces),min(voltagebins),'k^','markersize',2)
         colormap(gca,Ecolor)
         axis xy
         xlabel('I (pA)');ylabel('V (E cells)');    
@@ -192,7 +193,8 @@ figure
         hold on
         plot(extime,exampletrace.I(:,ee),'color',Icolor(end/2,:))
         ylim([vmin PopParams.V_th])
-        xlabel('t (ms)');ylabel({['I = ',num2str(Ivals(extraces(ee)))],'V_m'})
+        xlabel('t (ms)');
+        ylabel({['I = ',num2str(round(Ivals(extraces(ee))))],'V_m'})
         
         if ee==1
             title('V: Example Traces')

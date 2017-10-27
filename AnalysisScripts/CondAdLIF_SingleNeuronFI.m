@@ -5,8 +5,8 @@
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
+repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
 addpath(genpath(repopath))
 
 figfolder = [repopath,'/Figures'];
@@ -18,8 +18,8 @@ PopParams.sigma = 0;        %niose magnitude: variance
 PopParams.theta = 1/10;     %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 1;
-PopParams.IPopNum = 1;
+PopParams.EPopNum = 20;
+PopParams.IPopNum = 20;
 
 %Neuron properties
 PopParams.E_L     = -65;    %rev potential: leak (mV)
@@ -59,14 +59,15 @@ PopParams.Kei   = 0;        %Expected I->E In Degree
 
 %% Run the FI Curve function to calculate single neuron FI curves
 simfunction = @EMAdLIFfunction;
-Irange = [150 450];
-numI = 26;
-[ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
-    'showfig','CondAdLIF_NoNoise','figfolder',figfolder);
+Irange = [150 400];
+numI = 31;
 
-%% Run the FI curve function for low and high magnitutes of noise
-%Jonathan: please run the FI curve function for two valules 
-%for noise here, one low and one high (find two good illustrative values)
+sigvals = [0 5 10 15];
+for ss = 1:length(sigvals)
+PopParams.sigma = sigvals(ss); 
+[ Ivals,rate(ss) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
+    'showfig',['CondAdLIF_Sig',num2str(sigvals(ss))],'figfolder',figfolder);
+end
 
 %% Summary plot: overlay the F-I curves for 3 representative magnitudes of noise (none low high)
 %Jonathan: please make a summary figure here that shows the input-output
@@ -74,3 +75,17 @@ numI = 26;
 %Combine this with the saved figures showing Vm distirbutions and possibly
 %some example traces to make a final summary figure we can discuss with
 %John!
+
+figure
+subplot(3,2,1)
+hold on
+for ss=1:length(sigvals)
+    plot(Ivals,rate(ss).E,'ko:','markersize',3,'linewidth',1)
+end
+NiceSave('AllFICurve',figfolder,[])
+
+%% Spike-frequency Adaptation
+
+
+
+%% Subthreshold Adaptation
