@@ -162,7 +162,8 @@ figure
         plot(Ivals,voltagemean.I,'o--','color',Icolor(end/2,:),'markersize',4)
         colormap(gca,Icolor)
         axis xy
-        xlabel('I (pA)');ylabel('V (I cells)');
+        %xlabel('I (pA)');
+        ylabel('V (I cells)');
     subplot(6,2,7)
         imagesc(Ivals,voltagebins,voltagedist.E)
         hold on
@@ -170,7 +171,8 @@ figure
         plot(Ivals(extraces),min(voltagebins),'k^','markersize',2)
         colormap(gca,Ecolor)
         axis xy
-        xlabel('I (pA)');ylabel('V (E cells)');    
+        %xlabel('I (pA)');
+        ylabel('V (E cells)');    
     subplot(6,2,9)
         imagesc(Ivals,conductancebins,adaptdist.E)
         hold on
