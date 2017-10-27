@@ -61,30 +61,44 @@ PopParams.Kei   = 0;        %Expected I->E In Degree
 simfunction = @EMAdLIFfunction;
 
 Irange = [150 400];
-numI = 31;
+numI = 35;
 
-%Simulate FI for 4 levels of noise
-sigvals = [0 10];
+%Simulate FI for 3 levels of noise
+sigvals = [0 10 20];
+%sigvals = [10];
 for ss = 1:length(sigvals)
 PopParams.sigma = sigvals(ss); 
-[ Ivals,rate(ss) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
+[ Ivals,rate(ss),voltagemean(ss) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
     'showfig',['CondAdLIF_Sig',num2str(sigvals(ss))],'figfolder',figfolder);
 end
 
 
 
-%% Summary plot: overlay the F-I curves for 3 representative magnitudes of noise (none low high)
-%Jonathan: please make a summary figure here that shows the input-output
-%functions for all three valules of noise (none,low,high) on the same plot.
-%Combine this with the saved figures showing Vm distirbutions and possibly
-%some example traces to make a final summary figure we can discuss with
-%John!
+%% Summary plot
 
 figure
 subplot(3,2,1)
 hold on
 for ss=1:length(sigvals)
     plot(Ivals,rate(ss).E,'ko:','markersize',3,'linewidth',1)
+end
+
+subplot(3,2,2)
+hold on
+for ss=1:length(sigvals)
+    plot(Ivals,rate(ss).I,'ko:','markersize',3,'linewidth',1)
+end
+
+subplot(3,2,3)
+hold on
+for ss=1:length(sigvals)
+    plot(Ivals,voltagemean(ss).E,'ko:','markersize',3,'linewidth',1)
+end
+
+subplot(3,2,4)
+hold on
+for ss=1:length(sigvals)
+    plot(Ivals,voltagemean(ss).I,'ko:','markersize',3,'linewidth',1)
 end
 NiceSave('AllFICurve',figfolder,[])
 
