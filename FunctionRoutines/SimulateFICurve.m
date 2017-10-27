@@ -16,6 +16,9 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,vara
 %   'bistableramp'  (true/false) an option to calculate FI curve with
 %                   increasing and decreasing input ramps, to test for
 %                   bistability/histeresis (NOT YET FUNCTIONAL)
+%   'timeparms'     a structure giving timing params for the simulations
+%                 .simtime          Duration to simulate 
+%                 .onsettransient   Onset transient to ignore
 %
 %
 
@@ -59,16 +62,21 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,vara
 %varargin = {};
 
 %% Input options
+defaulttimeparms.simtime = 4000; %ms, time to simulate each "trial"
+defaulttimeparms.onsettransient = 500; %ms, onsiet transient time to ignore
 figvalidation = @(x) islogical(x) || ischar(x);
+
 
 p = inputParser;
 addParameter(p,'showfig',true,figvalidation)
 addParameter(p,'figfolder',[],@ischar)
 addParameter(p,'bistableramp',false,@islogical)
+addParameter(p,'timeparms',defaulttimeparms,@isstruct)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 figfolder = p.Results.figfolder;
 RAMP = p.Results.bistableramp;
+timeparms = p.Results.timeparms;
 
 if ischar(SHOWFIG)
     figname=SHOWFIG;
@@ -79,10 +87,9 @@ if RAMP
     error('''bistableramp'' option is not yet functional... sorry :''(')
 end
 %% Set the parameters
-simtime = 5000; %put as input option...
-onsettransient = 500; %Onset transient to ignore
+onsettransient = timeparms.onsettransient; %Onset transient to ignore
 TimeParams.dt      = 0.01;
-TimeParams.SimTime = simtime;
+TimeParams.SimTime = timeparms.simtime;
 %% Run the simulations
 Ivals = linspace(Irange(1),Irange(2),numI);
 clear SimValues

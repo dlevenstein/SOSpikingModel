@@ -18,8 +18,8 @@ PopParams.sigma = 0;        %niose magnitude: variance
 PopParams.theta = 1/10;     %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 20;
-PopParams.IPopNum = 20;
+PopParams.EPopNum = 10;
+PopParams.IPopNum = 10;
 
 %Neuron properties
 PopParams.E_L     = -65;    %rev potential: leak (mV)
@@ -59,15 +59,19 @@ PopParams.Kei   = 0;        %Expected I->E In Degree
 
 %% Run the FI Curve function to calculate single neuron FI curves
 simfunction = @EMAdLIFfunction;
+
 Irange = [150 400];
 numI = 31;
 
-sigvals = [0 5 10 15];
+%Simulate FI for 4 levels of noise
+sigvals = [0 10];
 for ss = 1:length(sigvals)
 PopParams.sigma = sigvals(ss); 
 [ Ivals,rate(ss) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
     'showfig',['CondAdLIF_Sig',num2str(sigvals(ss))],'figfolder',figfolder);
 end
+
+
 
 %% Summary plot: overlay the F-I curves for 3 representative magnitudes of noise (none low high)
 %Jonathan: please make a summary figure here that shows the input-output
@@ -84,8 +88,44 @@ for ss=1:length(sigvals)
 end
 NiceSave('AllFICurve',figfolder,[])
 
-%% Spike-frequency Adaptation
+%%
+Ecolor = makeColorMap([1 1 1],[0 0.5 0],[0 0 0]);
+Icolor = makeColorMap([1 1 1],[0.8 0 0],[0 0 0]);
+
+figure
+plot(Ivals,rate.I,'o--','color',Icolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,rate.E,'o--','color',Ecolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,rate_low.I,'-.','color',Icolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,rate_low.E,'-.','color',Ecolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,rate_high.I,':','color',Icolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,rate_high.E,':','color',Ecolor(end/2,:),'markersize',4)
+legend('I: No Noise','E: No Noise','I: 0.1','E: 0.1','I: 0.3','E: 0.3','location','northwest')
+xlabel('I (pA)');ylabel('Rate (spks/cell/s)');title('FI Comparisons')
+xlim(Ivals([1 end]))
+
+NiceSave('FI_Comparisons',figfolder,[]);
+
+figure
+plot(Ivals,voltagemean.I,'o--','color',Icolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,voltagemean.E,'o--','color',Ecolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,voltagemean_low.I,'-.','color',Icolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,voltagemean_low.E,'-.','color',Ecolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,voltagemean_high.I,':','color',Icolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,voltagemean_high.E,':','color',Ecolor(end/2,:),'markersize',4)
+legend('I: No Noise','E: No Noise','I: 0.1','E: 0.1','I: 0.3','E: 0.3','location','northwest')
+xlabel('I (pA)');ylabel('Rate (spks/cell/s)');title('Voltage Comparisons')
+xlim(Ivals([1 end]))
+
+NiceSave('Voltage_Comparisons',figfolder,[]);
 
 
-
-%% Subthreshold Adaptation
