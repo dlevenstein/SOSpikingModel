@@ -69,25 +69,25 @@ numI = 26;
 %for noise here, one low and one high (find two good illustrative values)
 
 %Input Noise
-PopParams.sigma = 0.5;       %niose magnitude: variance
+PopParams.sigma = 0.01;       %niose magnitude: variance
 PopParams.theta = 1/10;     %noise time scale (1/ms)
 
 simfunction = @EMAdLIFfunction;
 Irange = [150 450];
 numI = 26;
 [ Ivals,rate_low ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
-    'showfig','CondAdLIF_Low_Noise','figfolder',figfolder);
+    'showfig','CondAdLIF_Low_Noise_001','figfolder',figfolder);
 
 %%
 %Input Noise
-PopParams.sigma = 5;      %niose magnitude: variance
+PopParams.sigma = 0.1;      %niose magnitude: variance
 PopParams.theta = 1/10;     %noise time scale (1/ms)
 
 simfunction = @EMAdLIFfunction;
 Irange = [150 450];
 numI = 26;
 [ Ivals,rate_high ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
-    'showfig','CondAdLIF_High_Noise','figfolder',figfolder);
+    'showfig','CondAdLIF_High_Noise_01','figfolder',figfolder);
 
 %% Summary plot: overlay the F-I curves for 3 representative magnitudes of noise (none low high)
 %Jonathan: please make a summary figure here that shows the input-output
@@ -100,26 +100,19 @@ Ecolor = makeColorMap([1 1 1],[0 0.5 0],[0 0 0]);
 Icolor = makeColorMap([1 1 1],[0.8 0 0],[0 0 0]);
 
 figure
-subplot(3,1,1)
 plot(Ivals,rate.I,'o--','color',Icolor(end/2,:),'markersize',4)
 hold on
 plot(Ivals,rate.E,'o--','color',Ecolor(end/2,:),'markersize',4)
-legend('I','E','location','northwest')
-xlabel('I (pA)');ylabel('Rate (spks/cell/s)');title('Sigma: 0')
-xlim(Ivals([1 end]))
-
-subplot(3,1,2)
+hold on
 plot(Ivals,rate_low.I,'o--','color',Icolor(end/2,:),'markersize',4)
 hold on
 plot(Ivals,rate_low.E,'o--','color',Ecolor(end/2,:),'markersize',4)
-legend('I','E','location','northwest')
-xlabel('I (pA)');ylabel('Rate (spks/cell/s)');title('Sigma: 0.5')
-xlim(Ivals([1 end]))
-
-subplot(3,1,3)
+hold on
 plot(Ivals,rate_high.I,'o--','color',Icolor(end/2,:),'markersize',4)
 hold on
 plot(Ivals,rate_high.E,'o--','color',Ecolor(end/2,:),'markersize',4)
-legend('I','E','location','northwest')
+%legend('I','E','location','northwest')
 xlabel('I (pA)');ylabel('Rate (spks/cell/s)');title('Sigma: 5')
 xlim(Ivals([1 end]))
+
+NiceSave('FI_Comparisons',figfolder,[]);
