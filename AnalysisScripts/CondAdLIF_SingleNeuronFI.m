@@ -61,7 +61,7 @@ PopParams.Kei   = 0;        %Expected I->E In Degree
 simfunction = @EMAdLIFfunction;
 Irange = [150 450];
 numI = 26;
-[ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
+[ Ivals,rate,voltagemean ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
     'showfig','CondAdLIF_NoNoise','figfolder',figfolder);
 
 %% Run the FI curve function for low and high magnitutes of noise
@@ -75,8 +75,8 @@ PopParams.theta = 1/10;     %noise time scale (1/ms)
 simfunction = @EMAdLIFfunction;
 Irange = [150 450];
 numI = 26;
-[ Ivals,rate_low ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
-    'showfig','CondAdLIF_Low_Noise_001','figfolder',figfolder);
+[ Ivals,rate_low,voltagemean_low ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
+    'showfig','CondAdLIF_Low_Noise_01','figfolder',figfolder);
 
 %%
 %Input Noise
@@ -86,8 +86,8 @@ PopParams.theta = 1/10;     %noise time scale (1/ms)
 simfunction = @EMAdLIFfunction;
 Irange = [150 450];
 numI = 26;
-[ Ivals,rate_high ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
-    'showfig','CondAdLIF_High_Noise_01','figfolder',figfolder);
+[ Ivals,rate_high,voltagemean_high ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
+    'showfig','CondAdLIF_High_Noise_03','figfolder',figfolder);
 
 %% Summary plot: overlay the F-I curves for 3 representative magnitudes of noise (none low high)
 %Jonathan: please make a summary figure here that shows the input-output
@@ -116,3 +116,22 @@ xlabel('I (pA)');ylabel('Rate (spks/cell/s)');title('FI Comparisons')
 xlim(Ivals([1 end]))
 
 NiceSave('FI_Comparisons',figfolder,[]);
+
+figure
+plot(Ivals,voltagemean.I,'o--','color',Icolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,voltagemean.E,'o--','color',Ecolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,voltagemean_low.I,'-.','color',Icolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,voltagemean_low.E,'-.','color',Ecolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,voltagemean_high.I,':','color',Icolor(end/2,:),'markersize',4)
+hold on
+plot(Ivals,voltagemean_high.E,':','color',Ecolor(end/2,:),'markersize',4)
+legend('I: No Noise','E: No Noise','I: 0.1','E: 0.1','I: 0.3','E: 0.3','location','northwest')
+xlabel('I (pA)');ylabel('Rate (spks/cell/s)');title('Voltage Comparisons')
+xlim(Ivals([1 end]))
+
+NiceSave('Voltage_Comparisons',figfolder,[]);
+
