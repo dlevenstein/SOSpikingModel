@@ -189,7 +189,7 @@ figure
         hold on
         plot(extime,exampletrace.I(:,ee),'color',Icolor(end/2,:))
         ylim([vmin PopParams.V_th])
-        xlabel('t (ms)');ylabel(['I = ',num2str(Ivals(extraces(ee)))])
+        xlabel('t (ms)');ylabel({['I = ',num2str(Ivals(extraces(ee)))],'V_m'})
         
         if ee==1
             title('V: Example Traces')
