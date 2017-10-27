@@ -213,8 +213,8 @@ X_t(:,n+1) = X_t(:,n) + -theta.*X_t(:,n) + sigma.*randn(PopNum,1).*sqrt(dt);
 V(:,n+1)   = V(:,n) +...
     (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
     -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C + ...
-            I_e(:,n)./C).*dt + ...
-    X_t(:,n)./C;
+            I_e(:,n)./C + X_t(:,n)./C).*dt + ...
+    ;
 
 s(:,n+1)   = s(:,n) + (a_s(:,n).*(1-s(:,n)) - b_s.*s(:,n)).*dt;
 
@@ -300,7 +300,7 @@ SimValues.spikes          = spikes;
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
 
-SimValues.noise           = I_e + X_t;
+SimValues.Input           = I_e + X_t;
 
 %% Figure
 if SHOWFIG
