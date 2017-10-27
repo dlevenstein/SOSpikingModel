@@ -383,7 +383,7 @@ SimValues.s               = s;
 SimValues.w               = w;
 SimValues.a_w             = a_w;
 SimValues.spikes          = spikes;
-SimValues.EcellIDX        = EcellIDX;
+SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
 
 SimValues.noise           = I_e + X_t;
