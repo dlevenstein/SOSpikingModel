@@ -44,7 +44,7 @@
 %       .Kei        I->E
 %   TimeParams
 %       .dt        timestep (ms)
-%       .SimTime   total simulation time (s)
+%       .SimTime   total simulation time (ms)
 %   'showfig'       (optional) show the figure? (default:true)
 %
 
