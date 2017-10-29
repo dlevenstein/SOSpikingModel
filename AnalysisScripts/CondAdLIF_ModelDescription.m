@@ -63,14 +63,14 @@ sigvals = [0 10 20];
 PopParams.theta = 1/10;
 for ss = 1:length(sigvals)
     PopParams.sigma = sigvals(ss);
-    [SimValues.sigma(ss)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+    [sigmatest.SimValues(ss)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
 end
 
 thetavals = [1 1/10 1/100];
 PopParams.sigma = 10;
 for ss = 1:length(sigvals)
     PopParams.theta = thetavals(ss);
-    [SimValues.theta(ss)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+    [thetatest.SimValues(ss)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
 end
 
 %close all
@@ -81,18 +81,32 @@ end
 
 clear InputStats
 clear VoltageStats
-InputStats.bins = linspace(-200,200,51);
-VoltageStats.bins = linspace(-70,-60,51);
+sigmatest.InputStats.bins = linspace(-200,200,51);
+sigmatest.VoltageStats.bins = linspace(-70,-60,51);
 for ss = 1:length(sigvals)
-    InputStats(ss).hist = hist(SimValues.sigma(ss).Input,InputStats.bins);
-    InputStats(ss).hist = InputStats(:,ss).hist./max(InputStats(ss).hist);
-    InputStats(ss).std = std(SimValues.sigma(ss).Input);
-    [InputStats(ss).fft,InputStats(ss).freqs] =  pwelch(SimValues.sigma(ss).Input,sf,[],[],sf);
+    sigmatest.InputStats(ss).hist = hist(sigmatest.SimValues(ss).Input,sigmatest.InputStats.bins);
+    sigmatest.InputStats(ss).hist = sigmatest.InputStats(:,ss).hist./max(sigmatest.InputStats(ss).hist);
+    sigmatest.InputStats(ss).std = std(sigmatest.SimValues(ss).Input);
+    [sigmatest.InputStats(ss).fft,sigmatest.InputStats(ss).freqs] =  pwelch(sigmatest.SimValues(ss).Input,sf,[],[],sf);
     
-    VoltageStats(ss).hist = hist(SimValues.sigma(ss).V,VoltageStats.bins);
-    VoltageStats(ss).hist = VoltageStats(:,ss).hist./max(VoltageStats(ss).hist);
-    VoltageStats(ss).std = std(SimValues.sigma(ss).V);
-    [VoltageStats(ss).fft,VoltageStats(ss).freqs] = pwelch(SimValues.sigma(ss).V,sf,[],[],sf);
+    sigmatest.VoltageStats(ss).hist = hist(sigmatest.SimValues(ss).V,sigmatest.VoltageStats.bins);
+    sigmatest.VoltageStats(ss).hist = sigmatest.VoltageStats(:,ss).hist./max(sigmatest.VoltageStats(ss).hist);
+    sigmatest.VoltageStats(ss).std = std(sigmatest.SimValues(ss).V);
+    [sigmatest.VoltageStats(ss).fft,sigmatest.VoltageStats(ss).freqs] = pwelch(sigmatest.SimValues(ss).V,sf,[],[],sf);
+end
+
+thetatest.InputStats.bins = linspace(-200,200,51);
+thetatest.VoltageStats.bins = linspace(-70,-60,51);
+for ss = 1:length(sigvals)
+    thetatest.InputStats(ss).hist = hist(thetatest.SimValues(ss).Input,thetatest.InputStats.bins);
+    thetatest.InputStats(ss).hist = thetatest.InputStats(:,ss).hist./max(thetatest.InputStats(ss).hist);
+    thetatest.InputStats(ss).std = std(thetatest.SimValues(ss).Input);
+    [thetatest.InputStats(ss).fft,thetatest.InputStats(ss).freqs] =  pwelch(thetatest.SimValues(ss).Input,sf,[],[],sf);
+    
+    thetatest.VoltageStats(ss).hist = hist(thetatest.SimValues(ss).V,thetatest.VoltageStats.bins);
+    thetatest.VoltageStats(ss).hist = thetatest.VoltageStats(:,ss).hist./max(thetatest.VoltageStats(ss).hist);
+    thetatest.VoltageStats(ss).std = std(thetatest.SimValues(ss).V);
+    [thetatest.VoltageStats(ss).fft,thetatest.VoltageStats(ss).freqs] = pwelch(thetatest.SimValues(ss).V,sf,[],[],sf);
 end
 %%
 noisecolors = [0 0 0; 0.35 0.35 0.35; 0.7 0.7 0.7];
@@ -101,40 +115,84 @@ figure
 subplot(3,4,1:2)
     hold on
     for ss = length(sigvals):-1:1
-        plot(SimValues.sigma(ss).t,SimValues.sigma(ss).Input(1,:),'color',noisecolors(ss,:),'linewidth',1)
+        plot(sigmatest.SimValues(ss).t,sigmatest.SimValues(ss).Input(1,:),'color',noisecolors(ss,:),'linewidth',1)
     end
     xlim(timewin)
 subplot(3,4,3)
 hold on
     for ss = length(sigvals):-1:1
-        bar(InputStats(1).bins,InputStats(ss).hist,'edgecolor',noisecolors(ss,:),'facecolor','w')
+        bar(sigmatest.InputStats(1).bins,sigmatest.InputStats(ss).hist,'edgecolor',noisecolors(ss,:),'facecolor','w')
     end
     axis tight
 subplot(3,4,4)
 hold on
     for ss = length(sigvals):-1:1
-        plot(log10(InputStats(ss).freqs),log10(InputStats(ss).fft),'color',noisecolors(ss,:))
+        plot(log10(sigmatest.InputStats(ss).freqs),log10(sigmatest.InputStats(ss).fft),'color',noisecolors(ss,:))
     end
     axis tight
     LogScale('x',10)
     
-subplot(3,4,5:6)
+subplot(6,4,9:10)
     hold on
     for ss = 1:length(sigvals)
-        plot(SimValues.sigma(ss).t,SimValues.sigma(ss).V(1,:),'color',noisecolors(ss,:),'linewidth',1)
+        plot(sigmatest.SimValues(ss).t,sigmatest.SimValues(ss).V(1,:),'color',noisecolors(ss,:),'linewidth',1)
     end
     xlim(timewin)
-subplot(3,4,7)
+subplot(6,4,11)
 hold on
     for ss = length(sigvals):-1:1
-        bar(VoltageStats(1).bins,VoltageStats(ss).hist,'edgecolor',noisecolors(ss,:),'facecolor','w')
+        bar(sigmatest.VoltageStats(1).bins,sigmatest.VoltageStats(ss).hist,'edgecolor',noisecolors(ss,:),'facecolor','w')
     end
     axis tight
     
-subplot(3,4,8)
+subplot(6,4,12)
 hold on
     for ss = 1:length(sigvals)
-        plot(log10(VoltageStats(ss).freqs),log10(VoltageStats(ss).fft),'color',noisecolors(ss,:))
+        plot(log10(sigmatest.VoltageStats(ss).freqs),log10(sigmatest.VoltageStats(ss).fft),'color',noisecolors(ss,:))
+    end
+    axis tight
+    LogScale('x',10)
+    
+ 
+    
+
+subplot(6,4,[13:14 17:18])
+    hold on
+    for ss = length(thetavals):-1:1
+        plot(thetatest.SimValues(ss).t,thetatest.SimValues(ss).Input(1,:),'color',noisecolors(ss,:),'linewidth',1)
+    end
+    xlim(timewin)
+subplot(6,4,[15 19])
+hold on
+    for ss = length(thetavals):-1:1
+        bar(thetatest.InputStats(1).bins,thetatest.InputStats(ss).hist,'edgecolor',noisecolors(ss,:),'facecolor','w')
+    end
+    axis tight
+subplot(6,4,[16 20])
+hold on
+    for ss = length(thetavals):-1:1
+        plot(log10(thetatest.InputStats(ss).freqs),log10(thetatest.InputStats(ss).fft),'color',noisecolors(ss,:))
+    end
+    axis tight
+    LogScale('x',10)
+    
+subplot(6,4,21:22)
+    hold on
+    for ss = 1:length(thetavals)
+        plot(thetatest.SimValues(ss).t,thetatest.SimValues(ss).V(1,:),'color',noisecolors(ss,:),'linewidth',1)
+    end
+    xlim(timewin)
+subplot(6,4,23)
+hold on
+    for ss = length(thetavals):-1:1
+        bar(thetatest.VoltageStats(1).bins,thetatest.VoltageStats(ss).hist,'edgecolor',noisecolors(ss,:),'facecolor','w')
+    end
+    axis tight
+    
+subplot(6,4,24)
+hold on
+    for ss = 1:length(thetavals)
+        plot(log10(thetatest.VoltageStats(ss).freqs),log10(thetatest.VoltageStats(ss).fft),'color',noisecolors(ss,:))
     end
     axis tight
     LogScale('x',10)
