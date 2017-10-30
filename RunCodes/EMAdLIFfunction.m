@@ -167,6 +167,8 @@ a           = PopParams.a;
 %--------------------------------------------------------------------------
 if isequal(size(I_e),[1 1]);
     I_e = I_e.*ones(PopNum,TimeLength);
+elseif isa(I_e, 'function_handle')  %IN PROGRESS
+    I_e = I_e(t,PopNum);
 end
 
 %% Variables
