@@ -59,7 +59,7 @@ TimeParams.dt      = 0.1;
 TimeParams.SimTime = 50000;
 sf = 1./(TimeParams.dt./1000); %sampling frequency of the simulation (Hz)
 
-sigvals = [0 10 20];
+sigvals = [0 10 20 40];
 PopParams.theta = 1/10;
 for ss = 1:length(sigvals)
     PopParams.sigma = sigvals(ss);
@@ -68,7 +68,7 @@ end
 
 thetavals = [1 1/10 1/100];
 PopParams.sigma = 10;
-for ss = 1:length(sigvals)
+for ss = 1:length(thetavals)
     PopParams.theta = thetavals(ss);
     [thetatest.SimValues(ss)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
 end
@@ -97,7 +97,7 @@ end
 
 thetatest.InputStats.bins = linspace(-200,200,51);
 thetatest.VoltageStats.bins = linspace(-70,-60,51);
-for ss = 1:length(sigvals)
+for ss = 1:length(thetavals)
     thetatest.InputStats(ss).hist = hist(thetatest.SimValues(ss).Input,thetatest.InputStats.bins);
     thetatest.InputStats(ss).hist = thetatest.InputStats(:,ss).hist./max(thetatest.InputStats(ss).hist);
     thetatest.InputStats(ss).std = std(thetatest.SimValues(ss).Input);
@@ -109,7 +109,21 @@ for ss = 1:length(sigvals)
     [thetatest.VoltageStats(ss).fft,thetatest.VoltageStats(ss).freqs] = pwelch(thetatest.SimValues(ss).V,sf,[],[],sf);
 end
 %%
-noisecolors = [0 0 0; 0.35 0.35 0.35; 0.7 0.7 0.7];
+figure
+subplot(2,2,1)
+plot(sigvals,[sigmatest.InputStats.std],'o')
+hold on
+plot([0 100],[0 100],'--')
+xlabel('Sigma');ylabel('Noise Std')
+
+subplot(2,2,2)
+plot(thetavals,[thetatest.InputStats.std],'o')
+hold on
+%plot([0 100],[0 100],'--')
+xlabel('Theta');ylabel('Noise Std')
+
+%%
+noisecolors = [0 0 0; 0.2 0.2 0.2; 0.4 0.4 0.4; 0.6 0.6 0.6];
 timewin = [1000 2000];
 figure
 subplot(3,4,1:2)
