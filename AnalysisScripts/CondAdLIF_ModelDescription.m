@@ -4,8 +4,8 @@
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
+%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
 addpath(genpath(repopath))
 
 figfolder = [repopath,'/Figures'];
@@ -112,7 +112,7 @@ end
 figure
 subplot(2,2,1)
 plot(sigvals,[sigmatest.InputStats.std],'o')
-hold on
+hold on 
 plot([0 100],[0 100],'--')
 xlabel('Sigma');ylabel('Noise Std')
 
@@ -144,7 +144,7 @@ hold on
         plot(log10(sigmatest.InputStats(ss).freqs),log10(sigmatest.InputStats(ss).fft),'color',noisecolors(ss,:))
     end
     axis tight
-    LogScale('x',10)
+    %LogScale('x',10)
     
 subplot(6,4,9:10)
     hold on
@@ -165,7 +165,7 @@ hold on
         plot(log10(sigmatest.VoltageStats(ss).freqs),log10(sigmatest.VoltageStats(ss).fft),'color',noisecolors(ss,:))
     end
     axis tight
-    LogScale('x',10)
+    %LogScale('x',10)
     
  
     
@@ -188,7 +188,7 @@ hold on
         plot(log10(thetatest.InputStats(ss).freqs),log10(thetatest.InputStats(ss).fft),'color',noisecolors(ss,:))
     end
     axis tight
-    LogScale('x',10)
+    %LogScale('x',10)
     
 subplot(6,4,21:22)
     hold on
@@ -209,7 +209,7 @@ hold on
         plot(log10(thetatest.VoltageStats(ss).freqs),log10(thetatest.VoltageStats(ss).fft),'color',noisecolors(ss,:))
     end
     axis tight
-    LogScale('x',10)
+    %LogScale('x',10)
     
     
     
