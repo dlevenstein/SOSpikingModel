@@ -270,7 +270,7 @@ for n=1:TimeLength-1
 
 %--------------------------------------------------------------------------
 
-X_t(:,n+1) = X_t(:,n) + -theta(:).*X_t(:,n).*dt + sigma(:).*randn(PopNum,1).*sqrt(dt);
+X_t(:,n+1) = X_t(:,n) + -theta(:).*X_t(:,n).*dt + sqrt(2.*theta).*sigma(:).*randn(PopNum,1).*sqrt(dt);
 
 V(:,n+1)   = V(:,n) +...
     (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
