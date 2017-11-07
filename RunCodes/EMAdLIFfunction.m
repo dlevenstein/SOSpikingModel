@@ -205,62 +205,62 @@ V(:,1) =  V_reset + (V_th+10-V_reset).*rand(PopNum,1);
 %% EI Parameter Adjustments
 
 if length(E_L) == 2 
-E_L         = [E_L(1).*ones(1,EPopNum),     E_L(2).*ones(1,EPopNum)];
+E_L         = [E_L(1).*ones(1,EPopNum),     E_L(2).*ones(1,IPopNum)];
 end
 if length(g_L) == 2 
-g_L         = [g_L(1).*ones(1,EPopNum),     g_L(2).*ones(1,EPopNum)];
+g_L         = [g_L(1).*ones(1,EPopNum),     g_L(2).*ones(1,IPopNum)];
 end
 if length(C) == 2 
-C           = [C(1).*ones(1,EPopNum),       C(2).*ones(1,EPopNum)];
+C           = [C(1).*ones(1,EPopNum),       C(2).*ones(1,IPopNum)];
 end
 if length(I_e) == 2 
-I_e         = [I_e(1).*ones(1,EPopNum),     I_e(2).*ones(1,EPopNum)];
+I_e         = [I_e(1).*ones(1,EPopNum),     I_e(2).*ones(1,IPopNum)];
 end
 if length(V_th) == 2 
-V_th        = [V_th(1).*ones(1,EPopNum),    V_th(2).*ones(1,EPopNum)];
+V_th        = [V_th(1).*ones(1,EPopNum),    V_th(2).*ones(1,IPopNum)];
 end
 if length(V_reset) == 2 
-V_reset     = [V_reset(1).*ones(1,EPopNum), V_reset(2).*ones(1,EPopNum)];
+V_reset     = [V_reset(1).*ones(1,EPopNum), V_reset(2).*ones(1,IPopNum)];
 end
 if length(t_ref) == 2 
-t_ref       = [t_ref(1).*ones(1,EPopNum),   t_ref(2).*ones(1,EPopNum)];
+t_ref       = [t_ref(1).*ones(1,EPopNum),   t_ref(2).*ones(1,IPopNum)];
 end
 if length(sigma) == 2 
-sigma       = [sigma(1).*ones(1,EPopNum),   sigma(2).*ones(1,EPopNum)];
+sigma       = [sigma(1).*ones(1,EPopNum),   sigma(2).*ones(1,IPopNum)];
 end
 if length(theta) == 2 
-theta       = [theta(1).*ones(1,EPopNum),   theta(2).*ones(1,EPopNum)];
+theta       = [theta(1).*ones(1,EPopNum),   theta(2).*ones(1,IPopNum)];
 end
 
 if length(E_w) == 2 
-E_w         = [E_w(1).*ones(1,EPopNum),     E_w(2).*ones(1,EPopNum)];
+E_w         = [E_w(1).*ones(1,EPopNum),     E_w(2).*ones(1,IPopNum)];
 end
 if length(b_w) == 2 
-b_w         = [b_w(1).*ones(1,EPopNum),     b_w(2).*ones(1,EPopNum)];
+b_w         = [b_w(1).*ones(1,EPopNum),     b_w(2).*ones(1,IPopNum)];
 end
 if length(delta_T) == 2 
-delta_T     = [delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,EPopNum)];
+delta_T     = [delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,IPopNum)];
 end
 if length(dw) == 2 
-dw          = [dw(1).*ones(1,EPopNum),      dw(2).*ones(1,EPopNum)];
+dw          = [dw(1).*ones(1,EPopNum),      dw(2).*ones(1,IPopNum)];
 end
 if length(gwnorm) == 2 
-gwnorm      = [gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,EPopNum)];
+gwnorm      = [gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)];
 end
 if length(w_r) == 2 
-w_r         = [w_r(1).*ones(1,EPopNum),     w_r(2).*ones(1,EPopNum)];
+w_r         = [w_r(1).*ones(1,EPopNum),     w_r(2).*ones(1,IPopNum)];
 end
 if length(b) == 2 
-b           = [b(1).*ones(1,EPopNum),       b(2).*ones(1,EPopNum)];
+b           = [b(1).*ones(1,EPopNum),       b(2).*ones(1,IPopNum)];
 end
 if length(b_s) == 2 
-b_s         = [b_s(1).*ones(1,EPopNum),     b_s(2).*ones(1,EPopNum)];
+b_s         = [b_s(1).*ones(1,EPopNum),     b_s(2).*ones(1,IPopNum)];
 end
 if length(ds) == 2 
-ds          = [ds(1).*ones(1,EPopNum),      ds(2).*ones(1,EPopNum)];
+ds          = [ds(1).*ones(1,EPopNum),      ds(2).*ones(1,IPopNum)];
 end
 if length(a) == 2 
-a           = [a(1).*ones(1,EPopNum),       a(2).*ones(1,EPopNum)];
+a           = [a(1).*ones(1,EPopNum),       a(2).*ones(1,IPopNum)];
 end
 %%
 
@@ -271,10 +271,9 @@ for n=1:TimeLength-1
 X_t(:,n+1) = X_t(:,n) + -theta(:).*X_t(:,n).*dt + sigma(:).*randn(PopNum,1).*sqrt(dt);
 
 V(:,n+1)   = V(:,n) +...
-    (-g_L(:).*(V(:,n)-E_L(:))./C(:) -g_w(:,n).*(V(:,n)-E_w(:))./C(:) ...
-    -g_e(:,n).*(V(:,n)-E_e)./C(:) -g_i(:,n).*(V(:,n)-E_i)./C(:) + ...
-            I_e(:,n)./C(:)).*dt + ...
-    X_t(:,n)./C(:);
+    (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
+    -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C + ...
+            I_e(:,n)./C + X_t(:,n)./C).*dt;
 
 s(:,n+1)   = s(:,n) + (a_s(:,n).*(1-s(:,n)) - b_s(:).*s(:,n)).*dt;
 
@@ -386,7 +385,7 @@ SimValues.spikes          = spikes;
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
 
-SimValues.noise           = I_e + X_t;
+SimValues.Input           = I_e + X_t;
 
 %% Figure
 if SHOWFIG
