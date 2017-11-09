@@ -199,71 +199,72 @@ t_w = zeros(PopNum,1);
 
 spikes = [];
 
-%--------------------------------------------------------------------------
-%Initial Conditions
-V0range = [V_reset V_th+10];
-V(:,1) =  V_reset + (V_th+10-V_reset).*rand(PopNum,1);
-
 %% EI Parameter Adjustments
 
 if length(E_L) == 2 
-E_L         = [E_L(1).*ones(1,EPopNum),     E_L(2).*ones(1,IPopNum)];
+E_L         = transpose([E_L(1).*ones(1,EPopNum),     E_L(2).*ones(1,IPopNum)]);
 end
 if length(g_L) == 2 
-g_L         = [g_L(1).*ones(1,EPopNum),     g_L(2).*ones(1,IPopNum)];
+g_L         = transpose([g_L(1).*ones(1,EPopNum),     g_L(2).*ones(1,IPopNum)]);
 end
 if length(C) == 2 
-C           = [C(1).*ones(1,EPopNum),       C(2).*ones(1,IPopNum)];
+C           = transpose([C(1).*ones(1,EPopNum),       C(2).*ones(1,IPopNum)]);
 end
 if length(I_e) == 2 
-I_e         = [I_e(1).*ones(1,EPopNum),     I_e(2).*ones(1,IPopNum)];
+I_e         = transpose([I_e(1).*ones(1,EPopNum),     I_e(2).*ones(1,IPopNum)]);
 end
 if length(V_th) == 2 
-V_th        = [V_th(1).*ones(1,EPopNum),    V_th(2).*ones(1,IPopNum)];
+V_th        = transpose([V_th(1).*ones(1,EPopNum),    V_th(2).*ones(1,IPopNum)]);
 end
 if length(V_reset) == 2 
-V_reset     = [V_reset(1).*ones(1,EPopNum), V_reset(2).*ones(1,IPopNum)];
+V_reset     = transpose([V_reset(1).*ones(1,EPopNum), V_reset(2).*ones(1,IPopNum)]);
 end
 if length(t_ref) == 2 
-t_ref       = [t_ref(1).*ones(1,EPopNum),   t_ref(2).*ones(1,IPopNum)];
+t_ref       = transpose([t_ref(1).*ones(1,EPopNum),   t_ref(2).*ones(1,IPopNum)]);
 end
 if length(sigma) == 2 
-sigma       = [sigma(1).*ones(1,EPopNum),   sigma(2).*ones(1,IPopNum)];
+sigma       = transpose([sigma(1).*ones(1,EPopNum),   sigma(2).*ones(1,IPopNum)]);
 end
 if length(theta) == 2 
-theta       = [theta(1).*ones(1,EPopNum),   theta(2).*ones(1,IPopNum)];
+theta       = transpose([theta(1).*ones(1,EPopNum),   theta(2).*ones(1,IPopNum)]);
 end
 
 if length(E_w) == 2 
-E_w         = [E_w(1).*ones(1,EPopNum),     E_w(2).*ones(1,IPopNum)];
+E_w         = transpose([E_w(1).*ones(1,EPopNum),     E_w(2).*ones(1,IPopNum)]);
 end
 if length(b_w) == 2 
-b_w         = [b_w(1).*ones(1,EPopNum),     b_w(2).*ones(1,IPopNum)];
+b_w         = transpose([b_w(1).*ones(1,EPopNum),     b_w(2).*ones(1,IPopNum)]);
 end
 if length(delta_T) == 2 
-delta_T     = [delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,IPopNum)];
+delta_T     = transpose([delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,IPopNum)]);
 end
 if length(dw) == 2 
-dw          = [dw(1).*ones(1,EPopNum),      dw(2).*ones(1,IPopNum)];
+dw          = transpose([dw(1).*ones(1,EPopNum),      dw(2).*ones(1,IPopNum)]);
 end
 if length(gwnorm) == 2 
-gwnorm      = [gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)];
+gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)]);
 end
 if length(w_r) == 2 
-w_r         = [w_r(1).*ones(1,EPopNum),     w_r(2).*ones(1,IPopNum)];
+w_r         = transpose([w_r(1).*ones(1,EPopNum),     w_r(2).*ones(1,IPopNum)]);
 end
 if length(b) == 2 
-b           = [b(1).*ones(1,EPopNum),       b(2).*ones(1,IPopNum)];
+b           = transpose([b(1).*ones(1,EPopNum),       b(2).*ones(1,IPopNum)]);
 end
 if length(b_s) == 2 
-b_s         = [b_s(1).*ones(1,EPopNum),     b_s(2).*ones(1,IPopNum)];
+b_s         = transpose([b_s(1).*ones(1,EPopNum),     b_s(2).*ones(1,IPopNum)]);
 end
 if length(ds) == 2 
-ds          = [ds(1).*ones(1,EPopNum),      ds(2).*ones(1,IPopNum)];
+ds          = transpose([ds(1).*ones(1,EPopNum),      ds(2).*ones(1,IPopNum)]);
 end
 if length(a) == 2 
-a           = [a(1).*ones(1,EPopNum),       a(2).*ones(1,IPopNum)];
+a           = transpose([a(1).*ones(1,EPopNum),       a(2).*ones(1,IPopNum)]);
 end
+
+%--------------------------------------------------------------------------
+%Initial Conditions
+
+V(:,1) = V_reset.*rand(PopNum,1) + (V_th+10).*rand(PopNum,1);
+
 %%
 
 for n=1:TimeLength-1
