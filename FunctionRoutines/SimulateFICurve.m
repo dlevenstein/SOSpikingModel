@@ -1,4 +1,4 @@
-function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,varargin)
+function [ Ivals,rate,voltagemean ] = SimulateFICurve(simfunction,PopParams,Irange,numI,varargin)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -16,6 +16,9 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,vara
 %   'bistableramp'  (true/false) an option to calculate FI curve with
 %                   increasing and decreasing input ramps, to test for
 %                   bistability/histeresis (NOT YET FUNCTIONAL)
+%   'timeparms'     a structure giving timing params for the simulations
+%                 .simtime          Duration to simulate 
+%                 .onsettransient   Onset transient to ignore
 %
 %
 
@@ -59,16 +62,21 @@ function [ Ivals,rate ] = SimulateFICurve(simfunction,PopParams,Irange,numI,vara
 %varargin = {};
 
 %% Input options
+defaulttimeparms.simtime = 5000; %ms, time to simulate each "trial"
+defaulttimeparms.onsettransient = 500; %ms, onsiet transient time to ignore
 figvalidation = @(x) islogical(x) || ischar(x);
+
 
 p = inputParser;
 addParameter(p,'showfig',true,figvalidation)
 addParameter(p,'figfolder',[],@ischar)
 addParameter(p,'bistableramp',false,@islogical)
+addParameter(p,'timeparms',defaulttimeparms,@isstruct)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 figfolder = p.Results.figfolder;
 RAMP = p.Results.bistableramp;
+timeparms = p.Results.timeparms;
 
 if ischar(SHOWFIG)
     figname=SHOWFIG;
@@ -79,10 +87,9 @@ if RAMP
     error('''bistableramp'' option is not yet functional... sorry :''(')
 end
 %% Set the parameters
-simtime = 2000; %put as input option...
-onsettransient = 500; %Onset transient to ignore
+onsettransient = timeparms.onsettransient; %Onset transient to ignore
 TimeParams.dt      = 0.01;
-TimeParams.SimTime = simtime;
+TimeParams.SimTime = timeparms.simtime;
 %% Run the simulations
 Ivals = linspace(Irange(1),Irange(2),numI);
 clear SimValues
@@ -96,8 +103,9 @@ end
 %rate = zeros(1,numI);
 voltagebins = linspace(PopParams.V_reset,PopParams.V_th,100);
 conductancebins = linspace(0,1,100);
-totaltime = simtime-onsettransient;
-clear voltagedist voltagemean adaptdist
+isibins = linspace(1,3,50);
+totaltime = timeparms.simtime-onsettransient;
+clear voltagedist voltagemean adaptdist ISIdist rate
 for ii = 1:numI
     afteronsetspikes = SimValues(ii).spikes(:,1)>onsettransient;
     Espikes = ismember(SimValues(ii).spikes(:,2),SimValues(ii).EcellIDX);
@@ -105,7 +113,18 @@ for ii = 1:numI
 
     rate.E(ii) = sum(afteronsetspikes&Espikes)./PopParams.EPopNum./(totaltime./1000); %units: spikes/cell/s
     rate.I(ii) = sum(afteronsetspikes&Ispikes)./PopParams.IPopNum./(totaltime./1000); %units: spikes/cell/s
-    %Add rate distribution here
+    
+    %Calculating ISI/rate distributions
+    for cc = 1:(PopParams.EPopNum+PopParams.IPopNum)
+        thiscell = SimValues(ii).spikes(:,2)==cc & afteronsetspikes;
+        cellspikes{cc} = SimValues(ii).spikes(thiscell,1);
+    end
+    cellrates = cellfun(@length,cellspikes)./(totaltime./1000);
+    ISIs = cellfun(@diff,cellspikes,'uniformoutput',false);
+    ISIdist.E(:,ii) = hist(log10(cat(1,ISIs{SimValues(ii).EcellIDX})),isibins);
+    ISIdist.E(:,ii) = ISIdist.E(:,ii)./max(ISIdist.E(:,ii));
+    ISIdist.I(:,ii) = hist(log10(cat(1,ISIs{SimValues(ii).IcellIDX})),isibins);
+    ISIdist.I(:,ii) = ISIdist.I(:,ii)./max(ISIdist.I(:,ii));
     
     %Calculating Voltage stats
     allcellsvoltage.E = reshape(SimValues(ii).V(SimValues(ii).EcellIDX,:),1,[]);
@@ -128,7 +147,8 @@ end
 
 %% Example Voltage Tracess
 numextraces = 5;
-extraces = round(linspace(1,numI,numextraces));
+extraces = round(linspace((0.5./numextraces).*numI,...
+    ((numextraces-0.5)./numextraces).*numI,numextraces));
 excells = [randsample(SimValues(1).EcellIDX,1) randsample(SimValues(1).IcellIDX,1)];
 if length(SimValues(1).EcellIDX)==1; excells(1)=SimValues(1).EcellIDX; end
 if length(SimValues(1).IcellIDX)==1; excells(1)=SimValues(1).IcellIDX; end
@@ -155,28 +175,47 @@ figure
         legend('I','E','location','northwest')
         xlabel('I (pA)');ylabel('Rate (spks/cell/s)')
         xlim(Ivals([1 end]))
-    subplot(6,2,5)
+        
+	subplot(6,2,7)
+        imagesc(Ivals,isibins,ISIdist.I)
+        colormap(gca,Icolor)
+        axis xy
+        LogScale('y',10)
+        set(gca,'xticklabel',[])
+        ylabel('I: ISI (ms)');
+	subplot(6,2,5)
+        imagesc(Ivals,isibins,ISIdist.E)
+        colormap(gca,Ecolor)
+        axis xy
+        LogScale('y',10)
+        set(gca,'xticklabel',[])
+        ylabel('E: ISI (ms)');
+    subplot(6,2,11)
         imagesc(Ivals,voltagebins,voltagedist.I)
         hold on
         plot(Ivals,voltagemean.I,'o--','color',Icolor(end/2,:),'markersize',4)
         colormap(gca,Icolor)
+        plot(Ivals(extraces),min(voltagebins),'k^','markersize',2)
         axis xy
-        xlabel('I (pA)');ylabel('V (I cells)');
-    subplot(6,2,7)
+        %xlabel('I (pA)');
+        ylabel('I: V_m');
+    subplot(6,2,9)
         imagesc(Ivals,voltagebins,voltagedist.E)
         hold on
         plot(Ivals,voltagemean.E,'o--','color',Ecolor(end/2,:),'markersize',4)
-        plot(Ivals(extraces),min(voltagebins),'k^')
+        
         colormap(gca,Ecolor)
         axis xy
-        xlabel('I (pA)');ylabel('V (E cells)');    
-    subplot(6,2,9)
-        imagesc(Ivals,conductancebins,adaptdist.E)
-        hold on
-        plot(Ivals,adaptmean.E,'o--','color',adaptcolor(end/2,:),'markersize',4)
-        axis xy
-        colormap(gca,adaptcolor)
-        xlabel('I (units?)');ylabel('g_w (E cells)');
+        %xlabel('I (pA)');
+        ylabel('E: V_m');
+        set(gca,'xticklabel',[])
+%     subplot(6,2,11)
+%         imagesc(Ivals,conductancebins,adaptdist.E)
+%         hold on
+%         plot(Ivals,adaptmean.E,'o--','color',adaptcolor(end/2,:),'markersize',4)
+%         axis xy
+%         colormap(gca,adaptcolor)
+%         xlabel('I (units?)');ylabel('g_w (E cells)');
 %     subplot(6,2,11)
 %         imagesc(Ivals,conductancebins,adaptdist.I)
 %         axis xy
@@ -192,7 +231,8 @@ figure
         hold on
         plot(extime,exampletrace.I(:,ee),'color',Icolor(end/2,:))
         ylim([vmin PopParams.V_th])
-        xlabel('t (ms)');ylabel({['I = ',num2str(Ivals(extraces(ee)))],'V_m'})
+        xlabel('t (ms)');
+        ylabel({['I = ',num2str(round(Ivals(extraces(ee))))],'V_m'})
         
         if ee==1
             title('V: Example Traces')
