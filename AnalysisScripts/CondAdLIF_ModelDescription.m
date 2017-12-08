@@ -4,8 +4,8 @@
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
+repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
 addpath(genpath(repopath))
 
 figfolder = [repopath,'/Figures'];
@@ -66,8 +66,8 @@ for ss = 1:length(sigvals)
     [sigmatest.SimValues(ss)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
 end
 
-thetavals = [1 1/10 1/100];
-PopParams.sigma = 10;
+thetavals = [10 1 1/10 1/100];
+PopParams.sigma = 20;
 for ss = 1:length(thetavals)
     PopParams.theta = thetavals(ss);
     [thetatest.SimValues(ss)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
@@ -109,22 +109,36 @@ for ss = 1:length(thetavals)
     [thetatest.VoltageStats(ss).fft,thetatest.VoltageStats(ss).freqs] = pwelch(thetatest.SimValues(ss).V,sf,[],[],sf);
 end
 %%
-figure
-subplot(2,2,1)
-plot(sigvals,[sigmatest.InputStats.std],'o')
-hold on 
-plot([0 100],[0 100],'--')
-xlabel('Sigma');ylabel('Noise Std')
 
-subplot(2,2,2)
-plot(thetavals,[thetatest.InputStats.std],'o')
-hold on
-%plot([0 100],[0 100],'--')
-xlabel('Theta');ylabel('Noise Std')
 
 %%
-noisecolors = [0 0 0; 0.2 0.2 0.2; 0.4 0.4 0.4; 0.6 0.6 0.6];
-timewin = [1000 2000];
+noisecolors = [0 0 0; 0.25 0.25 0.25; 0.5 0.5 0.5; 0.75 0.75 0.75];
+
+figure
+subplot(3,3,1)
+hold on
+    for ss = length(sigvals):-1:1
+     plot(sigvals(ss),sigmatest.InputStats(ss).std,'.','color',noisecolors(ss,:),'markersize',20)
+    end
+ 
+plot([0 60],[0 60],'--')
+xlabel('Sigma (pA)');ylabel('Noise Std (pA)')
+
+subplot(3,3,2)
+hold on
+    for ss = 1:length(thetavals)
+    plot(log10(thetavals(ss)),thetatest.InputStats(ss).std,'.','color',noisecolors(ss,:),'markersize',20)
+    end
+hold on
+LogScale('x',10)
+%plot([0 100],[0 100],'--')
+ylim([0 40])
+xlabel('Theta (ms^-^1)');ylabel('Noise Std (pA)')
+
+NiceSave('noiseplots',figfolder,'CondAdLIF')  
+
+
+timewin = [1000 1500];
 figure
 subplot(3,4,1:2)
     hold on
@@ -132,19 +146,22 @@ subplot(3,4,1:2)
         plot(sigmatest.SimValues(ss).t,sigmatest.SimValues(ss).Input(1,:),'color',noisecolors(ss,:),'linewidth',1)
     end
     xlim(timewin)
+    xlabel('t (ms)');ylabel('Input (pA)')
 subplot(3,4,3)
 hold on
     for ss = length(sigvals):-1:1
-        bar(sigmatest.InputStats(1).bins,sigmatest.InputStats(ss).hist,'edgecolor',noisecolors(ss,:),'facecolor','w')
+        plot(sigmatest.InputStats(1).bins,sigmatest.InputStats(ss).hist,'color',noisecolors(ss,:),'Linewidth',1)
     end
     axis tight
+    xlabel('Input (pA)')
 subplot(3,4,4)
 hold on
     for ss = length(sigvals):-1:1
         plot(log10(sigmatest.InputStats(ss).freqs),log10(sigmatest.InputStats(ss).fft),'color',noisecolors(ss,:))
     end
     axis tight
-    %LogScale('x',10)
+    LogScale('xy',10)
+    xlabel('f (Hz)');ylabel('Power (pA)')
     
 subplot(6,4,9:10)
     hold on
@@ -152,10 +169,11 @@ subplot(6,4,9:10)
         plot(sigmatest.SimValues(ss).t,sigmatest.SimValues(ss).V(1,:),'color',noisecolors(ss,:),'linewidth',1)
     end
     xlim(timewin)
+    xlabel('t (ms)');ylabel('V (mV)')
 subplot(6,4,11)
 hold on
     for ss = length(sigvals):-1:1
-        bar(sigmatest.VoltageStats(1).bins,sigmatest.VoltageStats(ss).hist,'edgecolor',noisecolors(ss,:),'facecolor','w')
+        plot(sigmatest.VoltageStats(1).bins,sigmatest.VoltageStats(ss).hist,'color',noisecolors(ss,:))
     end
     axis tight
     
@@ -165,53 +183,57 @@ hold on
         plot(log10(sigmatest.VoltageStats(ss).freqs),log10(sigmatest.VoltageStats(ss).fft),'color',noisecolors(ss,:))
     end
     axis tight
-    %LogScale('x',10)
+    LogScale('x',10)
     
  
     
 
-subplot(6,4,[13:14 17:18])
+subplot(3,4,9:10)
     hold on
-    for ss = length(thetavals):-1:1
+    for ss = 1:length(thetavals)
         plot(thetatest.SimValues(ss).t,thetatest.SimValues(ss).Input(1,:),'color',noisecolors(ss,:),'linewidth',1)
     end
     xlim(timewin)
-subplot(6,4,[15 19])
+    xlabel('t (ms)');ylabel('Input (pA)')
+subplot(3,4,11)
 hold on
     for ss = length(thetavals):-1:1
-        bar(thetatest.InputStats(1).bins,thetatest.InputStats(ss).hist,'edgecolor',noisecolors(ss,:),'facecolor','w')
+        plot(thetatest.InputStats(1).bins,thetatest.InputStats(ss).hist,'color',noisecolors(ss,:))
     end
     axis tight
-subplot(6,4,[16 20])
+    xlabel('Input (pA)')
+subplot(3,4,12)
 hold on
     for ss = length(thetavals):-1:1
         plot(log10(thetatest.InputStats(ss).freqs),log10(thetatest.InputStats(ss).fft),'color',noisecolors(ss,:))
     end
     axis tight
-    %LogScale('x',10)
+    LogScale('xy',10)
+    xlabel('f (Hz)');ylabel('Power (pA)')
     
-subplot(6,4,21:22)
+subplot(6,4,13:14)
     hold on
     for ss = 1:length(thetavals)
         plot(thetatest.SimValues(ss).t,thetatest.SimValues(ss).V(1,:),'color',noisecolors(ss,:),'linewidth',1)
     end
     xlim(timewin)
-subplot(6,4,23)
+    
+subplot(6,4,15)
 hold on
     for ss = length(thetavals):-1:1
-        bar(thetatest.VoltageStats(1).bins,thetatest.VoltageStats(ss).hist,'edgecolor',noisecolors(ss,:),'facecolor','w')
+        plot(thetatest.VoltageStats(1).bins,thetatest.VoltageStats(ss).hist,'color',noisecolors(ss,:))
     end
     axis tight
     
-subplot(6,4,24)
+subplot(6,4,16)
 hold on
     for ss = 1:length(thetavals)
         plot(log10(thetatest.VoltageStats(ss).freqs),log10(thetatest.VoltageStats(ss).fft),'color',noisecolors(ss,:))
     end
     axis tight
-    %LogScale('x',10)
+    LogScale('x',10)
     
-    
+NiceSave('noiseIllustration',figfolder,'CondAdLIF')    
     
 %% Voltage Reset
 %refreactory period, step current
