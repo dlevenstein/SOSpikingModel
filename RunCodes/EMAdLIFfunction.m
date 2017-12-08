@@ -165,10 +165,10 @@ a           = PopParams.a;
 
 %% Input
 %--------------------------------------------------------------------------
-if isequal(size(I_e),[1 1]);
+if isa(I_e, 'function_handle')
+    I_e = I_e(t);
+elseif isequal(size(I_e),[1 1])
     I_e = I_e.*ones(PopNum,TimeLength);
-elseif isa(I_e, 'function_handle')  %IN PROGRESS
-    I_e = I_e(t,PopNum);
 end
 
 %% Variables
@@ -359,11 +359,8 @@ end
 
 g_w(:,n+1) = EcellIDX'.*gwnorm(:).*w(:,n+1);
 
-g_e(:,n+1) = EE_mat*s(:,n+1);
-g_e(:,n+1) = IE_mat*s(:,n+1);
-
-g_i(:,n+1) = II_mat*s(:,n+1);
-g_i(:,n+1) = EI_mat*s(:,n+1);
+g_e(:,n+1) = EE_mat*s(:,n+1) + IE_mat*s(:,n+1);
+g_i(:,n+1) = II_mat*s(:,n+1) + EI_mat*s(:,n+1);
 
 %--------------------------------------------------------------------------
 
