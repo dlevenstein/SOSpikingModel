@@ -86,8 +86,7 @@ Icells = EPopNum+1:PopNum;      IcellIDX = ismember(1:PopNum,Icells);
 %For example, there are values for the EE connections on the 1x1 matrix, II
 %on the 2x2 matrix, and etc (this is based on the indexing of the neuron population). 
 
-%NOTE: I have adjusted this be such that presynaptic neurons are columns and
-%postsynaptic neurons are rows.
+%NOTE: presynaptic neurons are columns and postsynaptic neurons are rows.
 
 Wee = PopParams.Wee;
 Kee = PopParams.Kee;
@@ -282,7 +281,7 @@ s(:,n+1)   = s(:,n) + (a_s(:,n).*(1-s(:,n)) - b_s(:).*s(:,n)).*dt;
 
 w(:,n+1)   = w(:,n) + (a_w(:,n).*(1-w(:,n)) - b_w(:).*w(:,n)).*dt;
 
-a_w(:,n+1) = w_r(:).*b_w(:)./(1 - w_r(:)).*exp((V(:,n+1)-V_reset(:))./delta_T(:));
+a_w(:,n+1) = w_r(:).*b_w(:)./(1 - w_r(:)).*exp((V(:,n+1)-E_L(:)).*delta_T(:));
 
 %--------------------------------------------------------------------------
 
