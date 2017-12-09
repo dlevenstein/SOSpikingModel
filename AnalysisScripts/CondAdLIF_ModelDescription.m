@@ -401,6 +401,7 @@ figure
 %variable, gW.  membrane potential with reversal potential.
 %step currents for sub,super,of diff't values.  sub+super for a select
 %intermediate zone
+TimeParams.SimTime = 2000;
 
 %Input 
 PopParams.I_e  = 0;
@@ -412,11 +413,11 @@ PopParams.EPopNum = 1;
 PopParams.IPopNum = 0;
 
 %Neuron properties
-PopParams.E_L     = -65;    %rev potential: leak (mV)
-PopParams.g_L     = 30;     %leak conductance (nS)
-PopParams.C       = 281;    %capacitance (pF)
-PopParams.V_th    = -55;    %spike threshold (mV)
-PopParams.V_reset = -85;    %reset potential (mV)
+PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
+PopParams.g_L     = [182/18 119/8];     %leak conductance (nS)
+PopParams.C       = [182 119];    %capacitance (pF)
+PopParams.V_th    = [-45 -47];    %spike threshold (mV)
+PopParams.V_reset = [-48 -50];    %reset potential (mV)
 PopParams.t_ref   = 0.2;    %refractory period (ms)
 
 %Synaptic Properties 
@@ -430,10 +431,11 @@ PopParams.a       = 0.5;    %synaptic activation rate (1/ms)
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
 PopParams.dw      = 0.2;    %adaptation activation duration (ms)
-PopParams.b       = 0.1;    %adaptation activation rate (1/ms)
-PopParams.delta_T = 10;     %subthreshold adaptation steepness
+PopParams.b       = 1;    %adaptation activation rate (1/ms)
+PopParams.delta_T = 0;     %subthreshold adaptation steepness
 PopParams.w_r = 0.1;        %adaptation at rest (0-1)
 PopParams.gwnorm = 0;       %magnitude of adaptation
+
 
 %Network Properties
 PopParams.Wee   = 0;        %E->E weight
@@ -445,15 +447,94 @@ PopParams.Kii   = 0;        %Expected I->I In Degree
 PopParams.Kie   = 0;        %Expected E->I In Degree
 PopParams.Kei   = 0;        %Expected I->E In Degree
 
-
-for ii = 1:6
-PopParams.b = b(ii);
-PopParams.t_ref = t_ref(ii);
-PopParams.b_w     = b_w(ii);
-PopParams.b_s = b_s(ii);
-PopParams.a       = a(ii);
+stepmags = -100:50:400;
+for ii = 1:length(stepmags)
+%Input Current Function: A step function that only effects neuron 1
+stepmag = (stepmags(ii));
+steptime = [1000 1500];
+Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2))];
+PopParams.I_e = Inputfun;
 [testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
 end
+
+%%
+viewwin = [900 1600];
+figure
+subplot(3,2,1)
+    hold on
+    for ii = 1:length(stepmags)
+    plot(testvals(ii).t,testvals(ii).V,'k')
+    end
+    xlim(viewwin)
+    
+subplot(3,2,3)
+    hold on
+    for ii = 1:length(stepmags)
+    plot(testvals(ii).t,testvals(ii).w,'k')
+    end
+    xlim(viewwin)
+    
+subplot(3,2,5)
+    hold on
+    for ii = 1:length(stepmags)
+    plot(testvals(ii).t,testvals(ii).a_w,'k')
+    end
+    xlim(viewwin)
+    
+    
+    %%
+    
+    %Adaptation Properties
+PopParams.E_w     = -70;    %rev potential: adaptation (mV)
+PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
+PopParams.dw      = 0.2;    %adaptation activation duration (ms)
+PopParams.b       = 1;    %adaptation activation rate (1/ms)
+PopParams.delta_T = 0.5;     %subthreshold adaptation steepness
+PopParams.w_r = 0.1;        %adaptation at rest (0-1)
+PopParams.gwnorm = 10; 
+
+
+for ii = 1:length(stepmags)
+%Input Current Function: A step function that only effects neuron 1
+stepmag = (stepmags(ii));
+steptime = [1000 1500];
+Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2))];
+PopParams.I_e = Inputfun;
+[testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+end
+
+%%
+viewwin = [900 1600];
+figure
+subplot(3,2,1)
+    hold on
+    for ii = 1:length(stepmags)
+    plot(testvals(ii).t,testvals(ii).V,'k')
+    end
+    xlim(viewwin)
+    
+subplot(3,2,3)
+    hold on
+    for ii = 1:length(stepmags)
+    plot(testvals(ii).t,testvals(ii).w,'k')
+    end
+    xlim(viewwin)
+    
+subplot(3,2,5)
+    hold on
+    for ii = 1:length(stepmags)
+    plot(testvals(ii).t,testvals(ii).a_w,'k')
+    end
+    xlim(viewwin)
+    
+subplot(2,2,2)
+     V = linspace(-70,-55,100);
+     a_w = PopParams.w_r.*PopParams.b_w./(1 - PopParams.w_r).*exp((V-PopParams.E_L(1)).*PopParams.delta_T);
+     plot(V,a_w,'k')
+     hold on
+     plot(V(end)+[0 5],PopParams.b.*[1 1],'k')
+     xlabel('V')
+     ylabel('Alpha(V)')
 %% Synaptic properties and variables
 
 %Show: E spike effect on I,E
