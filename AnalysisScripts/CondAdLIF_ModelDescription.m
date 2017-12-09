@@ -237,7 +237,74 @@ NiceSave('noiseIllustration',figfolder,'CondAdLIF')
     
 %% Voltage Reset
 %refreactory period, step current
+PopParams.sigma = 0;
+PopParams.EPopNum = 2;
+TimeParams.SimTime = 250;
 
+
+PopParams.Wee   = 100;        %E->E weight
+PopParams.Wii   = 1;        %I->I weight
+PopParams.Wie   = 1;        %E->I weight
+PopParams.Wei   = 1;        %I->E weight
+PopParams.Kee   = 2;        %Expected E->E In Degree
+PopParams.Kii   = 1;        %Expected I->I In Degree
+PopParams.Kie   = 1;        %Expected E->I In Degree
+PopParams.Kei   = 1;
+
+%Synaptic Properties 
+PopParams.E_e     = 0;      %rev potential: E (mV)
+PopParams.E_i     = -80;    %rev potential: I (mV)
+PopParams.b_s     = 1;      %synaptic decay timescale (1/ms)
+PopParams.ds      = 0.5;    %synaptic activation duration (ms)
+PopParams.a       = 0.5;    %synaptic activation rate (1/ms)
+
+%Adaptation Properties
+PopParams.E_w     = -70;    %rev potential: adaptation (mV)
+PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
+PopParams.dw      = 0.2;    %adaptation activation duration (ms)
+PopParams.b       = 0.1;    %adaptation activation rate (1/ms)
+PopParams.delta_T = 5;     %subthreshold adaptation steepness
+PopParams.w_r = 0.1;        %adaptation at rest (0-1)
+PopParams.gwnorm = 0;       %magnitude of adaptation
+
+%Input Current Function
+stepmag = 301;
+steptime = 100;
+Inputfun = @(t) [stepmag.*(t>steptime)  ;zeros(size(t))];
+PopParams.I_e = Inputfun;
+
+[testvals] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+
+%%
+viewwin = [90 200];
+figure
+    subplot(4,2,1)
+        plot(testvals.t,testvals.Input(1,:),'k')
+        xlim(viewwin)
+    subplot(4,2,3)
+        plot(testvals.t,testvals.V(1,:),'k')
+        xlim(viewwin)
+    subplot(4,2,5)
+        plot(testvals.t,testvals.w(1,:),'k')
+        xlim(viewwin)
+    subplot(4,2,7)
+        plot(testvals.t,testvals.s(1,:),'k')
+        xlim(viewwin)
+        
+    subplot(4,2,2)
+        plot(testvals.t,testvals.g_e(2,:),'k')
+        xlim(viewwin)
+    subplot(4,2,4)
+        plot(testvals.t,testvals.V(2,:),'k')
+        xlim(viewwin)
+    subplot(4,2,6)
+        plot(testvals.t,testvals.w(2,:),'k')
+        xlim(viewwin)
+    subplot(4,2,8)
+        plot(testvals.t,testvals.s(2,:),'k')
+        xlim(viewwin)
+        
+        
 %% Adaptation - 
 %subthreshold, superthreshold.  show E cell under low mag step current? w
 %variable, gW.  membrane potential with reversal potential.
