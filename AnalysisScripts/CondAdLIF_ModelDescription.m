@@ -235,12 +235,13 @@ hold on
     
 NiceSave('noiseIllustration',figfolder,'CondAdLIF')    
     
-%% Voltage Reset
+%% Spiking/Synaptic Properties
 %refreactory period, step current
 PopParams.sigma = 0;
 PopParams.EPopNum = 2;
-TimeParams.SimTime = 250;
+TimeParams.SimTime = 2000;
 
+t_ref   = [0.5 0.5 0.5 0.2 0.5 1];
 
 PopParams.Wee   = 100;        %E->E weight
 PopParams.Wii   = 1;        %I->I weight
@@ -254,6 +255,173 @@ PopParams.Kei   = 1;
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
+b_s     = [1 1 1 0.5 1 2];      %synaptic decay timescale (1/ms)
+PopParams.ds      = 0.5;    %synaptic activation duration (ms)
+a       = [0.5 1 1.5 0.5 0.5 0.5];    %synaptic activation rate (1/ms)
+
+%Adaptation Properties
+PopParams.E_w     = -70;    %rev potential: adaptation (mV)
+b_w     = [0.1 0.03 0.01 0.01 0.01 0.01];   %adaptation decay timescale (1/ms)
+PopParams.dw      = 0.2;    %adaptation activation duration (ms)
+b       = [1 1 1 0.5 1 2];    %adaptation activation rate (1/ms) (spike)
+PopParams.delta_T = 0;     %subthreshold adaptation steepness
+PopParams.w_r = 0.1;        %adaptation at rest (0-1)
+PopParams.gwnorm = 0;       %magnitude of adaptation
+
+%Input Current Function: A step function that only effects neuron 1
+stepmag = 301;
+steptime = [1000 1100];
+Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2))  ;zeros(size(t))];
+PopParams.I_e = Inputfun;
+
+for ii = 1:6
+PopParams.b = b(ii);
+PopParams.t_ref = t_ref(ii);
+PopParams.b_w     = b_w(ii);
+PopParams.b_s = b_s(ii);
+PopParams.a       = a(ii);
+[testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+end
+%% Spiking Properties
+viewwin = [990 1200];
+viewwin2 = [1050 1060];
+figure
+    subplot(4,2,1)
+        plot(testvals(1).t,testvals(1).Input(1,:),'k')
+        xlim(viewwin)
+        ylabel('I')
+    subplot(4,2,3)
+        plot(testvals(1).t,testvals(1).V(1,:),'k')
+        xlim(viewwin)
+        ylabel('V_p_r_e')
+    subplot(4,2,5)
+    hold on
+    for ii = 1:3
+        plot(testvals(ii).t,testvals(ii).w(1,:),'k')
+    end
+        xlim(viewwin)
+        ylabel('w_p_r_e')
+    subplot(4,2,7)
+    hold on
+    for ii = 1:3
+        plot(testvals(ii).t,testvals(ii).s(1,:),'k')
+    end
+        xlim(viewwin)
+        ylabel('s_p_r_e')
+        
+    subplot(4,2,2)
+    hold on
+    for ii = 4:6
+        plot(testvals(ii).t,testvals(ii).a_w(1,:),'k')
+    end
+        xlim(viewwin2)
+        ylabel('a_w')
+    subplot(4,2,4)
+    hold on
+    for ii = 4:6
+        plot(testvals(ii).t,testvals(ii).V(1,:),'k')
+    end
+        xlim(viewwin2)
+        ylabel('V_p_r_e')
+    subplot(4,2,6)
+    hold on
+    for ii = 4:6
+        plot(testvals(ii).t,testvals(ii).w(1,:),'k')
+    end
+        xlim(viewwin2)
+        ylabel('w_p_r_e')
+    subplot(4,2,8)
+    hold on
+    for ii = 4:6
+        plot(testvals(ii).t,testvals(ii).s(1,:),'k')
+    end
+        xlim(viewwin2)
+        ylabel('s_p_r_e')
+        
+NiceSave('spikeparms',figfolder,'CondAdLIF') 
+
+%% Synaptic Properties
+viewwin = [1025 1150];
+figure
+    subplot(4,2,1)
+        plot(testvals(1).t,testvals(1).Input(1,:),'k')
+        xlim(viewwin)
+        ylabel('I')
+    subplot(4,2,3)
+        plot(testvals(1).t,testvals(1).V(1,:),'k')
+        xlim(viewwin)
+        ylabel('V_p_r_e')
+    subplot(4,2,5)
+        plot(testvals(1).t,testvals(1).w(1,:),'k')
+        xlim(viewwin)
+        ylabel('w_p_r_e')
+    subplot(4,2,7)
+        plot(testvals(1).t,testvals(1).s(1,:),'k')
+        xlim(viewwin)
+        ylabel('s_p_r_e')
+        
+    subplot(4,2,2)
+    hold on
+    for ii = 4:6
+        plot(testvals(ii).t,testvals(ii).g_e(2,:),'k')
+    end
+    axis tight
+    xlim(viewwin)
+        ylabel('g_e_,_p_o_s_t')
+    subplot(4,2,4)
+    hold on
+    for ii = 4:6
+        plot(testvals(ii).t,testvals(ii).V(2,:),'k')
+        
+    end
+    axis tight
+    xlim(viewwin)
+        ylabel('v_p_o_s_t')
+    subplot(4,2,6)
+        plot(testvals(1).t,testvals(1).w(2,:),'k')
+        xlim(viewwin)
+        ylabel('w_p_o_s_t')
+%     subplot(4,2,8)
+%         plot(testvals.t,testvals.s(2,:),'k')
+%         xlim(viewwin)
+%         ylabel('w_p_o_s_t')
+       NiceSave('synparms',figfolder,'CondAdLIF')  
+     %% Adaptation Function
+     w_r = 0.1;
+     b_w = 0.01;
+     E_L = -65;
+     delta_T = 10;
+     V = linspace(-70,-55,100);
+     a_w = w_r.*b_w./(1 - w_r).*exp((V-E_L).*delta_T);
+     plot(V,a_w)
+%% Adaptation - 
+
+
+%subthreshold, superthreshold.  show E cell under low mag step current? w
+%variable, gW.  membrane potential with reversal potential.
+%step currents for sub,super,of diff't values.  sub+super for a select
+%intermediate zone
+
+%Input 
+PopParams.I_e  = 0;
+PopParams.sigma = 0;        %niose magnitude: variance
+PopParams.theta = 1/10;        %noise time scale (1/ms)
+
+% One neuron
+PopParams.EPopNum = 1;
+PopParams.IPopNum = 0;
+
+%Neuron properties
+PopParams.E_L     = -65;    %rev potential: leak (mV)
+PopParams.g_L     = 30;     %leak conductance (nS)
+PopParams.C       = 281;    %capacitance (pF)
+PopParams.V_th    = -55;    %spike threshold (mV)
+PopParams.V_reset = -85;    %reset potential (mV)
+PopParams.t_ref   = 0.2;    %refractory period (ms)
+
+%Synaptic Properties 
+PopParams.E_e     = 0;      %rev potential: E (mV)
+PopParams.E_i     = -80;    %rev potential: I (mV)
 PopParams.b_s     = 1;      %synaptic decay timescale (1/ms)
 PopParams.ds      = 0.5;    %synaptic activation duration (ms)
 PopParams.a       = 0.5;    %synaptic activation rate (1/ms)
@@ -263,54 +431,29 @@ PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
 PopParams.dw      = 0.2;    %adaptation activation duration (ms)
 PopParams.b       = 0.1;    %adaptation activation rate (1/ms)
-PopParams.delta_T = 5;     %subthreshold adaptation steepness
+PopParams.delta_T = 10;     %subthreshold adaptation steepness
 PopParams.w_r = 0.1;        %adaptation at rest (0-1)
 PopParams.gwnorm = 0;       %magnitude of adaptation
 
-%Input Current Function
-stepmag = 301;
-steptime = 100;
-Inputfun = @(t) [stepmag.*(t>steptime)  ;zeros(size(t))];
-PopParams.I_e = Inputfun;
+%Network Properties
+PopParams.Wee   = 0;        %E->E weight
+PopParams.Wii   = 0;        %I->I weight
+PopParams.Wie   = 0;        %E->I weight
+PopParams.Wei   = 0;        %I->E weight
+PopParams.Kee   = 0;        %Expected E->E In Degree
+PopParams.Kii   = 0;        %Expected I->I In Degree
+PopParams.Kie   = 0;        %Expected E->I In Degree
+PopParams.Kei   = 0;        %Expected I->E In Degree
 
-[testvals] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
 
-%%
-viewwin = [90 200];
-figure
-    subplot(4,2,1)
-        plot(testvals.t,testvals.Input(1,:),'k')
-        xlim(viewwin)
-    subplot(4,2,3)
-        plot(testvals.t,testvals.V(1,:),'k')
-        xlim(viewwin)
-    subplot(4,2,5)
-        plot(testvals.t,testvals.w(1,:),'k')
-        xlim(viewwin)
-    subplot(4,2,7)
-        plot(testvals.t,testvals.s(1,:),'k')
-        xlim(viewwin)
-        
-    subplot(4,2,2)
-        plot(testvals.t,testvals.g_e(2,:),'k')
-        xlim(viewwin)
-    subplot(4,2,4)
-        plot(testvals.t,testvals.V(2,:),'k')
-        xlim(viewwin)
-    subplot(4,2,6)
-        plot(testvals.t,testvals.w(2,:),'k')
-        xlim(viewwin)
-    subplot(4,2,8)
-        plot(testvals.t,testvals.s(2,:),'k')
-        xlim(viewwin)
-        
-        
-%% Adaptation - 
-%subthreshold, superthreshold.  show E cell under low mag step current? w
-%variable, gW.  membrane potential with reversal potential.
-%step currents for sub,super,of diff't values.  sub+super for a select
-%intermediate zone
-
+for ii = 1:6
+PopParams.b = b(ii);
+PopParams.t_ref = t_ref(ii);
+PopParams.b_w     = b_w(ii);
+PopParams.b_s = b_s(ii);
+PopParams.a       = a(ii);
+[testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+end
 %% Synaptic properties and variables
 
 %Show: E spike effect on I,E
