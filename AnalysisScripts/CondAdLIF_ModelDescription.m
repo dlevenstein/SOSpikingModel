@@ -28,6 +28,14 @@ PopParams.V_th    = -55;    %spike threshold (mV)
 PopParams.V_reset = -85;    %reset potential (mV)
 PopParams.t_ref   = 0.2;    %refractory period (ms)
 
+%Neuron properties
+PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
+PopParams.g_L     = [182/18 119/8];     %leak conductance (nS)
+PopParams.C       = [182 119];    %capacitance (pF)
+PopParams.V_th    = [-45 -47];    %spike threshold (mV)
+PopParams.V_reset = [-55 -55];    %reset potential (mV)
+PopParams.t_ref   = 0.2;    %refractory period (ms)
+
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
@@ -269,7 +277,7 @@ PopParams.w_r = 0.1;        %adaptation at rest (0-1)
 PopParams.gwnorm = 0;       %magnitude of adaptation
 
 %Input Current Function: A step function that only effects neuron 1
-stepmag = 301;
+stepmag = 201;
 steptime = [1000 1100];
 Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2))  ;zeros(size(t))];
 PopParams.I_e = Inputfun;
