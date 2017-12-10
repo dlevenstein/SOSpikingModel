@@ -217,9 +217,13 @@ V_th        = transpose([V_th(1).*ones(1,EPopNum),    V_th(2).*ones(1,IPopNum)])
 end
 if length(V_reset) == 2 
 V_reset     = transpose([V_reset(1).*ones(1,EPopNum), V_reset(2).*ones(1,IPopNum)]);
+elseif length(V_reset) == 1
+V_reset     = transpose([V_reset.*ones(1,EPopNum), V_reset.*ones(1,IPopNum)]);
 end
 if length(t_ref) == 2 
 t_ref       = transpose([t_ref(1).*ones(1,EPopNum),   t_ref(2).*ones(1,IPopNum)]);
+elseif length(t_ref) == 1
+t_ref       = transpose([t_ref.*ones(1,EPopNum),   t_ref.*ones(1,IPopNum)]);
 end
 if length(sigma) == 2 
 sigma       = transpose([sigma(1).*ones(1,EPopNum),   sigma(2).*ones(1,IPopNum)]);
@@ -239,6 +243,8 @@ delta_T     = transpose([delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,IPopNum
 end
 if length(dw) == 2 
 dw          = transpose([dw(1).*ones(1,EPopNum),      dw(2).*ones(1,IPopNum)]);
+elseif length(dw) == 1
+dw          = transpose([dw.*ones(1,EPopNum),      dw.*ones(1,IPopNum)]);
 end
 if length(gwnorm) == 2 
 gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)]);
@@ -248,120 +254,85 @@ w_r         = transpose([w_r(1).*ones(1,EPopNum),     w_r(2).*ones(1,IPopNum)]);
 end
 if length(b) == 2 
 b           = transpose([b(1).*ones(1,EPopNum),       b(2).*ones(1,IPopNum)]);
+elseif length(b) == 1
+b           = transpose([b.*ones(1,EPopNum),       b.*ones(1,IPopNum)]);
 end
 if length(b_s) == 2 
 b_s         = transpose([b_s(1).*ones(1,EPopNum),     b_s(2).*ones(1,IPopNum)]);
 end
 if length(ds) == 2 
 ds          = transpose([ds(1).*ones(1,EPopNum),      ds(2).*ones(1,IPopNum)]);
+elseif length(ds) == 1 
+ds          = transpose([ds.*ones(1,EPopNum),      ds.*ones(1,IPopNum)]);
 end
 if length(a) == 2 
 a           = transpose([a(1).*ones(1,EPopNum),       a(2).*ones(1,IPopNum)]);
+elseif length(a) == 1
+a           = transpose([a.*ones(1,EPopNum),       a.*ones(1,IPopNum)]);
 end
 
 %--------------------------------------------------------------------------
-%Initial Conditions
-
+%Initial Conditions - random voltages
+%Improvement: set # initial spiking neurons instead of hard coding Vth+10
 V(:,1) = V_reset.*rand(PopNum,1) + (V_th+10).*rand(PopNum,1);
 
-%%
-
+%% Time Loop
 for n=1:TimeLength-1
+    %% Dynamics
+    %Noise input
+    X_t(:,n+1) = X_t(:,n) + ...
+        -theta(:).*X_t(:,n).*dt + sqrt(2.*theta).*sigma(:).*randn(PopNum,1).*sqrt(dt);
 
-%--------------------------------------------------------------------------
+    %V - Voltage Equation
+    V(:,n+1)   = V(:,n) +...
+        (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
+        -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C + ...
+                I_e(:,n)./C + X_t(:,n)./C).*dt;
+    %     if any(isnan(V))  %bug checking with delta_T too high
+    %         test
+    %     end
+    %s - Synaptic Output       
+    s(:,n+1)   = s(:,n) + (a_s(:,n).*(1-s(:,n)) - b_s(:).*s(:,n)).*dt;
+    %w - Adaptation Variable
+    w(:,n+1)   = w(:,n) + (a_w(:,n).*(1-w(:,n)) - b_w(:).*w(:,n)).*dt;
+    %a_w - Adaptation rate
+    a_w(:,n+1) = w_r(:).*b_w(:)./(1 - w_r(:)).*exp((V(:,n+1)-E_L(:)).*delta_T(:));
 
-X_t(:,n+1) = X_t(:,n) + -theta(:).*X_t(:,n).*dt + sqrt(2.*theta).*sigma(:).*randn(PopNum,1).*sqrt(dt);
+    %% Spiking
+    if any(V(:,n) > V_th)
+        %Find neurons that spiked and record the spiketimes 
+        spikeneurons = find(V(:,n+1) > V_th(:));
+        spikes = [spikes; [t(n).*ones(size(spikeneurons)),spikeneurons]];
 
-V(:,n+1)   = V(:,n) +...
-    (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
-    -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C + ...
-            I_e(:,n)./C + X_t(:,n)./C).*dt;
+        %Set spiking neurons refractory period 
+        %(TO DO: single refractory period)
+        t_r(spikeneurons) = t_ref(spikeneurons);
+        t_w(spikeneurons) = dw(spikeneurons);
+        t_s(spikeneurons) = ds(spikeneurons);
+    end
 
-s(:,n+1)   = s(:,n) + (a_s(:,n).*(1-s(:,n)) - b_s(:).*s(:,n)).*dt;
+    %%  Refractory period Countdowns (no need for three separate)
+    if any(t_r > 0) || any(t_s > 0) || any(t_w > 0)
+        %Voltage Refractory Period
+        refractoryneurons = t_r > 0;
+        V(refractoryneurons,n+1) = V_reset(refractoryneurons);
+        t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
+        %Synaptic Activation
+        synneurons = t_s > 0;
+        a_s(synneurons,n+1) = a(synneurons);
+        t_s(synneurons) = t_s(synneurons) - dt;
+        %Spike Adaptation
+        adaptneurons = find(t_w > 0);
+        a_w(adaptneurons,n+1) = b(adaptneurons);        
+        t_w(adaptneurons) = t_w(adaptneurons) - dt;
+    end
 
-w(:,n+1)   = w(:,n) + (a_w(:,n).*(1-w(:,n)) - b_w(:).*w(:,n)).*dt;
 
-a_w(:,n+1) = w_r(:).*b_w(:)./(1 - w_r(:)).*exp((V(:,n+1)-E_L(:)).*delta_T(:));
+    %% Synaptic,Adaptaion Conductances
+        g_w(:,n+1) = EcellIDX'.*gwnorm(:).*w(:,n+1); %only E cells adapt
 
-%--------------------------------------------------------------------------
-
-if any(V(:,n) > V_th)
-
-spikeneurons = find(V(:,n+1) > V_th(:));
-
-spikes = [spikes; [t(n).*ones(size(spikeneurons)),spikeneurons]];
-
-%--------------------------------------------------------------------------
-
-if length(t_ref) > 1
-t_r(spikeneurons) = t_ref(spikeneurons);
-else
-t_r(spikeneurons) = t_ref;
-end
-
-if length(dw) > 1
-t_w(spikeneurons) = dw(spikeneurons);
-else
-t_w(spikeneurons) = dw;
-end
-
-if length(ds) > 1
-t_s(spikeneurons) = ds(spikeneurons);
-else
-t_s(spikeneurons) = ds;    
-end
-
-end
-
-%--------------------------------------------------------------------------
-
-if any(t_r > 0)
-
-refractoryneurons = find(t_r > 0);
-if length(V_reset) > 1
-V(refractoryneurons,n+1) = V_reset(refractoryneurons);
-else
-V(refractoryneurons,n+1) = V_reset;
-end
-    
-t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
-
-end
-
-if any(t_s > 0)
-
-synneurons = find(t_s > 0);
-if length(a) > 1
-a_s(synneurons,n+1) = a(synneurons);
-else
-a_s(synneurons,n+1) = a;
-end
-
-t_s(synneurons) = t_s(synneurons) - dt;
-
-end
-
-if any(t_w > 0)
-
-adaptneurons = find(t_w > 0);
-if length(b) > 1
-a_w(adaptneurons,n+1) = b(adaptneurons);
-else
-a_w(adaptneurons,n+1) = b;
-end
-
-t_w(adaptneurons) = t_w(adaptneurons) - dt;
-
-end
-
-%--------------------------------------------------------------------------
-
-g_w(:,n+1) = EcellIDX'.*gwnorm(:).*w(:,n+1);
-
-g_e(:,n+1) = EE_mat*s(:,n+1) + IE_mat*s(:,n+1);
-g_i(:,n+1) = II_mat*s(:,n+1) + EI_mat*s(:,n+1);
-
-%--------------------------------------------------------------------------
+        g_e(:,n+1) = EE_mat*s(:,n+1) + IE_mat*s(:,n+1);
+        g_i(:,n+1) = II_mat*s(:,n+1) + EI_mat*s(:,n+1);
 
 end
 
