@@ -247,17 +247,18 @@ NiceSave('noiseIllustration',figfolder,'CondAdLIF')
 %refreactory period, step current
 PopParams.sigma = 0;
 PopParams.EPopNum = 2;
+PopParams.IPopNum = 1;
 TimeParams.SimTime = 2000;
 
 t_ref   = [0.5 0.5 0.5 0.2 0.5 1];
 
 PopParams.Wee   = 100;        %E->E weight
-PopParams.Wii   = 1;        %I->I weight
-PopParams.Wie   = 1;        %E->I weight
-PopParams.Wei   = 1;        %I->E weight
+PopParams.Wii   = 0;        %I->I weight
+PopParams.Wie   = 50;        %E->I weight
+PopParams.Wei   = 0;        %I->E weight
 PopParams.Kee   = 2;        %Expected E->E In Degree
 PopParams.Kii   = 1;        %Expected I->I In Degree
-PopParams.Kie   = 1;        %Expected E->I In Degree
+PopParams.Kie   = 2;        %Expected E->I In Degree
 PopParams.Kei   = 1;
 
 %Synaptic Properties 
@@ -277,18 +278,19 @@ PopParams.w_r = 0.1;        %adaptation at rest (0-1)
 PopParams.gwnorm = 0;       %magnitude of adaptation
 
 %Input Current Function: A step function that only effects neuron 1
-stepmag = 201;
+stepmag = 211;
 steptime = [1000 1100];
-Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2))  ;zeros(size(t))];
+Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2));  ...
+    zeros(size(t));zeros(size(t))];
 PopParams.I_e = Inputfun;
 
 for ii = 1:6
-PopParams.b = b(ii);
-PopParams.t_ref = t_ref(ii);
-PopParams.b_w     = b_w(ii);
-PopParams.b_s = b_s(ii);
-PopParams.a       = a(ii);
-[testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+    PopParams.b = b(ii);
+    PopParams.t_ref = t_ref(ii);
+    PopParams.b_w     = b_w(ii);
+    PopParams.b_s = b_s(ii);
+    PopParams.a       = a(ii);
+    [testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
 end
 %% Spiking Properties
 viewwin = [990 1200];
@@ -299,6 +301,7 @@ figure
         xlim(viewwin)
         ylabel('I')
     subplot(4,2,3)
+    
         plot(testvals(1).t,testvals(1).V(1,:),'k')
         xlim(viewwin)
         ylabel('V_p_r_e')
@@ -360,40 +363,34 @@ figure
         xlim(viewwin)
         ylabel('V_p_r_e')
     subplot(4,2,5)
-        plot(testvals(1).t,testvals(1).w(1,:),'k')
-        xlim(viewwin)
-        ylabel('w_p_r_e')
-    subplot(4,2,7)
-        plot(testvals(1).t,testvals(1).s(1,:),'k')
+    for ii = 1:3
+        plot(testvals(ii).t,testvals(ii).s(1,:),'k')
+    end
         xlim(viewwin)
         ylabel('s_p_r_e')
         
     subplot(4,2,2)
     hold on
-    for ii = 4:6
+    for ii = 1:3
         plot(testvals(ii).t,testvals(ii).g_e(2,:),'k')
+        plot(testvals(ii).t,testvals(ii).g_e(3,:),'r')
     end
     axis tight
     xlim(viewwin)
         ylabel('g_e_,_p_o_s_t')
     subplot(4,2,4)
     hold on
-    for ii = 4:6
+    for ii = 1:3
         plot(testvals(ii).t,testvals(ii).V(2,:),'k')
+        plot(testvals(ii).t,testvals(ii).V(3,:),'r')
         
     end
     axis tight
     xlim(viewwin)
         ylabel('v_p_o_s_t')
-    subplot(4,2,6)
-        plot(testvals(1).t,testvals(1).w(2,:),'k')
-        xlim(viewwin)
-        ylabel('w_p_o_s_t')
-%     subplot(4,2,8)
-%         plot(testvals.t,testvals.s(2,:),'k')
-%         xlim(viewwin)
-%         ylabel('w_p_o_s_t')
-       NiceSave('synparms',figfolder,'CondAdLIF')  
+
+        
+        
      %% Adaptation Function
      w_r = 0.1;
      b_w = 0.01;
