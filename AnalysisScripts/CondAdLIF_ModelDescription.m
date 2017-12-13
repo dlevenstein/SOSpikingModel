@@ -116,8 +116,6 @@ for ss = 1:length(thetavals)
     thetatest.VoltageStats(ss).std = std(thetatest.SimValues(ss).V);
     [thetatest.VoltageStats(ss).fft,thetatest.VoltageStats(ss).freqs] = pwelch(thetatest.SimValues(ss).V,sf,[],[],sf);
 end
-%%
-
 
 %%
 noisecolors = [0 0 0; 0.25 0.25 0.25; 0.5 0.5 0.5; 0.75 0.75 0.75];
@@ -254,7 +252,7 @@ t_ref   = [0.5 0.5 0.5 0.2 0.5 1];
 
 PopParams.Wee   = 100;        %E->E weight
 PopParams.Wii   = 0;        %I->I weight
-PopParams.Wie   = 50;        %E->I weight
+PopParams.Wie   = 100;        %E->I weight
 PopParams.Wei   = 0;        %I->E weight
 PopParams.Kee   = 1;        %Expected E->E In Degree
 PopParams.Kii   = 0;        %Expected I->I In Degree
@@ -294,13 +292,9 @@ for ii = 1:6
     [testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
 end
 
-
-%% Debug
-figure
-plot(testvals(2).t,testvals(2).g_e,'k' )
 %% Spiking Properties
 viewwin = [990 1150];
-viewwin2 = [1025 1035];
+viewwin2 = [1027.5 1035];
 Ecolors = [0 0 0;0.35 0.35 0.35;0.7 0.7 0.7]; 
 figure
     subplot(8,2,1)
@@ -371,7 +365,10 @@ figure
 NiceSave('spikeparms',figfolder,'CondAdLIF') 
 
 %% Synaptic Properties
-viewwin = [1025 1150];
+viewwin = [1025 1120];
+vrange = [-68 -55];
+Ecolors = [0 0.2 0;0.35 0.55 0.35;0.7 0.9 0.7]; 
+Icolors = [0.2 0 0;0.55 0.35 0.35;0.9 0.7 0.7]; 
 figure
     subplot(4,2,1)
         plot(testvals(1).t,testvals(1).Input(1,:),'k')
@@ -382,34 +379,182 @@ figure
         xlim(viewwin)
         ylabel('V_p_r_e')
     subplot(4,2,5)
-    for ii = 1:3
-        plot(testvals(ii).t,testvals(ii).s(1,:),'k')
+    hold on
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).s(1,:),'color',Ecolors(ii,:),'linewidth',2)
     end
         xlim(viewwin)
+        legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
         ylabel('s_p_r_e')
         
     subplot(4,2,2)
     hold on
-    for ii = 1:3
-        plot(testvals(ii).t,testvals(ii).g_e(2,:),'k')
-        plot(testvals(ii).t,testvals(ii).g_e(3,:),'r')
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).g_e(2,:),'color',Ecolors(ii,:),'linewidth',2)
     end
     axis tight
-    xlim(viewwin)
+    xlim(viewwin);
+    legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
         ylabel('g_e_,_p_o_s_t')
     subplot(4,2,4)
     hold on
-    for ii = 1:3
-        plot(testvals(ii).t,testvals(ii).V(2,:),'k')
-        plot(testvals(ii).t,testvals(ii).V(3,:),'r')
-        
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).V(2,:),'color',Ecolors(ii,:),'linewidth',2)      
     end
     axis tight
-    xlim(viewwin)
+    %legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
+    xlim(viewwin);ylim(vrange)
+        ylabel('v_p_o_s_t')
+        
+        
+    subplot(4,2,6)
+    hold on
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).g_e(3,:),'color',Icolors(ii,:),'linewidth',2)
+    end
+    axis tight
+    xlim(viewwin);
+    legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
+        ylabel('g_e_,_p_o_s_t')
+    subplot(4,2,8)
+    hold on
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).V(3,:),'color',Icolors(ii,:),'linewidth',2)   
+    end
+    axis tight
+    xlim(viewwin);ylim(vrange)
+    %legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
         ylabel('v_p_o_s_t')
 
+ NiceSave('postsynparms',figfolder,'CondAdLIF')        
         
+ 
+ 
+ 
+%% Spiking/Synaptic Properties
+%refreactory period, step current
+PopParams.sigma = 0;
+PopParams.EPopNum = 1;
+PopParams.IPopNum = 2;
+TimeParams.SimTime = 2000;
+
+t_ref   = [0.5 0.5 0.5 0.2 0.5 1];
+
+PopParams.Wee   = 0;        %E->E weight
+PopParams.Wii   = 100;        %I->I weight
+PopParams.Wie   = 0;        %E->I weight
+PopParams.Wei   = 100;        %I->E weight
+PopParams.Kee   = 1;        %Expected E->E In Degree
+PopParams.Kii   = 0;        %Expected I->I In Degree
+PopParams.Kie   = 2;        %Expected E->I In Degree
+PopParams.Kei   = 0;
+
+%Synaptic Properties 
+PopParams.E_e     = 0;      %rev potential: E (mV)
+PopParams.E_i     = -80;    %rev potential: I (mV)
+b_s     = [0.5 0.2 0.1 1 1 1];      %synaptic decay timescale (1/ms)
+PopParams.ds      = 0.5;    %synaptic activation duration (ms)
+a       = [0.1 0.1 0.1 0.1 0.3 0.5 ];    %synaptic activation rate (1/ms)
+
+%Adaptation Properties
+PopParams.E_w     = -70;    %rev potential: adaptation (mV)
+b_w     = [0.10 0.05 0.02 0.02 0.02 0.02];   %adaptation decay rate (1/ms)
+PopParams.dw      = 0.2;    %adaptation activation duration (ms)
+b       = [1 1 1 0.5 1 2];    %adaptation activation rate (1/ms) (spike)
+PopParams.delta_T = 0;     %subthreshold adaptation steepness
+PopParams.w_r = 0.1;        %adaptation at rest (0-1)
+PopParams.gwnorm = 0;       %magnitude of adaptation
+
+%Input Current Function: A step function that only effects neuron 1
+stepmag = 305;
+steptime = [1000 1050];
+Inputfun = @(t) [zeros(size(t));zeros(size(t));...
+    stepmag.*(t>steptime(1) & t<steptime(2))];
+PopParams.I_e = Inputfun;
+
+clear testvals
+for ii = 1:6
+    PopParams.b = b(ii);
+    PopParams.t_ref = t_ref(ii);
+    PopParams.b_w     = b_w(ii);
+    PopParams.b_s = b_s(ii);
+    PopParams.a       = a(ii);
+    [testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+end
+
+%% Spiking Properties
+spikeneuron = 3;
+viewwin = [990 1150];
+viewwin2 = [1027.5 1035];
+precolors = [0 0 0;0.35 0.35 0.35;0.7 0.7 0.7]; 
+figure
+    subplot(8,2,1)
+        plot(testvals(1).t,testvals(1).Input(spikeneuron,:),'k','linewidth',2)
+        box off
+        xlim(viewwin)
+        ylim([0 stepmag+20])
+        ylabel('I');xlabel('t (ms)')
+    subplot(4,2,3)
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).V(spikeneuron,:),'k','linewidth',2)
+    end
+        xlim(viewwin)
+        ylim([-70 PopParams.V_th(1)])
+        ylabel('V_p_r_e')
+        box off
         
+    subplot(4,2,5)
+        hold on
+        for ii = 3:-1:1
+            plot(testvals(ii).t,testvals(ii).w(spikeneuron,:),'color',precolors(ii,:),'linewidth',2)
+        end
+        legend(num2str(b_w(3)),num2str(b_w(2)),num2str(b_w(1)))
+        xlim(viewwin);ylim([0 0.3])
+        ylabel('w_p_r_e')
+    subplot(4,2,7)
+        hold on
+        for ii = 3:-1:1
+            plot(testvals(ii).t,testvals(ii).s(spikeneuron,:),'color',precolors(ii,:),'linewidth',2)
+        end
+        legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
+        xlim(viewwin)
+        ylabel('s_p_r_e')
+        
+    subplot(4,2,2)
+        hold on
+        for ii = 6:-1:4
+            plot(testvals(ii).t,testvals(ii).a_w(spikeneuron,:),'color',precolors(ii-3,:),'linewidth',2)
+        end
+        legend(num2str(b(6)),num2str(b(5)),num2str(b(4)),'location','west')
+        xlim(viewwin2)
+        ylabel('a_w')
+    subplot(4,2,4)
+        hold on
+        for ii = 6:-1:4
+            plot(testvals(ii).t,testvals(ii).V(spikeneuron,:),'color',precolors(ii-3,:),'linewidth',2)
+        end
+        xlim(viewwin2);ylim([-70 PopParams.V_th(1)])
+        legend(num2str(t_ref(6)),num2str(t_ref(5)),num2str(t_ref(4)),'location','west')
+        ylabel('V_p_r_e')
+    subplot(4,2,6)
+        hold on
+        for ii = 6:-1:4
+            plot(testvals(ii).t,testvals(ii).w(spikeneuron,:),'color',precolors(ii-3,:),'linewidth',2)
+        end
+        xlim(viewwin2)
+        legend(num2str(b(6)),num2str(b(5)),num2str(b(4)),'location','west')
+        ylabel('w_p_r_e')
+    subplot(4,2,8)
+        hold on
+        for ii = 6:-1:4
+            plot(testvals(ii).t,testvals(ii).s(spikeneuron,:),'color',precolors(ii-3,:),'linewidth',2)
+        end
+        xlim(viewwin2)
+        legend(num2str(a(6)),num2str(a(5)),num2str(a(4)),'location','west')
+        ylabel('s_p_r_e')
+        
+NiceSave('Ispikeparms',figfolder,'CondAdLIF') 
+
      %% Adaptation Function
      w_r = 0.1;
      b_w = 0.01;

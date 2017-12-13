@@ -242,6 +242,8 @@ b_w         = transpose([b_w(1).*ones(1,EPopNum),     b_w(2).*ones(1,IPopNum)]);
 end
 if length(delta_T) == 2 
 delta_T     = transpose([delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,IPopNum)]);
+elseif length(delta_T) == 1
+delta_T     = transpose([delta_T(1).*ones(1,EPopNum), 0.*ones(1,IPopNum)]);
 end
 if length(dw) == 2 
 dw          = transpose([dw(1).*ones(1,EPopNum),      dw(2).*ones(1,IPopNum)]);
@@ -253,11 +255,13 @@ gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)
 end
 if length(w_r) == 2 
 w_r         = transpose([w_r(1).*ones(1,EPopNum),     w_r(2).*ones(1,IPopNum)]);
+elseif length(w_r) == 1 
+w_r         = transpose([w_r(1).*ones(1,EPopNum),     0.*ones(1,IPopNum)]);
 end
 if length(b) == 2 
 b           = transpose([b(1).*ones(1,EPopNum),       b(2).*ones(1,IPopNum)]);
 elseif length(b) == 1
-b           = transpose([b.*ones(1,EPopNum),       b.*ones(1,IPopNum)]);
+b           = transpose([b.*ones(1,EPopNum),       0.*ones(1,IPopNum)]);
 end
 if length(b_s) == 2 
 b_s         = transpose([b_s(1).*ones(1,EPopNum),     b_s(2).*ones(1,IPopNum)]);
@@ -334,7 +338,7 @@ for n=1:TimeLength-1
 
 
     %% Synaptic,Adaptaion Conductances
-        g_w(:,n+1) = EcellIDX'.*gwnorm(:).*w(:,n+1); %only E cells adapt
+        g_w(:,n+1) = gwnorm(:).*w(:,n+1); %only E cells adapt
 
         g_e(:,n+1) = EE_mat*s(:,n+1) + IE_mat*s(:,n+1);
         g_i(:,n+1) = II_mat*s(:,n+1) + EI_mat*s(:,n+1);
