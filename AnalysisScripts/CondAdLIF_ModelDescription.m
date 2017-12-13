@@ -48,7 +48,7 @@ PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
 PopParams.dw      = 0.2;    %adaptation activation duration (ms)
 PopParams.b       = 0.1;    %adaptation activation rate (1/ms)
-PopParams.delta_T = 10;     %subthreshold adaptation steepness
+PopParams.delta_T = 0;     %subthreshold adaptation steepness
 PopParams.w_r = 0.1;        %adaptation at rest (0-1)
 PopParams.gwnorm = 0;       %magnitude of adaptation
 
@@ -256,21 +256,21 @@ PopParams.Wee   = 100;        %E->E weight
 PopParams.Wii   = 0;        %I->I weight
 PopParams.Wie   = 50;        %E->I weight
 PopParams.Wei   = 0;        %I->E weight
-PopParams.Kee   = 2;        %Expected E->E In Degree
-PopParams.Kii   = 1;        %Expected I->I In Degree
+PopParams.Kee   = 1;        %Expected E->E In Degree
+PopParams.Kii   = 0;        %Expected I->I In Degree
 PopParams.Kie   = 2;        %Expected E->I In Degree
-PopParams.Kei   = 1;
+PopParams.Kei   = 0;
 
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
-b_s     = [1 1 1 0.5 1 2];      %synaptic decay timescale (1/ms)
+b_s     = [0.5 0.2 0.1 1 1 1];      %synaptic decay timescale (1/ms)
 PopParams.ds      = 0.5;    %synaptic activation duration (ms)
-a       = [0.5 1 1.5 0.5 0.5 0.5];    %synaptic activation rate (1/ms)
+a       = [0.1 0.1 0.1 0.1 0.3 0.5 ];    %synaptic activation rate (1/ms)
 
 %Adaptation Properties
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
-b_w     = [0.1 0.03 0.01 0.01 0.01 0.01];   %adaptation decay timescale (1/ms)
+b_w     = [0.10 0.05 0.02 0.02 0.02 0.02];   %adaptation decay rate (1/ms)
 PopParams.dw      = 0.2;    %adaptation activation duration (ms)
 b       = [1 1 1 0.5 1 2];    %adaptation activation rate (1/ms) (spike)
 PopParams.delta_T = 0;     %subthreshold adaptation steepness
@@ -278,12 +278,13 @@ PopParams.w_r = 0.1;        %adaptation at rest (0-1)
 PopParams.gwnorm = 0;       %magnitude of adaptation
 
 %Input Current Function: A step function that only effects neuron 1
-stepmag = 211;
-steptime = [1000 1100];
+stepmag = 250;
+steptime = [1000 1050];
 Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2));  ...
     zeros(size(t));zeros(size(t))];
 PopParams.I_e = Inputfun;
 
+clear testvals
 for ii = 1:6
     PopParams.b = b(ii);
     PopParams.t_ref = t_ref(ii);
@@ -292,61 +293,79 @@ for ii = 1:6
     PopParams.a       = a(ii);
     [testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
 end
-%% Spiking Properties
-viewwin = [990 1200];
-viewwin2 = [1050 1060];
+
+
+%% Debug
 figure
-    subplot(4,2,1)
-        plot(testvals(1).t,testvals(1).Input(1,:),'k')
+plot(testvals(2).t,testvals(2).g_e,'k' )
+%% Spiking Properties
+viewwin = [990 1150];
+viewwin2 = [1025 1035];
+Ecolors = [0 0 0;0.35 0.35 0.35;0.7 0.7 0.7]; 
+figure
+    subplot(8,2,1)
+        plot(testvals(1).t,testvals(1).Input(1,:),'k','linewidth',2)
+        box off
         xlim(viewwin)
-        ylabel('I')
+        ylim([0 stepmag+20])
+        ylabel('I');xlabel('t (ms)')
     subplot(4,2,3)
-    
-        plot(testvals(1).t,testvals(1).V(1,:),'k')
-        xlim(viewwin)
-        ylabel('V_p_r_e')
-    subplot(4,2,5)
-    hold on
-    for ii = 1:3
-        plot(testvals(ii).t,testvals(ii).w(1,:),'k')
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).V(1,:),'k','linewidth',2)
     end
         xlim(viewwin)
+        ylim([-70 PopParams.V_th(1)])
+        ylabel('V_p_r_e')
+        box off
+        
+    subplot(4,2,5)
+        hold on
+        for ii = 3:-1:1
+            plot(testvals(ii).t,testvals(ii).w(1,:),'color',Ecolors(ii,:),'linewidth',2)
+        end
+        legend(num2str(b_w(3)),num2str(b_w(2)),num2str(b_w(1)))
+        xlim(viewwin);ylim([0 0.3])
         ylabel('w_p_r_e')
     subplot(4,2,7)
-    hold on
-    for ii = 1:3
-        plot(testvals(ii).t,testvals(ii).s(1,:),'k')
-    end
+        hold on
+        for ii = 3:-1:1
+            plot(testvals(ii).t,testvals(ii).s(1,:),'color',Ecolors(ii,:),'linewidth',2)
+        end
+        legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
         xlim(viewwin)
         ylabel('s_p_r_e')
         
     subplot(4,2,2)
-    hold on
-    for ii = 4:6
-        plot(testvals(ii).t,testvals(ii).a_w(1,:),'k')
-    end
+        hold on
+        for ii = 6:-1:4
+            plot(testvals(ii).t,testvals(ii).a_w(1,:),'color',Ecolors(ii-3,:),'linewidth',2)
+        end
+        legend(num2str(b(6)),num2str(b(5)),num2str(b(4)),'location','west')
         xlim(viewwin2)
         ylabel('a_w')
     subplot(4,2,4)
-    hold on
-    for ii = 4:6
-        plot(testvals(ii).t,testvals(ii).V(1,:),'k')
-    end
-        xlim(viewwin2)
+        hold on
+        for ii = 6:-1:4
+            plot(testvals(ii).t,testvals(ii).V(1,:),'color',Ecolors(ii-3,:),'linewidth',2)
+        end
+        xlim(viewwin2);ylim([-70 PopParams.V_th(1)])
+        legend(num2str(t_ref(6)),num2str(t_ref(5)),num2str(t_ref(4)),'location','west')
         ylabel('V_p_r_e')
     subplot(4,2,6)
-    hold on
-    for ii = 4:6
-        plot(testvals(ii).t,testvals(ii).w(1,:),'k')
-    end
+        hold on
+        for ii = 6:-1:4
+            plot(testvals(ii).t,testvals(ii).w(1,:),'color',Ecolors(ii-3,:),'linewidth',2)
+        end
         xlim(viewwin2)
+        legend(num2str(b(6)),num2str(b(5)),num2str(b(4)),'location','west')
         ylabel('w_p_r_e')
     subplot(4,2,8)
-    hold on
-    for ii = 4:6
-        plot(testvals(ii).t,testvals(ii).s(1,:),'k')
-    end
+        hold on
+        for ii = 6:-1:4
+            plot(testvals(ii).t,testvals(ii).s(1,:),'color',Ecolors(ii-3,:),'linewidth',2)
+        end
         xlim(viewwin2)
+        legend(num2str(a(6)),num2str(a(5)),num2str(a(4)),'location','west')
         ylabel('s_p_r_e')
         
 NiceSave('spikeparms',figfolder,'CondAdLIF') 

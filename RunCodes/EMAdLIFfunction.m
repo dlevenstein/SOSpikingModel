@@ -275,8 +275,11 @@ end
 
 %--------------------------------------------------------------------------
 %Initial Conditions - random voltages
-%Improvement: set # initial spiking neurons instead of hard coding Vth+10
-V(:,1) = V_reset.*rand(PopNum,1) + (V_th+10).*rand(PopNum,1);
+%Improvement: set # initial spiking neurons instead of hard coding 
+%range: E_L-Vth
+p0spike = 0.05; %5 chance of initial spiking 
+V0range = [min(E_L) max(V_th)]; %make this neuron vector
+V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 
 %% Time Loop
 for n=1:TimeLength-1
