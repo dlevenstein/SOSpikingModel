@@ -86,39 +86,41 @@ Icells = EPopNum+1:PopNum;      IcellIDX = ismember(1:PopNum,Icells);
 %For example, there are values for the EE connections on the 1x1 matrix, II
 %on the 2x2 matrix, and etc (this is based on the indexing of the neuron population). 
 
-%NOTE: presynaptic neurons are columns and postsynaptic neurons are rows.
+%NOTE: presynaptic neurons are columns (dim2) and postsynaptic neurons are rows (dim1).
 
+%E->E Synapses
 Wee = PopParams.Wee;
 Kee = PopParams.Kee;
-Pee = Kee./PopNum;
+Pee = Kee./(EPopNum-1); %-1 to account for self-connections (which are then removed)
 
 EE_mat(Ecells,Ecells) = rand(EPopNum)<=Pee;
 EE_mat = EE_mat.*Wee;
 EE_mat(diag(diag(true(size(EE_mat)))))=0; %Remove selfconnections
 
+%I->I Synapses
 Wii = PopParams.Wii;
 Kii = PopParams.Kii;
-Pii = Kii./PopNum;
+Pii = Kii./(IPopNum-1);
 
 II_mat(Icells,Icells) = rand(IPopNum)<=Pii;
 II_mat = II_mat.*Wii;
 II_mat(diag(diag(true(size(II_mat)))))=0; %Remove selfconnections
 
+%E->I Synapses
 Wie = PopParams.Wie;
 Kie = PopParams.Kie;
-Pie = Kie./PopNum;
+Pie = Kie./EPopNum;
 
 IE_mat(Icells,Ecells) = rand(IPopNum,EPopNum)<=Pie;
 IE_mat = IE_mat.*Wie;
-IE_mat(diag(diag(true(size(IE_mat)))))=0; %Remove selfconnections
 
+%I->E Synapses
 Wei = PopParams.Wei;
 Kei = PopParams.Kei;
-Pei = Kei./PopNum;
+Pei = Kei./IPopNum;
 
 EI_mat(Ecells,Icells) = rand(EPopNum,IPopNum)<=Pei;
 EI_mat = EI_mat.*Wei;
-EI_mat(diag(diag(true(size(EI_mat)))))=0; %Remove selfconnections
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
@@ -354,6 +356,7 @@ SimValues.a_w             = a_w;
 SimValues.spikes          = spikes;
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
+SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
 
 SimValues.Input           = I_e + X_t;
 
