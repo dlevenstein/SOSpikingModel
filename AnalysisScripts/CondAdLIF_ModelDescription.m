@@ -444,10 +444,10 @@ PopParams.Wee   = 0;        %E->E weight
 PopParams.Wii   = 100;        %I->I weight
 PopParams.Wie   = 0;        %E->I weight
 PopParams.Wei   = 100;        %I->E weight
-PopParams.Kee   = 1;        %Expected E->E In Degree
-PopParams.Kii   = 0;        %Expected I->I In Degree
-PopParams.Kie   = 2;        %Expected E->I In Degree
-PopParams.Kei   = 0;
+PopParams.Kee   = 0;        %Expected E->E In Degree
+PopParams.Kii   = 1;        %Expected I->I In Degree
+PopParams.Kie   = 0;        %Expected E->I In Degree
+PopParams.Kei   = 2;
 
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
@@ -484,6 +484,7 @@ end
 
 %% Spiking Properties
 spikeneuron = 3;
+vrange = [-70 -64];
 viewwin = [990 1150];
 viewwin2 = [1027.5 1035];
 precolors = [0 0 0;0.35 0.35 0.35;0.7 0.7 0.7]; 
@@ -506,45 +507,14 @@ figure
     subplot(4,2,5)
         hold on
         for ii = 3:-1:1
-            plot(testvals(ii).t,testvals(ii).w(spikeneuron,:),'color',precolors(ii,:),'linewidth',2)
-        end
-        legend(num2str(b_w(3)),num2str(b_w(2)),num2str(b_w(1)))
-        xlim(viewwin);ylim([0 0.3])
-        ylabel('w_p_r_e')
-    subplot(4,2,7)
-        hold on
-        for ii = 3:-1:1
             plot(testvals(ii).t,testvals(ii).s(spikeneuron,:),'color',precolors(ii,:),'linewidth',2)
         end
         legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
         xlim(viewwin)
         ylabel('s_p_r_e')
         
-    subplot(4,2,2)
-        hold on
-        for ii = 6:-1:4
-            plot(testvals(ii).t,testvals(ii).a_w(spikeneuron,:),'color',precolors(ii-3,:),'linewidth',2)
-        end
-        legend(num2str(b(6)),num2str(b(5)),num2str(b(4)),'location','west')
-        xlim(viewwin2)
-        ylabel('a_w')
-    subplot(4,2,4)
-        hold on
-        for ii = 6:-1:4
-            plot(testvals(ii).t,testvals(ii).V(spikeneuron,:),'color',precolors(ii-3,:),'linewidth',2)
-        end
-        xlim(viewwin2);ylim([-70 PopParams.V_th(1)])
-        legend(num2str(t_ref(6)),num2str(t_ref(5)),num2str(t_ref(4)),'location','west')
-        ylabel('V_p_r_e')
-    subplot(4,2,6)
-        hold on
-        for ii = 6:-1:4
-            plot(testvals(ii).t,testvals(ii).w(spikeneuron,:),'color',precolors(ii-3,:),'linewidth',2)
-        end
-        xlim(viewwin2)
-        legend(num2str(b(6)),num2str(b(5)),num2str(b(4)),'location','west')
-        ylabel('w_p_r_e')
-    subplot(4,2,8)
+
+    subplot(4,2,7)
         hold on
         for ii = 6:-1:4
             plot(testvals(ii).t,testvals(ii).s(spikeneuron,:),'color',precolors(ii-3,:),'linewidth',2)
@@ -552,6 +522,46 @@ figure
         xlim(viewwin2)
         legend(num2str(a(6)),num2str(a(5)),num2str(a(4)),'location','west')
         ylabel('s_p_r_e')
+        
+        
+    subplot(4,2,2)
+    hold on
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).g_i(1,:),'color',Ecolors(ii,:),'linewidth',2)
+    end
+    axis tight
+    xlim(viewwin);
+    legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
+        ylabel('g_i_,_p_o_s_t')
+    subplot(4,2,4)
+    hold on
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).V(1,:),'color',Ecolors(ii,:),'linewidth',2)      
+    end
+    axis tight
+    %legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
+    xlim(viewwin);ylim(vrange)
+        ylabel('v_p_o_s_t')
+        
+        
+    subplot(4,2,6)
+    hold on
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).g_i(2,:),'color',Icolors(ii,:),'linewidth',2)
+    end
+    axis tight
+    xlim(viewwin);
+    legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
+        ylabel('g_i_,_p_o_s_t')
+    subplot(4,2,8)
+    hold on
+    for ii = 3:-1:1
+        plot(testvals(ii).t,testvals(ii).V(2,:),'color',Icolors(ii,:),'linewidth',2)   
+    end
+    axis tight
+    xlim(viewwin);ylim(vrange)
+    %legend(num2str(b_s(3)),num2str(b_s(2)),num2str(b_s(1)))
+        ylabel('v_p_o_s_t')
         
 NiceSave('Ispikeparms',figfolder,'CondAdLIF') 
 
@@ -616,7 +626,7 @@ PopParams.Kii   = 0;        %Expected I->I In Degree
 PopParams.Kie   = 0;        %Expected E->I In Degree
 PopParams.Kei   = 0;        %Expected I->E In Degree
 
-stepmags = -100:50:400;
+stepmags = -200:50:500;
 for ii = 1:length(stepmags)
 %Input Current Function: A step function that only effects neuron 1
 stepmag = (stepmags(ii));
@@ -658,9 +668,9 @@ PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
 PopParams.dw      = 0.2;    %adaptation activation duration (ms)
 PopParams.b       = 1;    %adaptation activation rate (1/ms)
-PopParams.delta_T = 0.5;     %subthreshold adaptation steepness
+PopParams.delta_T = 0.3;     %subthreshold adaptation steepness
 PopParams.w_r = 0.1;        %adaptation at rest (0-1)
-PopParams.gwnorm = 10; 
+PopParams.gwnorm = 30; 
 
 
 for ii = 1:length(stepmags)
@@ -673,7 +683,7 @@ PopParams.I_e = Inputfun;
 end
 
 %%
-viewwin = [900 1600];
+viewwin = [900 1800];
 figure
 subplot(3,2,1)
     hold on
@@ -681,6 +691,7 @@ subplot(3,2,1)
     plot(testvals(ii).t,testvals(ii).V,'k')
     end
     xlim(viewwin)
+    ylabel('V')
     
 subplot(3,2,3)
     hold on
@@ -688,6 +699,7 @@ subplot(3,2,3)
     plot(testvals(ii).t,testvals(ii).w,'k')
     end
     xlim(viewwin)
+    ylabel('w')
     
 subplot(3,2,5)
     hold on
@@ -695,9 +707,10 @@ subplot(3,2,5)
     plot(testvals(ii).t,testvals(ii).a_w,'k')
     end
     xlim(viewwin)
+    ylabel('alpha_w')
     
 subplot(2,2,2)
-     V = linspace(-70,-55,100);
+     V = linspace(-70,PopParams.V_th(1),100);
      a_w = PopParams.w_r.*PopParams.b_w./(1 - PopParams.w_r).*exp((V-PopParams.E_L(1)).*PopParams.delta_T);
      plot(V,a_w,'k')
      hold on
