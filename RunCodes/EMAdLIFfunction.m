@@ -277,11 +277,14 @@ elseif length(a) == 1
 a           = transpose([a.*ones(1,EPopNum),       a.*ones(1,IPopNum)]);
 end
 
-%--------------------------------------------------------------------------
-%Initial Conditions - random voltages
+%% if no spike adaptation, set to steady state????? or set to alpha(v_th)
+b(b==0) = w_r(b==0).*b_w(b==0)./(1 - w_r(b==0)).*exp((V_reset(b==0)-E_L(b==0)).*delta_T(b==0));
+
+
+%% Initial Conditions - random voltages
 %Improvement: set # initial spiking neurons instead of hard coding 
 %range: E_L-Vth
-p0spike = 0.05; %5 chance of initial spiking 
+p0spike = 0.0; %5 chance of initial spiking 
 V0range = [min(E_L) max(V_th)]; %make this neuron vector
 V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 
