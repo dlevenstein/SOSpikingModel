@@ -566,21 +566,21 @@ figure
 NiceSave('Ispikeparms',figfolder,'CondAdLIF') 
 
      %% Adaptation Function
-     w_r = 0.1;
-     b_w = 0.01;
-     E_L = -65;
-     delta_T = 10;
-     V = linspace(-70,-55,100);
-     a_w = w_r.*b_w./(1 - w_r).*exp((V-E_L).*delta_T);
-     plot(V,a_w)
-%% Adaptation - 
+%      w_r = 0.1;
+%      b_w = 0.01;
+%      E_L = -65;
+%      delta_T = 10;
+%      V = linspace(-70,-55,100);
+%      a_w = w_r.*b_w./(1 - w_r).*exp((V-E_L).*delta_T);
+%      plot(V,a_w)
+%% Adaptation - gbar
 
 
 %subthreshold, superthreshold.  show E cell under low mag step current? w
 %variable, gW.  membrane potential with reversal potential.
 %step currents for sub,super,of diff't values.  sub+super for a select
 %intermediate zone
-TimeParams.SimTime = 2000;
+TimeParams.SimTime = 2500;
 
 %Input 
 PopParams.I_e  = 0;
@@ -626,41 +626,168 @@ PopParams.Kii   = 0;        %Expected I->I In Degree
 PopParams.Kie   = 0;        %Expected E->I In Degree
 PopParams.Kei   = 0;        %Expected I->E In Degree
 
-stepmags = -200:50:500;
-for ii = 1:length(stepmags)
-%Input Current Function: A step function that only effects neuron 1
-stepmag = (stepmags(ii));
-steptime = [1000 1500];
-Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2))];
-PopParams.I_e = Inputfun;
-[testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
-end
+stepmags = 200:10:500;
 
-%%
-viewwin = [900 1600];
+gvals = [0 7.5 15];
+clear w_ss; clear rate_ss; clear rate_0; clear ISIs
+for gg = 1:length(gvals)
+    PopParams.gwnorm = gvals(gg);
+    %Simulate steps (maybe add step option to EMAdLIFfunction?
+    for ii = 1:length(stepmags)
+        %Input Current Function: A step function that only effects neuron 1
+        stepmag = (stepmags(ii));
+        steptime = [1000 2000];
+        Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2))];
+        PopParams.I_e = Inputfun;
+        [testvals(ii,gg)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+    end
+
+    % Calculations
+    sswin = [1500 2000];
+    
+    for ii = 1:length(stepmags)
+        w_ss(ii,gg) = mean(testvals(ii,gg).w(testvals(ii,gg).t>sswin(1) & testvals(ii,gg).t<sswin(2)));
+        ISIs{ii,gg} = diff(testvals(ii,gg).spikes(:,1));
+        if isempty(ISIs{ii,gg})
+            rate_ss(ii,gg) = 0; rate_0(ii,gg) = 0;
+            continue
+        end
+        rate_ss(ii,gg) = 1./(ISIs{ii,gg}(end)./1000);
+        rate_0(ii,gg) = 1./(ISIs{ii,gg}(1)./1000);
+    end
+    
+end
+%% Gbar figure
+viewwin = [900 2100];
 figure
-subplot(3,2,1)
+for gg = 1:length(gvals)
+    subplot(4,3,gg)
+        hold on
+        for ii = round(linspace(1,length(stepmags),8))
+        plot(testvals(ii,gg).t,testvals(ii,gg).V,'k')
+        end
+        ylabel('v');%xlabel('t')
+        xlim(viewwin)
+
+    subplot(4,3,3+gg)
+        hold on
+        for ii = round(linspace(1,length(stepmags),8))
+        plot(testvals(ii,gg).t,testvals(ii,gg).w,'k')
+        end
+        ylabel('w');xlabel('t')
+        xlim(viewwin)
+end    
+    
+ subplot(4,4,13)
     hold on
-    for ii = 1:length(stepmags)
-    plot(testvals(ii).t,testvals(ii).V,'k')
-    end
-    xlim(viewwin)
+    plot(log10([1 300]),log10([1 300]),'k')
+    plot(log10(rate_0),log10(rate_ss),'o')
+    LogScale('xy',10)
+    xlabel('ISI^-^1_0 (Hz)');ylabel('ISI^-^1_s_s (Hz)')
     
-subplot(3,2,3)
+subplot(4,4,14)
+    plot(stepmags,w_ss,'.-')
+    xlabel('Input');ylabel('w_s_s')
+    
+subplot(4,4,15)
+    plot(log10(rate_ss),w_ss,'.-')
+    LogScale('x',10)
+    xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
+    
+subplot(4,4,16)
+    plot(stepmags,log10(rate_ss),'o')
     hold on
-    for ii = 1:length(stepmags)
-    plot(testvals(ii).t,testvals(ii).w,'k')
-    end
-    xlim(viewwin)
+    plot(stepmags,log10(rate_0),'.')
+    LogScale('y',10)
+    xlabel('Input');ylabel('Rate (Hz)')
     
-subplot(3,2,5)
+NiceSave('Adaptation_gbar',figfolder,'CondAdLIF') 
+
+
+%% Adaptation - b
+PopParams.gwnorm = gvals(2);
+bvals = [0 1 2];
+clear w_ss; clear rate_ss; clear rate_0; clear ISIs
+for bb = 1:length(bvals)
+    PopParams.b = bvals(bb);
+    %Simulate steps (maybe add step option to EMAdLIFfunction?
+    for ii = 1:length(stepmags)
+        %Input Current Function: A step function that only effects neuron 1
+        stepmag = (stepmags(ii));
+        steptime = [1000 2000];
+        Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2))];
+        PopParams.I_e = Inputfun;
+        [testvals(ii,bb)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+    end
+
+    % Calculations
+    sswin = [1500 2000];
+    
+    for ii = 1:length(stepmags)
+        w_ss(ii,bb) = mean(testvals(ii,bb).w(testvals(ii,bb).t>sswin(1) & testvals(ii,bb).t<sswin(2)));
+        ISIs{ii,bb} = diff(testvals(ii,bb).spikes(:,1));
+        if isempty(ISIs{ii,bb})
+            rate_ss(ii,bb) = 0; rate_0(ii,bb) = 0;
+            continue
+        end
+        rate_ss(ii,bb) = 1./(ISIs{ii,bb}(end)./1000);
+        rate_0(ii,bb) = 1./(ISIs{ii,bb}(1)./1000);
+    end
+    
+end
+%% b figure
+viewwin = [900 2100];
+figure
+for bb = 1:length(bvals)
+    subplot(4,3,bb)
+        hold on
+        for ii = round(linspace(1,length(stepmags),8))
+        plot(testvals(ii,bb).t,testvals(ii,bb).V,'k')
+        end
+        ylabel('v');%xlabel('t')
+        xlim(viewwin)
+
+    subplot(4,3,3+bb)
+        hold on
+        for ii = round(linspace(1,length(stepmags),8))
+        plot(testvals(ii,bb).t,testvals(ii,bb).w,'k')
+        end
+        ylabel('w');xlabel('t')
+        xlim(viewwin)
+        
+    subplot(4,3,6+bb)
+        hold on
+        for ii = round(linspace(1,length(stepmags),8))
+        plot(testvals(ii,bb).t,testvals(ii,bb).a_w,'k')
+        end
+        ylabel('w');xlabel('t')
+        xlim(viewwin)
+end    
+    
+ subplot(4,4,13)
     hold on
-    for ii = 1:length(stepmags)
-    plot(testvals(ii).t,testvals(ii).a_w,'k')
-    end
-    xlim(viewwin)
+    plot(log10([1 300]),log10([1 300]),'k')
+    plot(log10(rate_0),log10(rate_ss),'o')
+    LogScale('xy',10)
+    xlabel('ISI^-^1_0 (Hz)');ylabel('ISI^-^1_s_s (Hz)')
     
+subplot(4,4,14)
+    plot(stepmags,w_ss,'.-')
+    xlabel('Input');ylabel('w_s_s')
     
+subplot(4,4,15)
+    plot(log10(rate_ss),w_ss,'.-')
+    LogScale('x',10)
+    xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
+    
+subplot(4,4,16)
+    plot(stepmags,log10(rate_ss),'o')
+    hold on
+    plot(stepmags,log10(rate_0),'.')
+    LogScale('y',10)
+    xlabel('Input');ylabel('Rate (Hz)')
+    
+NiceSave('Adaptation_jumpb',figfolder,'CondAdLIF') 
     %%
     
     %Adaptation Properties
@@ -681,6 +808,10 @@ Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2))];
 PopParams.I_e = Inputfun;
 [testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
 end
+
+
+
+%%
 
 %%
 viewwin = [900 1800];
@@ -717,6 +848,8 @@ subplot(2,2,2)
      plot(V(end)+[0 5],PopParams.b.*[1 1],'k')
      xlabel('V')
      ylabel('Alpha(V)')
+     
+
 %% Synaptic properties and variables
 
 %Show: E spike effect on I,E
