@@ -626,9 +626,9 @@ PopParams.Kii   = 0;        %Expected I->I In Degree
 PopParams.Kie   = 0;        %Expected E->I In Degree
 PopParams.Kei   = 0;        %Expected I->E In Degree
 
-stepmags = 200:10:500;
+stepmags = 190:10:500;
 
-gvals = [0 7.5 15];
+gvals = [0 5 10 15];
 clear w_ss; clear rate_ss; clear rate_0; clear ISIs
 for gg = 1:length(gvals)
     PopParams.gwnorm = gvals(gg);
@@ -661,7 +661,7 @@ end
 viewwin = [900 2100];
 figure
 for gg = 1:length(gvals)
-    subplot(4,3,gg)
+    subplot(5,4,gg)
         hold on
         for ii = round(linspace(1,length(stepmags),8))
         plot(testvals(ii,gg).t,testvals(ii,gg).V,'k')
@@ -669,7 +669,7 @@ for gg = 1:length(gvals)
         ylabel('v');%xlabel('t')
         xlim(viewwin)
 
-    subplot(4,3,3+gg)
+    subplot(5,4,4+gg)
         hold on
         for ii = round(linspace(1,length(stepmags),8))
         plot(testvals(ii,gg).t,testvals(ii,gg).w,'k')
@@ -681,7 +681,7 @@ end
  subplot(4,4,13)
     hold on
     plot(log10([1 300]),log10([1 300]),'k')
-    plot(log10(rate_0),log10(rate_ss),'o')
+    plot(log10(rate_0),log10(rate_ss),'.-')
     LogScale('xy',10)
     xlabel('ISI^-^1_0 (Hz)');ylabel('ISI^-^1_s_s (Hz)')
     
@@ -695,18 +695,17 @@ subplot(4,4,15)
     xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
     
 subplot(4,4,16)
-    plot(stepmags,log10(rate_ss),'o')
+    plot(stepmags,log10(rate_ss),'.-')
     hold on
-    plot(stepmags,log10(rate_0),'.')
+    plot(stepmags,log10(rate_0),'o')
     LogScale('y',10)
     xlabel('Input');ylabel('Rate (Hz)')
     
 NiceSave('Adaptation_gbar',figfolder,'CondAdLIF') 
 
-
 %% Adaptation - b
-PopParams.gwnorm = gvals(2);
-bvals = [0 1 2];
+PopParams.gwnorm = gvals(3);
+bvals = [0 1 2 3];
 clear w_ss; clear rate_ss; clear rate_0; clear ISIs
 for bb = 1:length(bvals)
     PopParams.b = bvals(bb);
@@ -739,7 +738,7 @@ end
 viewwin = [900 2100];
 figure
 for bb = 1:length(bvals)
-    subplot(4,3,bb)
+    subplot(5,4,bb)
         hold on
         for ii = round(linspace(1,length(stepmags),8))
         plot(testvals(ii,bb).t,testvals(ii,bb).V,'k')
@@ -747,15 +746,15 @@ for bb = 1:length(bvals)
         ylabel('v');%xlabel('t')
         xlim(viewwin)
 
-    subplot(4,3,3+bb)
+    subplot(5,4,4+bb)
         hold on
         for ii = round(linspace(1,length(stepmags),8))
         plot(testvals(ii,bb).t,testvals(ii,bb).w,'k')
         end
         ylabel('w');xlabel('t')
-        xlim(viewwin)
+        xlim(viewwin);ylim([0 1])
         
-    subplot(4,3,6+bb)
+    subplot(5,4,8+bb)
         hold on
         for ii = round(linspace(1,length(stepmags),8))
         plot(testvals(ii,bb).t,testvals(ii,bb).a_w,'k')
@@ -767,7 +766,7 @@ end
  subplot(4,4,13)
     hold on
     plot(log10([1 300]),log10([1 300]),'k')
-    plot(log10(rate_0),log10(rate_ss),'o')
+    plot(log10(rate_0),log10(rate_ss),'.-')
     LogScale('xy',10)
     xlabel('ISI^-^1_0 (Hz)');ylabel('ISI^-^1_s_s (Hz)')
     
@@ -781,13 +780,99 @@ subplot(4,4,15)
     xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
     
 subplot(4,4,16)
-    plot(stepmags,log10(rate_ss),'o')
+    plot(stepmags,log10(rate_ss),'.-')
     hold on
-    plot(stepmags,log10(rate_0),'.')
+    plot(stepmags,log10(rate_0),'o')
     LogScale('y',10)
     xlabel('Input');ylabel('Rate (Hz)')
     
 NiceSave('Adaptation_jumpb',figfolder,'CondAdLIF') 
+
+
+%% Adaptation - beta
+PopParams.b = bvals(3);
+betavals = [0.1 0.03 0.01 0.003];
+clear w_ss; clear rate_ss; clear rate_0; clear ISIs
+for bb = 1:length(betavals)
+    PopParams.b_w = betavals(bb);
+    %Simulate steps (maybe add step option to EMAdLIFfunction?
+    for ii = 1:length(stepmags)
+        %Input Current Function: A step function that only effects neuron 1
+        stepmag = (stepmags(ii));
+        steptime = [1000 2000];
+        Inputfun = @(t) [stepmag.*(t>steptime(1) & t<steptime(2))];
+        PopParams.I_e = Inputfun;
+        [testvals(ii,bb)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+    end
+
+    % Calculations
+    sswin = [1500 2000];
+    
+    for ii = 1:length(stepmags)
+        w_ss(ii,bb) = mean(testvals(ii,bb).w(testvals(ii,bb).t>sswin(1) & testvals(ii,bb).t<sswin(2)));
+        ISIs{ii,bb} = diff(testvals(ii,bb).spikes(:,1));
+        if isempty(ISIs{ii,bb})
+            rate_ss(ii,bb) = 0; rate_0(ii,bb) = 0;
+            continue
+        end
+        rate_ss(ii,bb) = 1./(ISIs{ii,bb}(end)./1000);
+        rate_0(ii,bb) = 1./(ISIs{ii,bb}(1)./1000);
+    end
+    
+end
+%% beta figure
+viewwin = [900 2100];
+figure
+for bb = 1:length(betavals)
+    subplot(5,4,bb)
+        hold on
+        for ii = round(linspace(1,length(stepmags),8))
+        plot(testvals(ii,bb).t,testvals(ii,bb).V,'k')
+        end
+        ylabel('v');%xlabel('t')
+        xlim(viewwin)
+
+    subplot(5,4,4+bb)
+        hold on
+        for ii = round(linspace(1,length(stepmags),8))
+        plot(testvals(ii,bb).t,testvals(ii,bb).w,'k')
+        end
+        ylabel('w');xlabel('t')
+        xlim(viewwin);ylim([0 1])
+        
+    subplot(5,4,8+bb)
+        hold on
+        for ii = round(linspace(1,length(stepmags),8))
+        plot(testvals(ii,bb).t,testvals(ii,bb).a_w,'k')
+        end
+        ylabel('w');xlabel('t')
+        xlim(viewwin)
+end    
+    
+ subplot(4,4,13)
+    hold on
+    plot(log10([1 300]),log10([1 300]),'k')
+    plot(log10(rate_0),log10(rate_ss),'.-')
+    LogScale('xy',10)
+    xlabel('ISI^-^1_0 (Hz)');ylabel('ISI^-^1_s_s (Hz)')
+    
+subplot(4,4,14)
+    plot(stepmags,w_ss,'.-')
+    xlabel('Input');ylabel('w_s_s')
+    
+subplot(4,4,15)
+    plot(log10(rate_ss),w_ss,'.-')
+    LogScale('x',10)
+    xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
+    
+subplot(4,4,16)
+    plot(stepmags,log10(rate_ss),'.-')
+    hold on
+    plot(stepmags,log10(rate_0),'o')
+    LogScale('y',10)
+    xlabel('Input');ylabel('Rate (Hz)')
+    
+NiceSave('Adaptation_beta',figfolder,'CondAdLIF') 
     %%
     
     %Adaptation Properties
