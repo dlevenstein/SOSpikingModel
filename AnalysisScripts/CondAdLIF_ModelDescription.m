@@ -663,43 +663,52 @@ figure
 for gg = 1:length(gvals)
     subplot(5,4,gg)
         hold on
-        for ii = round(linspace(1,length(stepmags),8))
+        for ii = round(linspace(1,length(stepmags),6))
         plot(testvals(ii,gg).t,testvals(ii,gg).V,'k')
         end
         ylabel('v');%xlabel('t')
-        xlim(viewwin)
+        xlim(viewwin);title(['g_b_a_r = ',num2str(gvals(gg))])
 
     subplot(5,4,4+gg)
         hold on
-        for ii = round(linspace(1,length(stepmags),8))
+        for ii = round(linspace(1,length(stepmags),6))
         plot(testvals(ii,gg).t,testvals(ii,gg).w,'k')
         end
         ylabel('w');xlabel('t')
         xlim(viewwin)
 end    
     
- subplot(4,4,13)
+ subplot(4,4,11)
     hold on
     plot(log10([1 300]),log10([1 300]),'k')
     plot(log10(rate_0),log10(rate_ss),'.-')
     LogScale('xy',10)
+    ylim(log10([1 500]));xlim(log10([1 500]))
     xlabel('ISI^-^1_0 (Hz)');ylabel('ISI^-^1_s_s (Hz)')
     
-subplot(4,4,14)
-    plot(stepmags,w_ss,'.-')
-    xlabel('Input');ylabel('w_s_s')
-    
 subplot(4,4,15)
-    plot(log10(rate_ss),w_ss,'.-')
-    LogScale('x',10)
-    xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
+    plot(stepmags,w_ss,'.-')
+    xlim(stepmags([1 end]))
+    xlabel('Input (pA)');ylabel('w_s_s')
     
 subplot(4,4,16)
-    plot(stepmags,log10(rate_ss),'.-')
-    hold on
-    plot(stepmags,log10(rate_0),'o')
+    plot(log10(rate_ss),w_ss,'.-')
+    LogScale('x',10)
+    xlim(log10([1 1000]));
+    xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
+    
+subplot(4,3,7)
+    plot(stepmags,log10(rate_0),'.-')
     LogScale('y',10)
-    xlabel('Input');ylabel('Rate (Hz)')
+    ylim(log10([1 500]));xlim(stepmags([1 end]))
+    legend(num2str(gvals(1)),num2str(gvals(2)),num2str(gvals(3)),num2str(gvals(4)),...
+        'location','southeast')
+    xlabel('Input (pA)');ylabel('Rate_0 (Hz)')
+subplot(4,3,10)
+    plot(stepmags,log10(rate_ss),'.-')
+    LogScale('y',10)
+    ylim(log10([1 500]));xlim(stepmags([1 end]))
+    xlabel('Input (pA)');ylabel('Rate_s_s (Hz)')
     
 NiceSave('Adaptation_gbar',figfolder,'CondAdLIF') 
 
@@ -740,51 +749,60 @@ figure
 for bb = 1:length(bvals)
     subplot(5,4,bb)
         hold on
-        for ii = round(linspace(1,length(stepmags),8))
+        for ii = round(linspace(1,length(stepmags),6))
         plot(testvals(ii,bb).t,testvals(ii,bb).V,'k')
         end
         ylabel('v');%xlabel('t')
-        xlim(viewwin)
+        xlim(viewwin);title(['b = ',num2str(bvals(bb))])
 
     subplot(5,4,4+bb)
         hold on
-        for ii = round(linspace(1,length(stepmags),8))
+        for ii = round(linspace(1,length(stepmags),6))
         plot(testvals(ii,bb).t,testvals(ii,bb).w,'k')
         end
         ylabel('w');xlabel('t')
         xlim(viewwin);ylim([0 1])
         
-    subplot(5,4,8+bb)
-        hold on
-        for ii = round(linspace(1,length(stepmags),8))
-        plot(testvals(ii,bb).t,testvals(ii,bb).a_w,'k')
-        end
-        ylabel('w');xlabel('t')
-        xlim(viewwin)
+%     subplot(5,4,8+bb)
+%         hold on
+%         for ii = round(linspace(1,length(stepmags),6))
+%         plot(testvals(ii,bb).t,testvals(ii,bb).a_w,'k')
+%         end
+%         ylabel('w');xlabel('t')
+%         xlim(viewwin)
 end    
     
- subplot(4,4,13)
+ subplot(4,4,11)
     hold on
     plot(log10([1 300]),log10([1 300]),'k')
     plot(log10(rate_0),log10(rate_ss),'.-')
     LogScale('xy',10)
+    ylim(log10([1 500]));xlim(log10([1 500]))
     xlabel('ISI^-^1_0 (Hz)');ylabel('ISI^-^1_s_s (Hz)')
     
-subplot(4,4,14)
-    plot(stepmags,w_ss,'.-')
-    xlabel('Input');ylabel('w_s_s')
-    
 subplot(4,4,15)
-    plot(log10(rate_ss),w_ss,'.-')
-    LogScale('x',10)
-    xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
+    plot(stepmags,w_ss,'.-')
+    xlim(stepmags([1 end]))
+    xlabel('Input (pA)');ylabel('w_s_s')
     
 subplot(4,4,16)
-    plot(stepmags,log10(rate_ss),'.-')
-    hold on
-    plot(stepmags,log10(rate_0),'o')
+    plot(log10(rate_ss),w_ss,'.-')
+    LogScale('x',10)
+    xlim(log10([1 1000]));
+    xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
+    
+subplot(4,3,7)
+    plot(stepmags,log10(rate_0),'.-')
     LogScale('y',10)
-    xlabel('Input');ylabel('Rate (Hz)')
+    ylim(log10([1 500]));xlim(stepmags([1 end]))
+    legend(num2str(bvals(1)),num2str(bvals(2)),num2str(bvals(3)),num2str(bvals(4)),...
+        'location','southeast')
+    xlabel('Input (pA)');ylabel('Rate_0 (Hz)')
+subplot(4,3,10)
+    plot(stepmags,log10(rate_ss),'.-')
+    LogScale('y',10)
+    ylim(log10([1 500]));xlim(stepmags([1 end]))
+    xlabel('Input (pA)');ylabel('Rate_s_s (Hz)')
     
 NiceSave('Adaptation_jumpb',figfolder,'CondAdLIF') 
 
@@ -826,51 +844,60 @@ figure
 for bb = 1:length(betavals)
     subplot(5,4,bb)
         hold on
-        for ii = round(linspace(1,length(stepmags),8))
+        for ii = round(linspace(1,length(stepmags),6))
         plot(testvals(ii,bb).t,testvals(ii,bb).V,'k')
         end
         ylabel('v');%xlabel('t')
-        xlim(viewwin)
+        xlim(viewwin);title(['beta = ',num2str(betavals(bb))])
 
     subplot(5,4,4+bb)
         hold on
-        for ii = round(linspace(1,length(stepmags),8))
+        for ii = round(linspace(1,length(stepmags),6))
         plot(testvals(ii,bb).t,testvals(ii,bb).w,'k')
         end
         ylabel('w');xlabel('t')
         xlim(viewwin);ylim([0 1])
         
-    subplot(5,4,8+bb)
-        hold on
-        for ii = round(linspace(1,length(stepmags),8))
-        plot(testvals(ii,bb).t,testvals(ii,bb).a_w,'k')
-        end
-        ylabel('w');xlabel('t')
-        xlim(viewwin)
+%     subplot(5,4,8+bb)
+%         hold on
+%         for ii = round(linspace(1,length(stepmags),6))
+%         plot(testvals(ii,bb).t,testvals(ii,bb).a_w,'k')
+%         end
+%         ylabel('w');xlabel('t')
+%         xlim(viewwin)
 end    
     
- subplot(4,4,13)
+ subplot(4,4,11)
     hold on
     plot(log10([1 300]),log10([1 300]),'k')
     plot(log10(rate_0),log10(rate_ss),'.-')
     LogScale('xy',10)
+    ylim(log10([1 500]));xlim(log10([1 500]))
     xlabel('ISI^-^1_0 (Hz)');ylabel('ISI^-^1_s_s (Hz)')
     
-subplot(4,4,14)
-    plot(stepmags,w_ss,'.-')
-    xlabel('Input');ylabel('w_s_s')
-    
 subplot(4,4,15)
-    plot(log10(rate_ss),w_ss,'.-')
-    LogScale('x',10)
-    xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
+    plot(stepmags,w_ss,'.-')
+    xlim(stepmags([1 end]))
+    xlabel('Input (pA)');ylabel('w_s_s')
     
 subplot(4,4,16)
-    plot(stepmags,log10(rate_ss),'.-')
-    hold on
-    plot(stepmags,log10(rate_0),'o')
+    plot(log10(rate_ss),w_ss,'.-')
+    LogScale('x',10)
+    xlim(log10([1 1000]));
+    xlabel('Rate_s_s (Hz)');ylabel('w_s_s')
+    
+subplot(4,3,7)
+    plot(stepmags,log10(rate_0),'.-')
     LogScale('y',10)
-    xlabel('Input');ylabel('Rate (Hz)')
+    ylim(log10([1 500]));xlim(stepmags([1 end]))
+    legend(num2str(betavals(1)),num2str(betavals(2)),num2str(betavals(3)),num2str(betavals(4)),...
+        'location','southeast')
+    xlabel('Input (pA)');ylabel('Rate_0 (Hz)')
+subplot(4,3,10)
+    plot(stepmags,log10(rate_ss),'.-')
+    LogScale('y',10)
+    ylim(log10([1 500]));xlim(stepmags([1 end]))
+    xlabel('Input (pA)');ylabel('Rate_s_s (Hz)')
     
 NiceSave('Adaptation_beta',figfolder,'CondAdLIF') 
     %%
