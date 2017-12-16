@@ -103,7 +103,7 @@ end
 %rate = zeros(1,numI);
 voltagebins = linspace(min([PopParams.V_reset,PopParams.E_L]),max(PopParams.V_th),100);
 conductancebins = linspace(0,1,100);
-isibins = linspace(1,3,50);
+isibins = linspace(0.5,3.5,60);
 totaltime = timeparms.simtime-onsettransient;
 clear voltagedist voltagemean adaptdist ISIdist rate
 for ii = 1:numI
