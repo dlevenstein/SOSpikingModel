@@ -52,14 +52,14 @@ PopParams.w_r = 0.1;        %adaptation at rest (0-1)
 PopParams.gwnorm = 0;       %magnitude of adaptation
 
 %Network Properties
-K = 40;
+K = 50;
 PopParams.Kee   = K;        %Expected E->E In Degree
 PopParams.Kii   = K;        %Expected I->I In Degree
 PopParams.Kie   = K;        %Expected E->I In Degree
 PopParams.Kei   = K;        %Expected I->E In Degree
 
 Jee = 1;
-Jei = 1;
+Jei = 2;
 Jie = 1;
 Jii = 1;
 synscalefactor = 100; %Puts J in order 1 (rigorize this, should relate to synaptic effect magnitude)
@@ -105,8 +105,9 @@ plot(isibins,ISIdist.I,'r')
 LogScale('x',10)
 
 %%
+cellrates(cellrates==0) = 0.1;
 figure
-hist(log10(cellrates))
+hist(log10(cellrates),20)
 xlabel('Firing Rate (Hz)')
 LogScale('x',10)
 %%
