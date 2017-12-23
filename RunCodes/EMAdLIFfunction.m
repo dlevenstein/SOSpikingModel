@@ -42,6 +42,8 @@
 %       .Kii        I->I
 %       .Kie        E->I
 %       .Kei        I->E
+%
+%       .p0spike    (optional) proportion of neurons spiking at t0
 %   TimeParams
 %       .dt        timestep (ms)
 %       .SimTime   total simulation time (ms)
@@ -200,7 +202,7 @@ t_w = zeros(PopNum,1);
 
 spikes = [];
 
-%% EI Parameter Adjustments
+%% EI Parameter Adjustments (ugly. needs cleaning)
 
 if length(E_L) == 2 
 E_L         = transpose([E_L(1).*ones(1,EPopNum),     E_L(2).*ones(1,IPopNum)]);
@@ -239,6 +241,8 @@ E_w         = transpose([E_w(1).*ones(1,EPopNum),     E_w(2).*ones(1,IPopNum)]);
 end
 if length(b_w) == 2 
 b_w         = transpose([b_w(1).*ones(1,EPopNum),     b_w(2).*ones(1,IPopNum)]);
+elseif length(b_w)==1
+b_w         = transpose([b_w.*ones(1,EPopNum),     b_w.*ones(1,IPopNum)]);  
 end
 if length(delta_T) == 2 
 delta_T     = transpose([delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,IPopNum)]);
@@ -284,7 +288,11 @@ b(b==0) = w_r(b==0).*b_w(b==0)./(1 - w_r(b==0)).*exp((V_reset(b==0)-E_L(b==0)).*
 %% Initial Conditions - random voltages
 %Improvement: set # initial spiking neurons instead of hard coding 
 %range: E_L-Vth
-p0spike = 0.0; %5 chance of initial spiking 
+if isfield(PopParams,'p0spike') 
+    p0spike = PopParams.p0spike;
+else
+    p0spike = 0.0; %5 chance of initial spiking 
+end
 V0range = [min(E_L) max(V_th)]; %make this neuron vector
 V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 
@@ -312,7 +320,7 @@ for n=1:TimeLength-1
 
     %% Spiking
     if any(V(:,n) > V_th)
-        %Find neurons that spiked and record the spiketimes 
+        %Find neurons that crossed threshold and record the spiketimes 
         spikeneurons = find(V(:,n+1) > V_th(:));
         spikes = [spikes; [t(n).*ones(size(spikeneurons)),spikeneurons]];
 
