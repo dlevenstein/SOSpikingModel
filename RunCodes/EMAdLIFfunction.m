@@ -367,8 +367,9 @@ end
 %Catch for no spiking in simulation error
 if isempty(spikes); spikes = [nan nan]; end
 
-exneuron = randi(PopNum,1);
-exspiketimes = spikes(spikes(:,2)==exneuron,1);
+for cc = 1:PopNum
+    spikesbycell{cc} = spikes(spikes(:,2)==cc,1);
+end
 
 SimValues.t               = t;
 SimValues.V               = V;
@@ -379,6 +380,7 @@ SimValues.s               = s;
 SimValues.w               = w;
 SimValues.a_w             = a_w;
 SimValues.spikes          = spikes;
+SimValues.spikesbycell    = spikesbycell;
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
 SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
@@ -387,6 +389,12 @@ SimValues.Input           = I_e + X_t;
 
 %% Figure
 if SHOWFIG
+    
+    
+exneuron = randi(PopNum,1);
+exspiketimes = spikes(spikes(:,2)==exneuron,1);
+    
+    
 figure
 plot(spikes(:,1),spikes(:,2),'k.', 'Markersize' , 0.1)
 xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
