@@ -370,6 +370,31 @@ end
 %Catch for no spiking in simulation error
 if isempty(spikes); spikes = [nan nan]; end
 
+
+%% Figure
+if SHOWFIG
+    
+    
+exneuron = randi(PopNum,1);
+exspiketimes = spikes(spikes(:,2)==exneuron,1);
+    
+    
+figure
+plot(spikes(:,1),spikes(:,2),'k.', 'Markersize' , 0.1)
+hold on
+plot([0 0],[0 PopNum],'r')
+xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
+xlim([-onsettime SimTime])
+end
+%% Output Structure
+
+%Remove onset time
+onsetidx = t<0;
+t(onsetidx) = [];       V(:,onsetidx) = [];     g_w(:,onsetidx) = [];
+g_e(:,onsetidx) = [];   g_i(:,onsetidx) = [];   s(:,onsetidx) = [];
+w(:,onsetidx) = [];     a_w(:,onsetidx) = [];   
+spikes(spikes(:,1)<0,:) = [];
+
 for cc = 1:PopNum
     spikesbycell{cc} = spikes(spikes(:,2)==cc,1);
 end
@@ -390,18 +415,5 @@ SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
 
 SimValues.Input           = I_e + X_t;
 
-%% Figure
-if SHOWFIG
-    
-    
-exneuron = randi(PopNum,1);
-exspiketimes = spikes(spikes(:,2)==exneuron,1);
-    
-    
-figure
-plot(spikes(:,1),spikes(:,2),'k.', 'Markersize' , 0.1)
-xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
-xlim([-onsettime SimTime])
-end
 
 end
