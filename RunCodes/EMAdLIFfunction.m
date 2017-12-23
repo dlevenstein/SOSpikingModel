@@ -49,6 +49,7 @@
 %       .SimTime   total simulation time (ms)
 %   'showfig'       (optional) show the figure? (default:true)
 %   'showprogress'  (optional) show time counter of progress (default:false)
+%   'onsettime'     duration of (removed?) onset time (default: 0ms)
 %
 
 %--------------------------------------------------------------------------
@@ -59,9 +60,11 @@ function [SimValues] = EMAdLIFfunction(PopParams,TimeParams,varargin)
 p = inputParser;
 addParameter(p,'showfig',true,@islogical)
 addParameter(p,'showprogress',false,@islogical)
+addParameter(p,'onsettime',0,@isnumeric)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
+onsettime = p.Results.onsettime;
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
@@ -74,7 +77,7 @@ SimTime     = TimeParams.SimTime;   %Simulation Time (ms)
 dt          = TimeParams.dt;        %differential (ms)
 
 %Calculate time vector from time parameters
-t           = [0:dt:SimTime];       %Time Space
+t           = [-onsettime:dt:SimTime];       %Time Space
 TimeLength  = length(t);    %Time Steps
 
 %--------------------------------------------------------------------------
@@ -303,7 +306,7 @@ V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 for n=1:TimeLength-1
     %% Time Counter
     if SHOWPROGRESS && mod(n,round(TimeLength./10))==0
-        display('10% More Done!')
+        display('10% More Done!') %clearly, this needs improvement
     end
     %% Dynamics
     %Noise input
@@ -398,6 +401,7 @@ exspiketimes = spikes(spikes(:,2)==exneuron,1);
 figure
 plot(spikes(:,1),spikes(:,2),'k.', 'Markersize' , 0.1)
 xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
+xlim([-onsettime SimTime])
 end
 
 end

@@ -52,14 +52,14 @@ PopParams.w_r = 0.1;        %adaptation at rest (0-1)
 PopParams.gwnorm = 0;       %magnitude of adaptation
 
 %Network Properties
-K = 50;
+K = 40;
 PopParams.Kee   = K;        %Expected E->E In Degree
 PopParams.Kii   = K;        %Expected I->I In Degree
 PopParams.Kie   = K;        %Expected E->I In Degree
 PopParams.Kei   = K;        %Expected I->E In Degree
 
 Jee = 1;
-Jei = 1;
+Jei = 2;
 Jie = 1;
 Jii = 1;
 synscalefactor = 100; %Puts J in order 1 (rigorize this, should relate to synaptic effect magnitude)
@@ -68,15 +68,50 @@ PopParams.Wii   = synscalefactor.*Jei./sqrt(K);        %I->I weight
 PopParams.Wie   = synscalefactor.*Jie./sqrt(K);        %E->I weight
 PopParams.Wei   = synscalefactor.*Jii./sqrt(K);        %I->E weight
 
-PopParams.p0spike = 0.1;
+PopParams.p0spike = 0.15;
 
 %%
 TimeParams.dt      = 0.01;
-TimeParams.SimTime = 500;
+TimeParams.SimTime = 1000;
 PopParams.I_e = 200;
-[SimValues] = EMAdLIFfunction(PopParams,TimeParams,'showprogress',true);
+[SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
+    'showprogress',true,'onsettime',100);
+
 
 %%
+isibins = linspace(0,3.5,60);
+ISIs = cellfun(@diff,SimValues.spikesbycell,'uniformoutput',false);
+ISIdist.E = hist(log10(cat(1,ISIs{SimValues.EcellIDX})),isibins);
+ISIdist.E = ISIdist.E./sum(ISIdist.E);
+ISIdist.I = hist(log10(cat(1,ISIs{SimValues.IcellIDX})),isibins);
+ISIdist.I = ISIdist.I./sum(ISIdist.I);
+
+ISIhist.all = cellfun(@(X) hist(log10(X),isibins),ISIs,'uniformoutput',false);
+ISIhist.all = cat(1,ISIhist.all{:});
+
+%%
+cellrates = cellfun(@length,SimValues.spikesbycell)./(TimeParams.SimTime./1000);
+sortrate.E = sort(cellrates(SimValues.EcellIDX));
+sortrate.I = sort(cellrates(SimValues.IcellIDX));
+
+%%
+figure
+imagesc(ISIhist.all)
+%%
+figure
+plot(isibins,ISIdist.E,'k')
+hold on
+plot(isibins,ISIdist.I,'r')
+LogScale('x',10)
+
+%%
+figure
+hist(log10(cellrates))
+xlabel('Firing Rate (Hz)')
+LogScale('x',10)
+%%
+
+
 Excellidx = {SimValues.EcellIDX(1),SimValues.IcellIDX(1)};
 Excelltype = {'E','I'};
 for ee = 1:length(Excellidx)
@@ -106,6 +141,7 @@ subplot(3,1,3)
     ylabel('Vm')
     xlabel('t (ms)')
 
+%%
 
 
 %% Run the FI Curve function to calculate single neuron FI curves
