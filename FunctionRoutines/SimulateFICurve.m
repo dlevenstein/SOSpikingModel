@@ -95,15 +95,15 @@ Ivals = linspace(Irange(1),Irange(2),numI);
 clear SimValues
 for ii = 1:numI
     ii
-PopParams.I_e     = Ivals(ii);
-[SimValues(ii)] = simfunction(PopParams,TimeParams,'showfig',false);
+    PopParams.I_e     = Ivals(ii);
+    [SimValues(ii)] = simfunction(PopParams,TimeParams,'showfig',false);
 end
 
 %% Calculate Rate, Variable distributions
 %rate = zeros(1,numI);
-voltagebins = linspace(PopParams.V_reset,PopParams.V_th,100);
+voltagebins = linspace(min([PopParams.V_reset,PopParams.E_L]),max(PopParams.V_th),100);
 conductancebins = linspace(0,1,100);
-isibins = linspace(1,3,50);
+isibins = linspace(0.5,3.5,60);
 totaltime = timeparms.simtime-onsettransient;
 clear voltagedist voltagemean adaptdist ISIdist rate
 for ii = 1:numI
@@ -162,86 +162,87 @@ for ii = 1:numextraces
 end
 %% Figure
 if SHOWFIG
-    
-Ecolor = makeColorMap([1 1 1],[0 0.5 0],[0 0 0]);
-Icolor = makeColorMap([1 1 1],[0.8 0 0],[0 0 0]);
-adaptcolor = makeColorMap([1 1 1],[0 0 0.8],[0 0 0]);
-    
-figure
-    subplot(3,2,1)
-        plot(Ivals,rate.I,'o--','color',Icolor(end/2,:),'markersize',4)
-        hold on
-        plot(Ivals,rate.E,'o--','color',Ecolor(end/2,:),'markersize',4)
-        legend('I','E','location','northwest')
-        xlabel('I (pA)');ylabel('Rate (spks/cell/s)')
-        xlim(Ivals([1 end]))
-        
-	subplot(6,2,7)
-        imagesc(Ivals,isibins,ISIdist.I)
-        colormap(gca,Icolor)
-        axis xy
-        LogScale('y',10)
-        set(gca,'xticklabel',[])
-        ylabel('I: ISI (ms)');
-	subplot(6,2,5)
-        imagesc(Ivals,isibins,ISIdist.E)
-        colormap(gca,Ecolor)
-        axis xy
-        LogScale('y',10)
-        set(gca,'xticklabel',[])
-        ylabel('E: ISI (ms)');
-    subplot(6,2,11)
-        imagesc(Ivals,voltagebins,voltagedist.I)
-        hold on
-        plot(Ivals,voltagemean.I,'o--','color',Icolor(end/2,:),'markersize',4)
-        colormap(gca,Icolor)
-        plot(Ivals(extraces),min(voltagebins),'k^','markersize',2)
-        axis xy
-        %xlabel('I (pA)');
-        ylabel('I: V_m');
-    subplot(6,2,9)
-        imagesc(Ivals,voltagebins,voltagedist.E)
-        hold on
-        plot(Ivals,voltagemean.E,'o--','color',Ecolor(end/2,:),'markersize',4)
-        
-        colormap(gca,Ecolor)
-        axis xy
-        %xlabel('I (pA)');
-        ylabel('E: V_m');
-        set(gca,'xticklabel',[])
-%     subplot(6,2,11)
-%         imagesc(Ivals,conductancebins,adaptdist.E)
-%         hold on
-%         plot(Ivals,adaptmean.E,'o--','color',adaptcolor(end/2,:),'markersize',4)
-%         axis xy
-%         colormap(gca,adaptcolor)
-%         xlabel('I (units?)');ylabel('g_w (E cells)');
-%     subplot(6,2,11)
-%         imagesc(Ivals,conductancebins,adaptdist.I)
-%         axis xy
-%         xlabel('I (units?)');ylabel('g_w (I cells)');
 
-    %add synaptic conductances...
-    %add noise etc parm text in figure
-    
-    vmin = min([PopParams.V_reset,PopParams.E_i,PopParams.E_L,PopParams.E_w]);
-    for ee = 1:numextraces
-    subplot(numextraces,2,(ee.*2))
-        plot(extime,exampletrace.E(:,ee),'color',Ecolor(end/2,:))
-        hold on
-        plot(extime,exampletrace.I(:,ee),'color',Icolor(end/2,:))
-        ylim([vmin PopParams.V_th])
-        xlabel('t (ms)');
-        ylabel({['I = ',num2str(round(Ivals(extraces(ee))))],'V_m'})
-        
-        if ee==1
-            title('V: Example Traces')
+    Ecolor = makeColorMap([1 1 1],[0 0.5 0],[0 0 0]);
+    Icolor = makeColorMap([1 1 1],[0.8 0 0],[0 0 0]);
+    adaptcolor = makeColorMap([1 1 1],[0 0 0.8],[0 0 0]);
+
+    figure
+        subplot(3,2,1)
+            plot(Ivals,rate.I,'o--','color',Icolor(end/2,:),'markersize',4)
+            hold on
+            plot(Ivals,rate.E,'o--','color',Ecolor(end/2,:),'markersize',4)
+            legend('I','E','location','northwest')
+            xlabel('I (pA)');ylabel('Rate (spks/cell/s)')
+            xlim(Ivals([1 end]))
+
+        subplot(6,2,7)
+            imagesc(Ivals,isibins,ISIdist.I)
+            colormap(gca,Icolor)
+            axis xy
+            LogScale('y',10)
+            set(gca,'xticklabel',[])
+            ylabel('I: ISI (ms)');
+        subplot(6,2,5)
+            imagesc(Ivals,isibins,ISIdist.E)
+            colormap(gca,Ecolor)
+            axis xy
+            LogScale('y',10)
+            set(gca,'xticklabel',[])
+            ylabel('E: ISI (ms)');
+        subplot(6,2,11)
+            imagesc(Ivals,voltagebins,voltagedist.I)
+            hold on
+            plot(Ivals,voltagemean.I,'o--','color',Icolor(end/2,:),'markersize',4)
+            colormap(gca,Icolor)
+            plot(Ivals(extraces),min(voltagebins),'k^','markersize',2)
+            axis xy
+            %xlabel('I (pA)');
+            ylabel('I: V_m');
+        subplot(6,2,9)
+            imagesc(Ivals,voltagebins,voltagedist.E)
+            hold on
+            plot(Ivals,voltagemean.E,'o--','color',Ecolor(end/2,:),'markersize',4)
+
+            colormap(gca,Ecolor)
+            axis xy
+            %xlabel('I (pA)');
+            ylabel('E: V_m');
+            set(gca,'xticklabel',[])
+    %     subplot(6,2,11)
+    %         imagesc(Ivals,conductancebins,adaptdist.E)
+    %         hold on
+    %         plot(Ivals,adaptmean.E,'o--','color',adaptcolor(end/2,:),'markersize',4)
+    %         axis xy
+    %         colormap(gca,adaptcolor)
+    %         xlabel('I (units?)');ylabel('g_w (E cells)');
+    %     subplot(6,2,11)
+    %         imagesc(Ivals,conductancebins,adaptdist.I)
+    %         axis xy
+    %         xlabel('I (units?)');ylabel('g_w (I cells)');
+
+        %add synaptic conductances...
+        %add noise etc parm text in figure
+
+        vmin = min([PopParams.V_reset,PopParams.E_L]);
+        vmax = max(PopParams.V_th);
+        for ee = 1:numextraces
+        subplot(numextraces,2,(ee.*2))
+            plot(extime,exampletrace.E(:,ee),'color',Ecolor(end/2,:))
+            hold on
+            plot(extime,exampletrace.I(:,ee),'color',Icolor(end/2,:))
+            ylim([vmin vmax])
+            xlabel('t (ms)');
+            ylabel({['I = ',num2str(round(Ivals(extraces(ee))))],'V_m'})
+
+            if ee==1
+                title('V: Example Traces')
+            end
         end
-    end
 
-if ~isempty(figfolder)
-    NiceSave('FICurve',figfolder,figname)
-end
+    if ~isempty(figfolder)
+        NiceSave('FICurve',figfolder,figname)
+    end
 
 end
 
