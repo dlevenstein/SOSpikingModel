@@ -43,11 +43,12 @@
 %       .Kie        E->I
 %       .Kei        I->E
 %
-%       .p0spike    (optional) proportion of neurons spiking at t0
+%       .p0spike    (optional) proportion of neurons spiking at t0 (default:0)
 %   TimeParams
 %       .dt        timestep (ms)
 %       .SimTime   total simulation time (ms)
 %   'showfig'       (optional) show the figure? (default:true)
+%   'showprogress'  (optional) show time counter of progress (default:false)
 %
 
 %--------------------------------------------------------------------------
@@ -57,8 +58,10 @@ function [SimValues] = EMAdLIFfunction(PopParams,TimeParams,varargin)
 %Parse optional inputs
 p = inputParser;
 addParameter(p,'showfig',true,@islogical)
+addParameter(p,'showprogress',false,@islogical)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
+SHOWPROGRESS = p.Results.showprogress;
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
@@ -298,6 +301,10 @@ V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 
 %% Time Loop
 for n=1:TimeLength-1
+    %% Time Counter
+    if SHOWPROGRESS && mod(n,round(TimeLength./10))==0
+        display('10% More Done!')
+    end
     %% Dynamics
     %Noise input
     X_t(:,n+1) = X_t(:,n) + ...
