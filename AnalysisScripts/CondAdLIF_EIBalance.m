@@ -77,26 +77,34 @@ PopParams.I_e = 200;
 [SimValues] = EMAdLIFfunction(PopParams,TimeParams,'showprogress',true);
 
 %%
-exNeu.E.I = SimValues.Input(SimValues.EcellIDX(1),:);
-exNeu.E.V = SimValues.V(SimValues.EcellIDX(1),:);
-exNeu.E.g_e = SimValues.g_e(SimValues.EcellIDX(1),:);
-exNeu.E.g_i = SimValues.g_i(SimValues.EcellIDX(1),:);
-exNeu.E.I_syne = -exNeu.E.g_e.*(exNeu.E.V-PopParams.E_e);
-exNeu.E.I_syni = -exNeu.E.g_i.*(exNeu.E.V-PopParams.E_i);
+Excellidx = {SimValues.EcellIDX(1),SimValues.IcellIDX(1)};
+Excelltype = {'E','I'};
+for ee = 1:length(Excellidx)
+    exNeu.(Excelltype{ee}).I = SimValues.Input(Excellidx{ee},:);
+    exNeu.(Excelltype{ee}).V = SimValues.V(Excellidx{ee},:);
+    exNeu.(Excelltype{ee}).g_e = SimValues.g_e(Excellidx{ee},:);
+    exNeu.(Excelltype{ee}).g_i = SimValues.g_i(Excellidx{ee},:);
+    exNeu.(Excelltype{ee}).I_syne = -exNeu.E.g_e.*(exNeu.E.V-PopParams.E_e);
+    exNeu.(Excelltype{ee}).I_syni = -exNeu.E.g_i.*(exNeu.E.V-PopParams.E_i);
+end
 
 
 figure
 subplot(3,1,1)
-plot(SimValues.t,exNeu.E.g_e,'k')
-hold on
-plot(SimValues.t,exNeu.E.g_i,'r')
+    plot(SimValues.t,exNeu.E.g_e,'k')
+    hold on
+    plot(SimValues.t,exNeu.E.g_i,'r')
+    ylabel('Synaptic Conductance')
 subplot(3,1,2)
-plot(SimValues.t,exNeu.E.I_syne,'k')
-hold on
-plot(SimValues.t,exNeu.E.I_syni,'r')
-plot(SimValues.t,exNeu.E.I,'k')
+    plot(SimValues.t,exNeu.E.I_syne,'k')
+    hold on
+    plot(SimValues.t,exNeu.E.I_syni,'r')
+    plot(SimValues.t,exNeu.E.I,'k')
+    ylabel('Synaptic Currents')
 subplot(3,1,3)
-plot(SimValues.t,exNeu.E.V,'k')
+    plot(SimValues.t,exNeu.E.V,'k')
+    ylabel('Vm')
+    xlabel('t (ms)')
 
 
 
