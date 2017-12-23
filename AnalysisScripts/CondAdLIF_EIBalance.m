@@ -58,23 +58,52 @@ PopParams.Kii   = K;        %Expected I->I In Degree
 PopParams.Kie   = K;        %Expected E->I In Degree
 PopParams.Kei   = K;        %Expected I->E In Degree
 
-Jee = 5;
-Jei = 5;
-Jie = 5;
-Jii = 5;
-
-PopParams.Wee   = Jee./sqrt(K);        %E->E weight
-PopParams.Wii   = Jei./sqrt(K);        %I->I weight
-PopParams.Wie   = Jie./sqrt(K);        %E->I weight
-PopParams.Wei   = Jii./sqrt(K);        %I->E weight
+Jee = 1;
+Jei = 1;
+Jie = 1;
+Jii = 1;
+synscalefactor = 100; %Puts J in order 1 (rigorize this, should relate to synaptic effect magnitude)
+PopParams.Wee   = synscalefactor.*Jee./sqrt(K);        %E->E weight
+PopParams.Wii   = synscalefactor.*Jei./sqrt(K);        %I->I weight
+PopParams.Wie   = synscalefactor.*Jie./sqrt(K);        %E->I weight
+PopParams.Wei   = synscalefactor.*Jii./sqrt(K);        %I->E weight
 
 PopParams.p0spike = 0.1;
+
+%%
+TimeParams.dt      = 0.01;
+TimeParams.SimTime = 500;
+PopParams.I_e = 200;
+[SimValues] = EMAdLIFfunction(PopParams,TimeParams,'showprogress',true);
+
+%%
+exNeu.E.I = SimValues.Input(SimValues.EcellIDX(1),:);
+exNeu.E.V = SimValues.V(SimValues.EcellIDX(1),:);
+exNeu.E.g_e = SimValues.g_e(SimValues.EcellIDX(1),:);
+exNeu.E.g_i = SimValues.g_i(SimValues.EcellIDX(1),:);
+exNeu.E.I_syne = -exNeu.E.g_e.*(exNeu.E.V-PopParams.E_e);
+exNeu.E.I_syni = -exNeu.E.g_i.*(exNeu.E.V-PopParams.E_i);
+
+
+figure
+subplot(3,1,1)
+plot(SimValues.t,exNeu.E.g_e,'k')
+hold on
+plot(SimValues.t,exNeu.E.g_i,'r')
+subplot(3,1,2)
+plot(SimValues.t,exNeu.E.I_syne,'k')
+hold on
+plot(SimValues.t,exNeu.E.I_syni,'r')
+plot(SimValues.t,exNeu.E.I,'k')
+subplot(3,1,3)
+plot(SimValues.t,exNeu.E.V,'k')
+
 
 
 %% Run the FI Curve function to calculate single neuron FI curves
 simfunction = @EMAdLIFfunction;
 
-Irange = [0 300];
+Irange = [100 300];
 numI = 10;
 
 [ Ivals,rate(ss),voltagemean(ss) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
