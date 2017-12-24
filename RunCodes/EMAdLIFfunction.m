@@ -49,7 +49,8 @@
 %       .SimTime   total simulation time (ms)
 %   'showfig'       (optional) show the figure? (default:true)
 %   'showprogress'  (optional) show time counter of progress (default:false)
-%   'onsettime'     duration of (removed?) onset time (default: 0ms)
+%   'onsettime'     (optional) duration of (removed?) onset time (default: 0ms)
+%   'save_dt'       (optional) dt for the saved output (default: 0.5ms)
 %
 
 %--------------------------------------------------------------------------
@@ -61,10 +62,12 @@ p = inputParser;
 addParameter(p,'showfig',true,@islogical)
 addParameter(p,'showprogress',false,@islogical)
 addParameter(p,'onsettime',0,@isnumeric)
+addParameter(p,'save_dt',0.5,@isnumeric)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
 onsettime = p.Results.onsettime;
+save_dt = p.Results.save_dt;
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
@@ -147,29 +150,22 @@ theta       = PopParams.theta;   %Strength to mean (time scale of noise, ms^-1)
 
 %--------------------------------------------------------------------------
 %Adaptation
-E_w         = PopParams.E_w;     %Adaptation leakage, (mV)
+E_w         = PopParams.E_w;     %Adaptation reversal potential, (mV)
 b_w         = PopParams.b_w;     %Adaptation decay (1/ms)
 
 delta_T     = PopParams.delta_T; %threshhold softness
-dw          = PopParams.dw;      %Time adaptation is activated (ms)
 
 gwnorm      = PopParams.gwnorm;  %Adaptation norm (nS)
-w_r         = PopParams.w_r;     %Adaptation rest
+w_r         = PopParams.w_r;     %Adaptation at rest (E_L)
 
 b           = PopParams.b;       %Spike Adaptation (nS)
 
 %--------------------------------------------------------------------------
-%Excitatory Synapse Parameters
+% Synapse Parameters
 E_e         = PopParams.E_e;     %Excitatory reversal potential (mV)
-
-%--------------------------------------------------------------------------
-%Inhibitory Synapse Parameters
 E_i         = PopParams.E_i;     %Inhibitory reversal potential (mV)
 
-%--------------------------------------------------------------------------
 b_s         = PopParams.b_s;     %Synaptic decay (1/ms)
-ds          = PopParams.ds;      %Time synapses are activated (ms)
-
 a           = PopParams.a;
 
 %% Input
@@ -183,6 +179,15 @@ end
 %% Variables
 %--------------------------------------------------------------------------
 %Simulation Variables
+
+% SimValues.t               = t;
+% SimValues.V               = V;
+% SimValues.g_w             = g_w;
+% SimValues.g_e             = g_e;
+% SimValues.g_i             = g_i;
+% SimValues.s               = s;
+% SimValues.w               = w;
+% SimValues.a_w             = a_w;
 
 V            = zeros(PopNum,TimeLength); %Membrane Potential
 
@@ -199,12 +204,9 @@ s            = zeros(PopNum,TimeLength); %synapse
 w            = zeros(PopNum,TimeLength); %adaptation
 
 X_t          = zeros(PopNum,TimeLength); %OU noise
-dW_t         = zeros(PopNum,TimeLength); %Stochastic Process
 
 
 t_r = zeros(PopNum,1);
-t_s = zeros(PopNum,1);
-t_w = zeros(PopNum,1);
 
 spikes = [];
 
@@ -255,17 +257,12 @@ delta_T     = transpose([delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,IPopNum
 elseif length(delta_T) == 1
 delta_T     = transpose([delta_T(1).*ones(1,EPopNum), 0.*ones(1,IPopNum)]);
 end
-if length(dw) == 2 
-dw          = transpose([dw(1).*ones(1,EPopNum),      dw(2).*ones(1,IPopNum)]);
-elseif length(dw) == 1
-dw          = transpose([dw.*ones(1,EPopNum),      dw.*ones(1,IPopNum)]);
-end
 if length(gwnorm) == 2 
 gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)]);
 end
 if length(w_r) == 2 
 w_r         = transpose([w_r(1).*ones(1,EPopNum),     w_r(2).*ones(1,IPopNum)]);
-elseif length(w_r) == 1 
+elseif length(w_r) == 1  %1 w_r input is assumed to be for E cells
 w_r         = transpose([w_r(1).*ones(1,EPopNum),     0.*ones(1,IPopNum)]);
 end
 if length(b) == 2 
@@ -275,11 +272,6 @@ b           = transpose([b.*ones(1,EPopNum),       0.*ones(1,IPopNum)]);
 end
 if length(b_s) == 2 
 b_s         = transpose([b_s(1).*ones(1,EPopNum),     b_s(2).*ones(1,IPopNum)]);
-end
-if length(ds) == 2 
-ds          = transpose([ds(1).*ones(1,EPopNum),      ds(2).*ones(1,IPopNum)]);
-elseif length(ds) == 1 
-ds          = transpose([ds.*ones(1,EPopNum),      ds.*ones(1,IPopNum)]);
 end
 if length(a) == 2 
 a           = transpose([a(1).*ones(1,EPopNum),       a(2).*ones(1,IPopNum)]);
@@ -303,66 +295,87 @@ V0range = [min(E_L) max(V_th)]; %make this neuron vector
 V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 
 %% Time Loop
-for n=1:TimeLength-1
+savecounter = 1;
+for tt=1:TimeLength-1
     %% Time Counter
-    if SHOWPROGRESS && mod(n,round(TimeLength./10))==0
+    if SHOWPROGRESS && mod(tt,round(TimeLength./10))==0
         display('10% More Done!') %clearly, this needs improvement
     end
-    %% Dynamics
+    %% Dynamics: update noise, V,s,w based on values in previous timestep
     %Noise input
-    X_t(:,n+1) = X_t(:,n) + ...
-        -theta(:).*X_t(:,n).*dt + sqrt(2.*theta).*sigma(:).*randn(PopNum,1).*sqrt(dt);
-
+    dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*randn(PopNum,1).*sqrt(dt);
+%     X_t(:,n+1) = X_t(:,n) + ...
+%         -theta(:).*X_t(:,n).*dt + sqrt(2.*theta).*sigma(:).*randn(PopNum,1).*sqrt(dt);
     %V - Voltage Equation
-    V(:,n+1)   = V(:,n) +...
-        (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
-        -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C + ...
-                I_e(:,n)./C + X_t(:,n)./C).*dt;
+    dVdt =   - g_L.*(V-E_L)./C ...                      %Leak
+             - g_w.*(V-E_w)./C ...                      %Adaptation
+             - g_e.*(V-E_e)./C - g_i.*(V-E_i)./C ...    %Synapses
+             + I_e./C + X_t./C;                         %External input
+    
+%     V(:,n+1)   = V(:,n) +...
+%         (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
+%         -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C + ...
+%                 I_e(:,n)./C + X_t(:,n)./C).*dt;
     %     if any(isnan(V))  %bug checking with delta_T too high
     %         test
     %     end
-    %s - Synaptic Output       
-    s(:,n+1)   = s(:,n) + (a_s(:,n).*(1-s(:,n)) - b_s(:).*s(:,n)).*dt;
+    %s - Synaptic Output 
+    dsdt = a_s.*(1-s) - b_s.*s;
+    %s(:,tt+1)   = s(:,tt) + (a_s(:,tt).*(1-s(:,tt)) - b_s(:).*s(:,tt)).*dt;
     %w - Adaptation Variable
-    w(:,n+1)   = w(:,n) + (a_w(:,n).*(1-w(:,n)) - b_w(:).*w(:,n)).*dt;
-    %a_w - Adaptation rate
-    a_w(:,n+1) = w_r(:).*b_w(:)./(1 - w_r(:)).*exp((V(:,n+1)-E_L(:)).*delta_T(:));
+    
+    dwdt = a_w.*(1-w) - b_w.*w;
+    %w(:,tt+1)   = w(:,tt) + (a_w(:,tt).*(1-w(:,tt)) - b_w(:).*w(:,tt)).*dt;
+    X_t = X_t + dX;
+    V = V + dVdt.*dt;
+    s = s + dsdt.*dt;
+    w = w + dwdt.*dt; 
+    timecounter = t+dt;
+    
+    %a_w - Adaptation rate for the next time step (unless spike)
+    a_w = w_r.*b_w./(1 - w_r).*exp((V-E_L).*delta_T);
+    %a_w(:,tt+1) = w_r(:).*b_w(:)./(1 - w_r(:)).*exp((V(:,tt+1)-E_L(:)).*delta_T(:));
 
     %% Spiking
-    if any(V(:,n) > V_th)
+    if any(V > V_th)
         %Find neurons that crossed threshold and record the spiketimes 
-        spikeneurons = find(V(:,n+1) > V_th(:));
-        spikes = [spikes; [t(n).*ones(size(spikeneurons)),spikeneurons]];
+        spikeneurons = find(V > V_th);
+        spikes = [spikes; [timecounter.*ones(size(spikeneurons)),spikeneurons]];
 
         %Set spiking neurons refractory period 
-        %(TO DO: single refractory period)
         t_r(spikeneurons) = t_ref(spikeneurons);
-        t_w(spikeneurons) = dw(spikeneurons);
-        t_s(spikeneurons) = ds(spikeneurons);
     end
 
     %%  Refractory period Countdowns (no need for three separate)
-    if any(t_r > 0) || any(t_s > 0) || any(t_w > 0)
-        %Voltage Refractory Period
+    if any(t_r > 0)
         refractoryneurons = t_r > 0;
-        V(refractoryneurons,n+1) = V_reset(refractoryneurons);
+        %Hold voltage, synaptic/adaptation rates at spike levels
+        V(refractoryneurons) = V_reset(refractoryneurons);
+        a_s(refractoryneurons) = a(refractoryneurons);
+        a_w(refractoryneurons) = b(refractoryneurons);  
+        %Count down the refractory period
         t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
-        %Synaptic Activation
-        synneurons = t_s > 0;
-        a_s(synneurons,n+1) = a(synneurons);
-        t_s(synneurons) = t_s(synneurons) - dt;
-        %Spike Adaptation
-        adaptneurons = find(t_w > 0);
-        a_w(adaptneurons,n+1) = b(adaptneurons);        
-        t_w(adaptneurons) = t_w(adaptneurons) - dt;
     end
 
+    %% Synaptic,Adaptaion Conductances for the next time step
+        g_w = gwnorm.*w;
 
-    %% Synaptic,Adaptaion Conductances
-        g_w(:,n+1) = gwnorm(:).*w(:,n+1); %only E cells adapt
-
-        g_e(:,n+1) = EE_mat*s(:,n+1) + IE_mat*s(:,n+1);
-        g_i(:,n+1) = II_mat*s(:,n+1) + EI_mat*s(:,n+1);
+        g_e = EE_mat*s + IE_mat*s;
+        g_i = II_mat*s + EI_mat*s;
+        
+    %% Add data to the output variables 
+    if mod(timecounter,save_dt)==0 && timecounter>=0
+         SimValues.t(savecounter) = ttimecounter;
+         SimValues.V(:,savecounter)              = V;
+         SimValues.g_w(:,savecounter)             = g_w;
+         SimValues.g_e(:,savecounter)             = g_e;
+         SimValues.g_i(:,savecounter)             = g_i;
+         SimValues.s(:,savecounter)               = s;
+         SimValues.w(:,savecounter)               = w;
+         SimValues.a_w(:,savecounter)             = a_w;
+         
+        savecounter = savecounter+1; %should probably do this with proper indexing, eh?
+    end
 
 end
 
@@ -389,24 +402,12 @@ end
 %% Output Structure
 
 %Remove onset time
-onsetidx = t<0;
-t(onsetidx) = [];       V(:,onsetidx) = [];     g_w(:,onsetidx) = [];
-g_e(:,onsetidx) = [];   g_i(:,onsetidx) = [];   s(:,onsetidx) = [];
-w(:,onsetidx) = [];     a_w(:,onsetidx) = [];   
-spikes(spikes(:,1)<0,:) = [];
+ spikes(spikes(:,1)<=0,:) = [];
 
 for cc = 1:PopNum
     spikesbycell{cc} = spikes(spikes(:,2)==cc,1);
 end
 
-SimValues.t               = t;
-SimValues.V               = V;
-SimValues.g_w             = g_w;
-SimValues.g_e             = g_e;
-SimValues.g_i             = g_i;
-SimValues.s               = s;
-SimValues.w               = w;
-SimValues.a_w             = a_w;
 SimValues.spikes          = spikes;
 SimValues.spikesbycell    = spikesbycell;
 SimValues.EcellIDX        = Ecells;
