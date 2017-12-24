@@ -107,8 +107,13 @@ LogScale('x',10)
 %%
 cellrates(cellrates==0) = 0.1;
 figure
-hist(log10(cellrates),20)
-xlabel('Firing Rate (Hz)')
+subplot(3,2,1)
+hist(log10(cellrates(SimValues.EcellIDX)),20)
+xlabel('Firing Rate (Hz)');ylabel('# E Cells')
+LogScale('x',10)
+subplot(3,2,3)
+hist(log10(cellrates(SimValues.IcellIDX)),20)
+xlabel('Firing Rate (Hz)');ylabel('# I Cells')
 LogScale('x',10)
 %%
 
