@@ -59,14 +59,14 @@ PopParams.Kie   = K;        %Expected E->I In Degree
 PopParams.Kei   = K;        %Expected I->E In Degree
 
 Jee = 1;
-Jei = 2;
+Jei = 1;
 Jie = 1;
 Jii = 1;
 synscalefactor = 100; %Puts J in order 1 (rigorize this, should relate to synaptic effect magnitude)
 PopParams.Wee   = synscalefactor.*Jee./sqrt(K);        %E->E weight
-PopParams.Wii   = synscalefactor.*Jei./sqrt(K);        %I->I weight
+PopParams.Wii   = synscalefactor.*Jii./sqrt(K);        %I->I weight
 PopParams.Wie   = synscalefactor.*Jie./sqrt(K);        %E->I weight
-PopParams.Wei   = synscalefactor.*Jii./sqrt(K);        %I->E weight
+PopParams.Wei   = synscalefactor.*Jei./sqrt(K);        %I->E weight
 
 PopParams.p0spike = 0.2;
 
