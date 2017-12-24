@@ -9,8 +9,10 @@
 %       .E_L     	Reversal potential of the leak current (i.e. Vrest)
 %       .g_L     	Conductance of the leak current 
 %       .C          Membrane Capacitance
-%       .I_e        Input current to the population (constant and same for
-%                                                    all cells.... for now)
+%       .I_e        Input current to the population. Can either be a
+%                   constant, input to [E I] populations,
+%                   or a function I_e(t) that returns input at time t
+%                   time t. Add: 
 %       .V_th       Membrane Threshold
 %       .V_reset    Reset Potential
 %
@@ -50,7 +52,7 @@
 %   'showfig'       (optional) show the figure? (default:true)
 %   'showprogress'  (optional) show time counter of progress (default:false)
 %   'onsettime'     (optional) duration of (removed?) onset time (default: 0ms)
-%   'save_dt'       (optional) dt for the saved output (default: 0.5ms)
+%   'save_dt'       (optional) dt for the saved output (default: 0.1ms)
 %
 
 %--------------------------------------------------------------------------
@@ -62,7 +64,7 @@ p = inputParser;
 addParameter(p,'showfig',true,@islogical)
 addParameter(p,'showprogress',false,@islogical)
 addParameter(p,'onsettime',0,@isnumeric)
-addParameter(p,'save_dt',0.5,@isnumeric)
+addParameter(p,'save_dt',0.1,@isnumeric)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
@@ -80,8 +82,8 @@ SimTime     = TimeParams.SimTime;   %Simulation Time (ms)
 dt          = TimeParams.dt;        %differential (ms)
 
 %Calculate time vector from time parameters
-t           = [-onsettime:dt:SimTime];       %Time Space
-TimeLength  = length(t);    %Time Steps
+SimTimeLength  = length([-onsettime:dt:SimTime]);   %Time Steps (simulated)
+SaveTimeLength  = length([0:save_dt:SimTime]);      %Time Steps (saved)
 
 %--------------------------------------------------------------------------
 %Weight Matrices
@@ -168,45 +170,38 @@ E_i         = PopParams.E_i;     %Inhibitory reversal potential (mV)
 b_s         = PopParams.b_s;     %Synaptic decay (1/ms)
 a           = PopParams.a;
 
-%% Input
-%--------------------------------------------------------------------------
+%% Input: convert into function of t
 if isa(I_e, 'function_handle')
-    I_e = I_e(t);
 elseif isequal(size(I_e),[1 1])
-    I_e = I_e.*ones(PopNum,TimeLength);
+    I_e = @(t) I_e;
+elseif length(I_e) == 2
+    I_e = @(t) transpose([I_e(1).*ones(1,EPopNum),     I_e(2).*ones(1,IPopNum)]);
 end
 
 %% Variables
-%--------------------------------------------------------------------------
+
 %Simulation Variables
-
-% SimValues.t               = t;
-% SimValues.V               = V;
-% SimValues.g_w             = g_w;
-% SimValues.g_e             = g_e;
-% SimValues.g_i             = g_i;
-% SimValues.s               = s;
-% SimValues.w               = w;
-% SimValues.a_w             = a_w;
-
-V            = zeros(PopNum,TimeLength); %Membrane Potential
-
-g_e          = zeros(PopNum,TimeLength); %conductance of synapse 
-g_i          = zeros(PopNum,TimeLength); %conductance of synapse 
-
-g_w          = zeros(PopNum,TimeLength); %conductance of adaptation 
-
-
-a_s          = zeros(PopNum,TimeLength); %synaptic rise (1/ms)
-a_w          = zeros(PopNum,TimeLength); %adaptation rise (1/ms)
-
-s            = zeros(PopNum,TimeLength); %synapse 
-w            = zeros(PopNum,TimeLength); %adaptation
-
-X_t          = zeros(PopNum,TimeLength); %OU noise
-
-
+V            = zeros(PopNum,1); %Membrane Potential
+g_e          = zeros(PopNum,1); %conductance of synapse 
+g_i          = zeros(PopNum,1); %conductance of synapse 
+g_w          = zeros(PopNum,1); %conductance of adaptation 
+a_s          = zeros(PopNum,1); %synaptic rise (1/ms)
+a_w          = zeros(PopNum,1); %adaptation rise (1/ms)
+s            = zeros(PopNum,1); %synapse 
+w            = zeros(PopNum,1); %adaptation
+X_t          = zeros(PopNum,1); %OU noise
 t_r = zeros(PopNum,1);
+
+%Saved Variables
+SimValues.t               = nan(1,SaveTimeLength);
+SimValues.V               = nan(PopNum,SaveTimeLength);
+SimValues.g_w             = nan(PopNum,SaveTimeLength);
+SimValues.g_e             = nan(PopNum,SaveTimeLength);
+SimValues.g_i             = nan(PopNum,SaveTimeLength);
+SimValues.s               = nan(PopNum,SaveTimeLength);
+SimValues.w               = nan(PopNum,SaveTimeLength);
+SimValues.a_w             = nan(PopNum,SaveTimeLength);
+SimValues.Input             = nan(PopNum,SaveTimeLength);
 
 spikes = [];
 
@@ -296,9 +291,10 @@ V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 
 %% Time Loop
 savecounter = 1;
-for tt=1:TimeLength-1
+timecounter = -onsettime;
+for tt=1:SimTimeLength-1
     %% Time Counter
-    if SHOWPROGRESS && mod(tt,round(TimeLength./10))==0
+    if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
         display('10% More Done!') %clearly, this needs improvement
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
@@ -307,10 +303,10 @@ for tt=1:TimeLength-1
 %     X_t(:,n+1) = X_t(:,n) + ...
 %         -theta(:).*X_t(:,n).*dt + sqrt(2.*theta).*sigma(:).*randn(PopNum,1).*sqrt(dt);
     %V - Voltage Equation
-    dVdt =   - g_L.*(V-E_L)./C ...                      %Leak
-             - g_w.*(V-E_w)./C ...                      %Adaptation
-             - g_e.*(V-E_e)./C - g_i.*(V-E_i)./C ...    %Synapses
-             + I_e./C + X_t./C;                         %External input
+    dVdt =  (- g_L.*(V-E_L) ...                      %Leak
+             - g_w.*(V-E_w) ...                      %Adaptation
+             - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
+             + I_e(timecounter) + X_t)./C;           %External input
     
 %     V(:,n+1)   = V(:,n) +...
 %         (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
@@ -327,10 +323,10 @@ for tt=1:TimeLength-1
     dwdt = a_w.*(1-w) - b_w.*w;
     %w(:,tt+1)   = w(:,tt) + (a_w(:,tt).*(1-w(:,tt)) - b_w(:).*w(:,tt)).*dt;
     X_t = X_t + dX;
-    V = V + dVdt.*dt;
-    s = s + dsdt.*dt;
-    w = w + dwdt.*dt; 
-    timecounter = t+dt;
+    V   = V + dVdt.*dt;
+    s   = s + dsdt.*dt;
+    w   = w + dwdt.*dt; 
+    timecounter = round(timecounter+dt,4);  %Round to deal with computational error
     
     %a_w - Adaptation rate for the next time step (unless spike)
     a_w = w_r.*b_w./(1 - w_r).*exp((V-E_L).*delta_T);
@@ -341,14 +337,16 @@ for tt=1:TimeLength-1
         %Find neurons that crossed threshold and record the spiketimes 
         spikeneurons = find(V > V_th);
         spikes = [spikes; [timecounter.*ones(size(spikeneurons)),spikeneurons]];
+        %To speed up, preallocate spike vector
 
         %Set spiking neurons refractory period 
         t_r(spikeneurons) = t_ref(spikeneurons);
     end
 
-    %%  Refractory period Countdowns (no need for three separate)
+    %%  Refractory period Countdowns
     if any(t_r > 0)
         refractoryneurons = t_r > 0;
+        
         %Hold voltage, synaptic/adaptation rates at spike levels
         V(refractoryneurons) = V_reset(refractoryneurons);
         a_s(refractoryneurons) = a(refractoryneurons);
@@ -359,24 +357,24 @@ for tt=1:TimeLength-1
 
     %% Synaptic,Adaptaion Conductances for the next time step
         g_w = gwnorm.*w;
-
         g_e = EE_mat*s + IE_mat*s;
         g_i = II_mat*s + EI_mat*s;
         
     %% Add data to the output variables 
     if mod(timecounter,save_dt)==0 && timecounter>=0
-         SimValues.t(savecounter) = ttimecounter;
-         SimValues.V(:,savecounter)              = V;
+         SimValues.t(savecounter)                 = timecounter;
+         SimValues.V(:,savecounter)               = V;
          SimValues.g_w(:,savecounter)             = g_w;
          SimValues.g_e(:,savecounter)             = g_e;
          SimValues.g_i(:,savecounter)             = g_i;
          SimValues.s(:,savecounter)               = s;
          SimValues.w(:,savecounter)               = w;
          SimValues.a_w(:,savecounter)             = a_w;
+         SimValues.Input(:,savecounter)          = I_e(timecounter) + X_t;
          
         savecounter = savecounter+1; %should probably do this with proper indexing, eh?
     end
-
+    
 end
 
 %%
@@ -413,8 +411,6 @@ SimValues.spikesbycell    = spikesbycell;
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
 SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
-
-SimValues.Input           = I_e + X_t;
 
 
 end
