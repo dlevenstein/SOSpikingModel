@@ -63,7 +63,7 @@ PopParams.Kie   = 0;        %Expected E->I In Degree
 PopParams.Kei   = 0;        %Expected I->E In Degree
 
 %% Noise Input Properties
-TimeParams.dt      = 0.1;
+TimeParams.dt      = 0.05;
 TimeParams.SimTime = 50000;
 sf = 1./(TimeParams.dt./1000); %sampling frequency of the simulation (Hz)
 

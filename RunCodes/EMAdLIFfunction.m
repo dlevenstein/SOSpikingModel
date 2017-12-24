@@ -331,6 +331,7 @@ for tt=1:SimTimeLength-1
     %a_w - Adaptation rate for the next time step (unless spike)
     a_w = w_r.*b_w./(1 - w_r).*exp((V-E_L).*delta_T);
     %a_w(:,tt+1) = w_r(:).*b_w(:)./(1 - w_r(:)).*exp((V(:,tt+1)-E_L(:)).*delta_T(:));
+    a_s = zeros(PopNum,1); %synapse rate for next time step (unless spike);
 
     %% Spiking
     if any(V > V_th)
