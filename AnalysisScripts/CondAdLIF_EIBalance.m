@@ -141,8 +141,6 @@ subplot(3,1,3)
     ylabel('Vm')
     xlabel('t (ms)')
 
-%%
-
 
 %% Run the FI Curve function to calculate single neuron FI curves
 simfunction = @EMAdLIFfunction;
