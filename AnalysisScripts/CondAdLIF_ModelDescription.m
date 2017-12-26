@@ -248,7 +248,7 @@ PopParams.EPopNum = 2;
 PopParams.IPopNum = 1;
 TimeParams.SimTime = 2000;
 
-t_ref   = [0.5 0.5 0.5 0.2 0.5 1];
+PopParams.t_ref   = 0.5;
 
 PopParams.Wee   = 100;        %E->E weight
 PopParams.Wii   = 0;        %I->I weight
@@ -285,7 +285,6 @@ PopParams.I_e = Inputfun;
 clear testvals
 for ii = 1:6
     PopParams.b = b(ii);
-    PopParams.t_ref = t_ref(ii);
     PopParams.b_w     = b_w(ii);
     PopParams.b_s = b_s(ii);
     PopParams.a       = a(ii);
@@ -343,7 +342,7 @@ figure
             plot(testvals(ii).t,testvals(ii).V(1,:),'color',Ecolors(ii-3,:),'linewidth',2)
         end
         xlim(viewwin2);ylim([-70 PopParams.V_th(1)])
-        legend(num2str(t_ref(6)),num2str(t_ref(5)),num2str(t_ref(4)),'location','west')
+        %legend(num2str(t_ref(6)),num2str(t_ref(5)),num2str(t_ref(4)),'location','west')
         ylabel('V_p_r_e')
     subplot(4,2,6)
         hold on
@@ -438,7 +437,7 @@ PopParams.EPopNum = 1;
 PopParams.IPopNum = 2;
 TimeParams.SimTime = 2000;
 
-t_ref   = [0.5 0.5 0.5 0.2 0.5 1];
+PopParams.t_ref   = 0.5;
 
 PopParams.Wee   = 0;        %E->E weight
 PopParams.Wii   = 100;        %I->I weight
@@ -475,7 +474,6 @@ PopParams.I_e = Inputfun;
 clear testvals
 for ii = 1:6
     PopParams.b = b(ii);
-    PopParams.t_ref = t_ref(ii);
     PopParams.b_w     = b_w(ii);
     PopParams.b_s = b_s(ii);
     PopParams.a       = a(ii);

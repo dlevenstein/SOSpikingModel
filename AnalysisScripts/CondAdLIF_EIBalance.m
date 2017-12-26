@@ -19,13 +19,6 @@ PopParams.theta = 1/10;     %noise time scale (1/ms)
 PopParams.EPopNum = 800;
 PopParams.IPopNum = 200;
 
-%Neuron properties
-PopParams.E_L     = -65;    %rev potential: leak (mV)
-PopParams.g_L     = 30;     %leak conductance (nS)
-PopParams.C       = 281;    %capacitance (pF)
-PopParams.V_th    = -55;    %spike threshold (mV)
-PopParams.V_reset = -85;    %reset potential (mV)
-PopParams.t_ref   = 0.2;    %refractory period (ms)
 
 %Neuron properties
 PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
@@ -39,13 +32,11 @@ PopParams.t_ref   = 0.2;    %refractory period (ms)
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
 PopParams.b_s     = 0.5;      %synaptic decay timescale (1/ms)
-PopParams.ds      = 0.5;    %synaptic activation duration (ms)
 PopParams.a       = 0.3;    %synaptic activation rate (1/ms)
 
 %Adaptation Properties
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
-PopParams.dw      = 0.2;    %adaptation activation duration (ms)
 PopParams.b       = 0;    %adaptation activation rate (1/ms)
 PopParams.delta_T = 0;     %subthreshold adaptation steepness
 PopParams.w_r = 0.1;        %adaptation at rest (0-1)
@@ -62,7 +53,7 @@ Jee = 1;
 Jei = 1;
 Jie = 1;
 Jii = 1;
-synscalefactor = 100; %Puts J in order 1 (rigorize this, should relate to synaptic effect magnitude)
+synscalefactor = 200; %Puts J in order 1 (rigorize this, should relate to synaptic effect magnitude)
 PopParams.Wee   = synscalefactor.*Jee./sqrt(K);        %E->E weight
 PopParams.Wii   = synscalefactor.*Jii./sqrt(K);        %I->I weight
 PopParams.Wie   = synscalefactor.*Jie./sqrt(K);        %E->I weight
@@ -71,9 +62,9 @@ PopParams.Wei   = synscalefactor.*Jei./sqrt(K);        %I->E weight
 PopParams.p0spike = 0.2;
 
 %%
-TimeParams.dt      = 0.01;
+TimeParams.dt      = 0.05;
 TimeParams.SimTime = 1000;
-PopParams.I_e = 200;
+PopParams.I_e = 250;
 [SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
     'showprogress',true,'onsettime',100);
 
@@ -153,10 +144,18 @@ subplot(3,1,3)
 %% Run the FI Curve function to calculate single neuron FI curves
 simfunction = @EMAdLIFfunction;
 
-Irange = [100 300];
-numI = 10;
+Irange = [100 400];
+numI = 20;
 
 [ Ivals,rate(ss),voltagemean(ss) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
     'showfig','CondAdLIF_EITest','figfolder',figfolder);
 
+%% Regimes
+PopParams.I_e = 225;
+[SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
+    'showprogress',true,'onsettime',100);
 
+%%
+PopParams.I_e = 300;
+[SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
+    'showprogress',true,'onsettime',100);

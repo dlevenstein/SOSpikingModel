@@ -88,7 +88,7 @@ if RAMP
 end
 %% Set the parameters
 onsettransient = timeparms.onsettransient; %Onset transient to ignore
-TimeParams.dt      = 0.01;
+TimeParams.dt      = 0.05;
 TimeParams.SimTime = timeparms.simtime;
 %% Run the simulations
 Ivals = linspace(Irange(1),Irange(2),numI);

@@ -64,7 +64,7 @@ p = inputParser;
 addParameter(p,'showfig',true,@islogical)
 addParameter(p,'showprogress',false,@islogical)
 addParameter(p,'onsettime',0,@isnumeric)
-addParameter(p,'save_dt',0.1,@isnumeric)
+addParameter(p,'save_dt',0.5,@isnumeric)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
@@ -203,7 +203,7 @@ SimValues.w               = nan(PopNum,SaveTimeLength);
 SimValues.a_w             = nan(PopNum,SaveTimeLength);
 SimValues.Input             = nan(PopNum,SaveTimeLength);
 
-spikes = [];
+spikes = nan(PopNum.*(SimTime+onsettime).*150,2); %assume max rate 150Hz
 
 %% EI Parameter Adjustments (ugly. needs cleaning)
 
@@ -292,36 +292,27 @@ V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 %% Time Loop
 savecounter = 1;
 timecounter = -onsettime;
+spikecounter = 0;
 for tt=1:SimTimeLength-1
     %% Time Counter
     if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
         display('10% More Done!') %clearly, this needs improvement
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
+    
     %Noise input
     dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*randn(PopNum,1).*sqrt(dt);
-%     X_t(:,n+1) = X_t(:,n) + ...
-%         -theta(:).*X_t(:,n).*dt + sqrt(2.*theta).*sigma(:).*randn(PopNum,1).*sqrt(dt);
     %V - Voltage Equation
     dVdt =  (- g_L.*(V-E_L) ...                      %Leak
              - g_w.*(V-E_w) ...                      %Adaptation
              - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
              + I_e(timecounter) + X_t)./C;           %External input
-    
-%     V(:,n+1)   = V(:,n) +...
-%         (-g_L.*(V(:,n)-E_L)./C -g_w(:,n).*(V(:,n)-E_w)./C ...
-%         -g_e(:,n).*(V(:,n)-E_e)./C -g_i(:,n).*(V(:,n)-E_i)./C + ...
-%                 I_e(:,n)./C + X_t(:,n)./C).*dt;
-    %     if any(isnan(V))  %bug checking with delta_T too high
-    %         test
-    %     end
     %s - Synaptic Output 
     dsdt = a_s.*(1-s) - b_s.*s;
-    %s(:,tt+1)   = s(:,tt) + (a_s(:,tt).*(1-s(:,tt)) - b_s(:).*s(:,tt)).*dt;
     %w - Adaptation Variable
-    
     dwdt = a_w.*(1-w) - b_w.*w;
-    %w(:,tt+1)   = w(:,tt) + (a_w(:,tt).*(1-w(:,tt)) - b_w(:).*w(:,tt)).*dt;
+
+    
     X_t = X_t + dX;
     V   = V + dVdt.*dt;
     s   = s + dsdt.*dt;
@@ -330,15 +321,17 @@ for tt=1:SimTimeLength-1
     
     %a_w - Adaptation rate for the next time step (unless spike)
     a_w = w_r.*b_w./(1 - w_r).*exp((V-E_L).*delta_T);
-    %a_w(:,tt+1) = w_r(:).*b_w(:)./(1 - w_r(:)).*exp((V(:,tt+1)-E_L(:)).*delta_T(:));
-    a_s = zeros(PopNum,1); %synapse rate for next time step (unless spike);
+    %synapse rate for next time step (unless spike);
+    a_s = zeros(PopNum,1); 
 
     %% Spiking
     if any(V > V_th)
         %Find neurons that crossed threshold and record the spiketimes 
         spikeneurons = find(V > V_th);
-        spikes = [spikes; [timecounter.*ones(size(spikeneurons)),spikeneurons]];
-        %To speed up, preallocate spike vector
+        numspikers = length(spikeneurons);
+        spikes(spikecounter+1:spikecounter+numspikers,:) = ...
+            [timecounter.*ones(numspikers,1),spikeneurons];
+        spikecounter = spikecounter+numspikers;
 
         %Set spiking neurons refractory period 
         t_r(spikeneurons) = t_ref(spikeneurons);
@@ -380,6 +373,7 @@ end
 
 %%
 %Catch for no spiking in simulation error
+spikes(spikecounter+1:end,:)=[];
 if isempty(spikes); spikes = [nan nan]; end
 
 
