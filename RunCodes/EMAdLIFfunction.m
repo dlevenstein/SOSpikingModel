@@ -300,7 +300,7 @@ for tt=1:SimTimeLength
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     
-    %Noise input
+    %Noise input (independent for each neuron... could also be correlated)
     dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*randn(PopNum,1).*sqrt(dt);
     %V - Voltage Equation
     dVdt =  (- g_L.*(V-E_L) ...                      %Leak
@@ -319,9 +319,9 @@ for tt=1:SimTimeLength
     w   = w + dwdt.*dt; 
     timecounter = round(timecounter+dt,4);  %Round to deal with computational error
     
-    %a_w - Adaptation rate for the next time step (unless spike)
+    %a_w - Adaptation activation rate for the next time step (unless spike)
     a_w = w_r.*b_w./(1 - w_r).*exp((V-E_L).*delta_T);
-    %synapse rate for next time step (unless spike);
+    %a_s - Synapse actiation rate for next time step (unless spike);
     a_s = zeros(PopNum,1); 
 
     %% Spiking
@@ -354,7 +354,8 @@ for tt=1:SimTimeLength
         g_e = EE_mat*s + IE_mat*s;
         g_i = II_mat*s + EI_mat*s;
         
-    %% Add data to the output variables 
+    %% Add data to the output variables
+    %Question: is accessing structure slower than doubles?
     if mod(timecounter,save_dt)==0 && timecounter>=0
          SimValues.t(savecounter)                 = timecounter;
          SimValues.V(:,savecounter)               = V;
@@ -366,7 +367,7 @@ for tt=1:SimTimeLength
          SimValues.a_w(:,savecounter)             = a_w;
          SimValues.Input(:,savecounter)          = I_e(timecounter) + X_t;
          
-        savecounter = savecounter+1; %should probably do this with proper indexing, eh?
+         savecounter = savecounter+1;
     end
     
 end
@@ -395,7 +396,7 @@ end
 %Remove onset time
  spikes(spikes(:,1)<=0,:) = [];
 
-for cc = 1:PopNum
+for cc = 1:PopNum %This can go very slow with lots of spikes....
     spikesbycell{cc} = spikes(spikes(:,2)==cc,1);
 end
 

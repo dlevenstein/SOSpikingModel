@@ -31,7 +31,7 @@ PopParams.t_ref   = 0.2;    %refractory period (ms)
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
-PopParams.b_s     = [0.5 0.2];      %synaptic decay timescale (1/ms)
+PopParams.b_s     = [0.5 0.5];      %synaptic decay timescale (1/ms)
 PopParams.a       = 0.3;    %synaptic activation rate (1/ms)
 
 %Adaptation Properties
@@ -39,8 +39,8 @@ PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
 PopParams.b       = 0;    %adaptation activation rate (1/ms)
 PopParams.delta_T = 0;     %subthreshold adaptation steepness
-PopParams.w_r = 0.1;        %adaptation at rest (0-1)
-PopParams.gwnorm = 0;       %magnitude of adaptation
+PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
+PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
 K = 100;
