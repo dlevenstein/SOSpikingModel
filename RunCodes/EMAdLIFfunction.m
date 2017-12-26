@@ -291,12 +291,12 @@ V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 
 %% Time Loop
 savecounter = 1;
-timecounter = -onsettime;
+timecounter = -onsettime-dt;
 spikecounter = 0;
-for tt=1:SimTimeLength-1
+for tt=1:SimTimeLength
     %% Time Counter
     if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
-        display('10% More Done!') %clearly, this needs improvement
+        display([num2str(round(100.*tt./SimTimeLength)),'% Done!']) %clearly, this needs improvement
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     
@@ -379,18 +379,16 @@ if isempty(spikes); spikes = [nan nan]; end
 
 %% Figure
 if SHOWFIG
-    
-    
+ 
 exneuron = randi(PopNum,1);
 exspiketimes = spikes(spikes(:,2)==exneuron,1);
-    
-    
+      
 figure
-plot(spikes(:,1),spikes(:,2),'k.', 'Markersize' , 0.1)
-hold on
-plot([0 0],[0 PopNum],'r')
-xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
-xlim([-onsettime SimTime])
+    plot(spikes(:,1),spikes(:,2),'k.', 'Markersize' , 0.1)
+    hold on
+    plot([0 0],[0 PopNum],'r')
+    xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
+    xlim([-onsettime SimTime]);ylim([0 PopNum+1]);
 end
 %% Output Structure
 

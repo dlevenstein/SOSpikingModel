@@ -16,8 +16,8 @@ PopParams.sigma = 0;        %niose magnitude: variance
 PopParams.theta = 1/10;     %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 800;
-PopParams.IPopNum = 200;
+PopParams.EPopNum = 1000;
+PopParams.IPopNum = 250;
 
 
 %Neuron properties
@@ -31,7 +31,7 @@ PopParams.t_ref   = 0.2;    %refractory period (ms)
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
-PopParams.b_s     = 0.5;      %synaptic decay timescale (1/ms)
+PopParams.b_s     = [0.5 0.2];      %synaptic decay timescale (1/ms)
 PopParams.a       = 0.3;    %synaptic activation rate (1/ms)
 
 %Adaptation Properties
@@ -43,7 +43,7 @@ PopParams.w_r = 0.1;        %adaptation at rest (0-1)
 PopParams.gwnorm = 0;       %magnitude of adaptation
 
 %Network Properties
-K = 50;
+K = 100;
 PopParams.Kee   = K;        %Expected E->E In Degree
 PopParams.Kii   = K;        %Expected I->I In Degree
 PopParams.Kie   = K;        %Expected E->I In Degree
@@ -53,17 +53,20 @@ Jee = 1;
 Jei = 1;
 Jie = 1;
 Jii = 1;
-synscalefactor = 200; %Puts J in order 1 (rigorize this, should relate to synaptic effect magnitude)
-PopParams.Wee   = synscalefactor.*Jee./sqrt(K);        %E->E weight
-PopParams.Wii   = synscalefactor.*Jii./sqrt(K);        %I->I weight
-PopParams.Wie   = synscalefactor.*Jie./sqrt(K);        %E->I weight
-PopParams.Wei   = synscalefactor.*Jei./sqrt(K);        %I->E weight
+synscalefactor = 500; %Puts J in order 1
+%(rigorize this, should relate to synaptic effect magnitude)
+%synscalefactor should be a synaptic weight value such that with K=1 an
+%excitatory synapse is just strong enough to bring a cell to threshold
+PopParams.Wee   = Jee.*synscalefactor./sqrt(K);        %E->E weight
+PopParams.Wii   = Jii.*synscalefactor./sqrt(K);        %I->I weight
+PopParams.Wie   = Jie.*synscalefactor./sqrt(K);        %E->I weight
+PopParams.Wei   = Jei.*synscalefactor./sqrt(K);        %I->E weight
 
-PopParams.p0spike = 0.2;
+PopParams.p0spike = 0.15;
 
 %%
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 1000;
+TimeParams.SimTime = 500;
 PopParams.I_e = 250;
 [SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
     'showprogress',true,'onsettime',100);
