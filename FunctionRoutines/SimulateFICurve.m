@@ -88,7 +88,7 @@ if RAMP
 end
 %% Set the parameters
 onsettransient = timeparms.onsettransient; %Onset transient to ignore
-TimeParams.dt      = 0.01;
+TimeParams.dt      = 0.05;
 TimeParams.SimTime = timeparms.simtime;
 %% Run the simulations
 Ivals = linspace(Irange(1),Irange(2),numI);
@@ -103,7 +103,7 @@ end
 %rate = zeros(1,numI);
 voltagebins = linspace(min([PopParams.V_reset,PopParams.E_L]),max(PopParams.V_th),100);
 conductancebins = linspace(0,1,100);
-isibins = linspace(0.5,3.5,60);
+isibins = linspace(0,3.5,60);
 totaltime = timeparms.simtime-onsettransient;
 clear voltagedist voltagemean adaptdist ISIdist rate
 for ii = 1:numI
