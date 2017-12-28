@@ -26,7 +26,7 @@ PopParams.g_L     = [182/18 119/8];     %leak conductance (nS)
 PopParams.C       = [182 119];    %capacitance (pF)
 PopParams.V_th    = [-45 -47];    %spike threshold (mV)
 PopParams.V_reset = [-55 -55];    %reset potential (mV)
-PopParams.t_ref   = 0.2;    %refractory period (ms)
+PopParams.t_ref   = 0.5;    %refractory period (ms)
 
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
@@ -53,7 +53,7 @@ Jee = 1;
 Jei = 1;
 Jie = 1;
 Jii = 1;
-synscalefactor = 500; %Puts J in order 1
+synscalefactor = 300; %Puts J in order 1
 %(rigorize this, should relate to synaptic effect magnitude)
 %synscalefactor should be a synaptic weight value such that with K=1 an
 %excitatory synapse is just strong enough to bring a cell to threshold
@@ -160,3 +160,38 @@ PopParams.I_e = 225;
 PopParams.I_e = 300;
 [SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
     'showprogress',true,'onsettime',100);
+
+
+
+%%
+sfacts = [50 500 1000];
+for ss = 1:length(sfacts)
+synscalefactor = sfacts(ss); %Puts J in order 1
+%(rigorize this, should relate to synaptic effect magnitude)
+%synscalefactor should be a synaptic weight value such that with K=1 an
+%excitatory synapse is just strong enough to bring a cell to threshold
+PopParams.Wee   = Jee.*synscalefactor./sqrt(K);        %E->E weight
+PopParams.Wii   = Jii.*synscalefactor./sqrt(K);        %I->I weight
+PopParams.Wie   = Jie.*synscalefactor./sqrt(K);        %E->I weight
+PopParams.Wei   = Jei.*synscalefactor./sqrt(K);        %I->E weight
+
+[ Ivals,rate(ss),voltagemean(ss) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
+    'showfig',['CondAdLIF_EITest_scale',num2str(synscalefactor)],'figfolder',figfolder);
+end
+
+%%
+test =CollapseStruct(rate,1);
+
+%%
+figure
+plot(Ivals,test.E,'k','linewidth',2)
+
+%%
+PopParams.I_e = 350;
+for ss = 1:length(sfacts)
+    synscalefactor = sfacts(ss); %Puts J in order 1
+    [SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
+        'showprogress',true,'onsettime',100);
+end
+
+%% Check some different K values.

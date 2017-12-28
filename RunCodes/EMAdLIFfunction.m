@@ -65,11 +65,13 @@ addParameter(p,'showfig',true,@islogical)
 addParameter(p,'showprogress',false,@islogical)
 addParameter(p,'onsettime',0,@isnumeric)
 addParameter(p,'save_dt',0.5,@isnumeric)
+addParameter(p,'cellout',false,@islogical)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
 onsettime = p.Results.onsettime;
 save_dt = p.Results.save_dt;
+cellout = p.Results.cellout;
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
@@ -370,6 +372,7 @@ for tt=1:SimTimeLength
          savecounter = savecounter+1;
     end
     
+    %%Idea: add a catch for silent network or excessive firing network?
 end
 
 %%
@@ -396,12 +399,15 @@ end
 %Remove onset time
  spikes(spikes(:,1)<=0,:) = [];
 
-for cc = 1:PopNum %This can go very slow with lots of spikes....
-    spikesbycell{cc} = spikes(spikes(:,2)==cc,1);
+if cellout
+    for cc = 1:PopNum %This can go very slow with lots of spikes....
+        spikesbycell{cc} = spikes(spikes(:,2)==cc,1);
+    end
+    SimValues.spikesbycell    = spikesbycell;
 end
 
 SimValues.spikes          = spikes;
-SimValues.spikesbycell    = spikesbycell;
+
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
 SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;

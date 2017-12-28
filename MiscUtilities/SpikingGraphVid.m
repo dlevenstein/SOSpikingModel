@@ -20,7 +20,7 @@ samplemat = weights([repcells,repcells]);
 samplemat = MakeSymmetric(samplemat);
 %%
 %plotxy=Kamada(samplemat,0.01);
-plotxy=Kamada(samplemat,0.01);
+plotxy=Kamada(samplemat,0.01); %Ugh... compile?
 
 %%
 cellcolors = (cellrate([repE,repI]));
@@ -32,7 +32,8 @@ colorbar
 
 
 %% Loop the video for spike times
-%Possibly include voltage?
+%Possibly include voltage? Color by cell type. Brightness by voltage. White
+%when spike.
 
 end
 

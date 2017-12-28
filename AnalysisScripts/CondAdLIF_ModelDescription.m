@@ -262,9 +262,9 @@ PopParams.Kei   = 0;
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
-b_s     = [0.5 0.2 0.1 1 1 1];      %synaptic decay timescale (1/ms)
+b_s     = [1 0.5 0.2 0.5 0.5 0.5];      %synaptic decay timescale (1/ms)
 PopParams.ds      = 0.5;    %synaptic activation duration (ms)
-a       = [0.1 0.1 0.1 0.1 0.3 0.5 ];    %synaptic activation rate (1/ms)
+a       = [0.3 0.3 0.3 0.1 0.3 0.5 ];    %synaptic activation rate (1/ms)
 
 %Adaptation Properties
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
@@ -288,7 +288,8 @@ for ii = 1:6
     PopParams.b_w     = b_w(ii);
     PopParams.b_s = b_s(ii);
     PopParams.a       = a(ii);
-    [testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+    [testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,...
+        'showfig',false,'save_dt',0.05);
 end
 
 %% Spiking Properties
