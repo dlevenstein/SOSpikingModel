@@ -6,6 +6,7 @@ repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
 addpath(genpath(repopath))
 
 figfolder = [repopath,'/Figures/EIBalance'];
+datafolder = [repopath,'/Data/FImapData'];
 
 %% Define the Population Parameters to feed the FI Cuve function
 
@@ -49,20 +50,20 @@ PopParams.Kei   = K;        %Expected I->E In Degree
 PopParams.p0spike = 0.15;
 
 %%
-TimeParams.dt      = 0.05;
+TimeParams.dt      = 5;
 TimeParams.SimTime = 500;
 PopParams.I_e = 250;
 
 %% Run the FI Curve function to calculate single neuron FI curves
 simfunction = @EMAdLIFfunction;
 
-Irange = [300 400];
-numI = 5;
+Irange = [0 400];
+numI = 36;
 
 %Simulate FI for 20 Weight levels
+Jvals = 0:1:20;
 
-Jvals = 0:1:2;
-
+%% Jee
 for jj = 1:length(Jvals)
     
 Jee = Jvals(jj);
@@ -79,5 +80,68 @@ PopParams.Wie   = Jie.*synscalefactor./sqrt(K);        %E->I weight
 PopParams.Wei   = Jei.*synscalefactor./sqrt(K);        %I->E weight
 
 [ Ivals,rate(jj),voltagemean(jj) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
-    'showfig',['CondAdLIF_Sig',num2str(Jvals(jj))],'figfolder',figfolder);
+    'showfig',['CondAdLIF_JeeFI',num2str(Jvals(jj))],'figfolder',figfolder);
 end
+save([datafolder,'/CondAdLIF_JeeFI'],'-struct','rate');
+%% Jei
+for jj = 1:length(Jvals)
+    
+Jee = 0;
+Jei = Jvals(jj);
+Jie = 0;
+Jii = 0;
+synscalefactor = 300; %Puts J in order 1
+%(rigorize this, should relate to synaptic effect magnitude)
+%synscalefactor should be a synaptic weight value such that with K=1 an
+%excitatory synapse is just strong enough to bring a cell to threshold
+PopParams.Wee   = Jee.*synscalefactor./sqrt(K);        %E->E weight
+PopParams.Wii   = Jii.*synscalefactor./sqrt(K);        %I->I weight
+PopParams.Wie   = Jie.*synscalefactor./sqrt(K);        %E->I weight
+PopParams.Wei   = Jei.*synscalefactor./sqrt(K);        %I->E weight
+
+[ Ivals,rate(jj),voltagemean(jj) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
+    'showfig',['CondAdLIF_JeiFI',num2str(Jvals(jj))],'figfolder',figfolder);
+end
+save([datafolder,'/CondAdLIF_JeiFI'],'-struct','rate');
+
+%% Jie
+for jj = 1:length(Jvals)
+    
+Jee = 0;
+Jei = 0;
+Jie = Jvals(jj);
+Jii = 0;
+synscalefactor = 300; %Puts J in order 1
+%(rigorize this, should relate to synaptic effect magnitude)
+%synscalefactor should be a synaptic weight value such that with K=1 an
+%excitatory synapse is just strong enough to bring a cell to threshold
+PopParams.Wee   = Jee.*synscalefactor./sqrt(K);        %E->E weight
+PopParams.Wii   = Jii.*synscalefactor./sqrt(K);        %I->I weight
+PopParams.Wie   = Jie.*synscalefactor./sqrt(K);        %E->I weight
+PopParams.Wei   = Jei.*synscalefactor./sqrt(K);        %I->E weight
+
+[ Ivals,rate(jj),voltagemean(jj) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
+    'showfig',['CondAdLIF_JieFI',num2str(Jvals(jj))],'figfolder',figfolder);
+end
+save([datafolder,'/CondAdLIF_JieFI'],'-struct','rate');
+
+%% Jii
+for jj = 1:length(Jvals)
+    
+Jee = 0;
+Jei = 0;
+Jie = 0;
+Jii = Jvals(jj);
+synscalefactor = 300; %Puts J in order 1
+%(rigorize this, should relate to synaptic effect magnitude)
+%synscalefactor should be a synaptic weight value such that with K=1 an
+%excitatory synapse is just strong enough to bring a cell to threshold
+PopParams.Wee   = Jee.*synscalefactor./sqrt(K);        %E->E weight
+PopParams.Wii   = Jii.*synscalefactor./sqrt(K);        %I->I weight
+PopParams.Wie   = Jie.*synscalefactor./sqrt(K);        %E->I weight
+PopParams.Wei   = Jei.*synscalefactor./sqrt(K);        %I->E weight
+
+[ Ivals,rate(jj),voltagemean(jj) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
+    'showfig',['CondAdLIF_JiiFI',num2str(Jvals(jj))],'figfolder',figfolder);
+end
+save([datafolder,'/CondAdLIF_JiiFI'],'-struct','rate');
