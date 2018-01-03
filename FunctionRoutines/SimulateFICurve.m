@@ -1,4 +1,4 @@
-function [ Ivals,rate,voltagemean ] = SimulateFICurve(simfunction,PopParams,Irange,numI,varargin)
+function [ Ivals,rate,voltagemean,SimValues ] = SimulateFICurve(simfunction,PopParams,Irange,numI,varargin)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -97,8 +97,8 @@ for ii = 1:numI
     ii
     PopParams.I_e     = Ivals(ii);
     [SimValues(ii)] = simfunction(PopParams,TimeParams,...
-        'showfig',false,'save_dt',1,'onsettime',onsettransient,...
-        'cellout',true);
+        'showfig',false,'save_dt',0.5,'onsettime',onsettransient,...
+        'cellout',true,'showprogress',true);
 end
 
 %Add: display parameters from PopParams in figure.

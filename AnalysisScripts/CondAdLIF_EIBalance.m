@@ -43,7 +43,7 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-K = 100;
+K = 80;
 PopParams.Kee   = K;        %Expected E->E In Degree
 PopParams.Kii   = K;        %Expected I->I In Degree
 PopParams.Kie   = K;        %Expected E->I In Degree
@@ -53,7 +53,7 @@ Jee = 1;
 Jei = 1;
 Jie = 1;
 Jii = 1;
-synscalefactor = 300; %Puts J in order 1
+synscalefactor = 250; %Puts J in order 1
 %(rigorize this, should relate to synaptic effect magnitude)
 %synscalefactor should be a synaptic weight value such that with K=1 an
 %excitatory synapse is just strong enough to bring a cell to threshold
@@ -69,7 +69,7 @@ TimeParams.dt      = 0.05;
 TimeParams.SimTime = 500;
 PopParams.I_e = 250;
 [SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
-    'showprogress',true,'onsettime',100);
+    'showprogress',true,'onsettime',100,'cellout',true);
 
 
 %%
@@ -87,10 +87,11 @@ ISIhist.all = cat(1,ISIhist.all{:});
 cellrates = cellfun(@length,SimValues.spikesbycell)./(TimeParams.SimTime./1000);
 sortrate.E = sort(cellrates(SimValues.EcellIDX));
 sortrate.I = sort(cellrates(SimValues.IcellIDX));
+[~,sortrate.all] =sort(cellrates);
 
 %%
 figure
-imagesc(ISIhist.all)
+imagesc(ISIhist.all(sortrate.all,:))
 %%
 figure
 plot(isibins,ISIdist.E,'k')
@@ -141,11 +142,18 @@ subplot(3,1,3)
     ylabel('Vm')
     xlabel('t (ms)')
 
+%% Calculate E-I input correlation for each cell
 
+eicorr = corr(SimValues.g_e',  SimValues.g_i');
+
+figure
+imagesc(eicorr(sortrate.all,sortrate.all))
+colorbar
+    
 %% Run the FI Curve function to calculate single neuron FI curves
 simfunction = @EMAdLIFfunction;
 
-Irange = [100 400];
+Irange = [150 350];
 numI = 20;
 
 [ Ivals,rate(ss),voltagemean(ss) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
@@ -164,7 +172,7 @@ PopParams.I_e = 300;
 
 
 %%
-sfacts = [50 500 1000];
+sfacts = [50 250 500];
 for ss = 1:length(sfacts)
 synscalefactor = sfacts(ss); %Puts J in order 1
 %(rigorize this, should relate to synaptic effect magnitude)

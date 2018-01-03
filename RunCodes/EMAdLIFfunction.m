@@ -23,7 +23,6 @@
 %       .E_i        Reversal potential of inhibitory synapses
 %       .a          Synaptic activation strength
 %       .bs         Time of synaptic decay
-%       .ds         Time synapses are activated
 % 
 %       .tau_a      Adaptation time constant
 %       .t_ref      Refractory period
@@ -31,7 +30,6 @@
 %       .gwnorm     Adaptation normalizer
 %       .b          Adaptation activation strength
 %       .bw         Time of adaptative decay
-%       .dw         Time adaptation is activated
 %       .w_r        Adaptation Rest
 %
 %                   SYNAPTIC WEIGHT (what are the units?)
@@ -279,6 +277,10 @@ end
 %% if no spike adaptation, set to steady state????? or set to alpha(v_th)
 b(b==0) = w_r(b==0).*b_w(b==0)./(1 - w_r(b==0)).*exp((V_reset(b==0)-E_L(b==0)).*delta_T(b==0));
 
+%% If no noise
+if sigma==0
+    dX = 0;
+end
 
 %% Initial Conditions - random voltages
 %Improvement: set # initial spiking neurons instead of hard coding 
@@ -303,7 +305,9 @@ for tt=1:SimTimeLength
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     
     %Noise input (independent for each neuron... could also be correlated)
-    dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*randn(PopNum,1).*sqrt(dt);
+    if sigma~=0
+        dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*randn(PopNum,1).*sqrt(dt);
+    end
     %V - Voltage Equation
     dVdt =  (- g_L.*(V-E_L) ...                      %Leak
              - g_w.*(V-E_w) ...                      %Adaptation
