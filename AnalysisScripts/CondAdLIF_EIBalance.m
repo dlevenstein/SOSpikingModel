@@ -43,7 +43,7 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-K = 80;
+K = 100;
 PopParams.Kee   = K;        %Expected E->E In Degree
 PopParams.Kii   = K;        %Expected I->I In Degree
 PopParams.Kie   = K;        %Expected E->I In Degree
@@ -91,7 +91,9 @@ sortrate.I = sort(cellrates(SimValues.IcellIDX));
 
 %%
 figure
-imagesc(ISIhist.all(sortrate.all,:))
+imagesc(isibins,[0 2500],ISIhist.all(sortrate.all,:))
+LogScale('x',10)
+xlabel('ISI (ms)')
 %%
 figure
 plot(isibins,ISIdist.E,'k')
