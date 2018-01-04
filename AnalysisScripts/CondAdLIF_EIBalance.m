@@ -16,8 +16,8 @@ PopParams.sigma = 0;        %niose magnitude: variance
 PopParams.theta = 1/10;     %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 1000;
-PopParams.IPopNum = 250;
+PopParams.EPopNum = 2000;
+PopParams.IPopNum = 500;
 
 
 %Neuron properties
@@ -66,7 +66,7 @@ PopParams.p0spike = 0.15;
 
 %%
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 500;
+TimeParams.SimTime = 1000;
 PopParams.I_e = 250;
 [SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
     'showprogress',true,'onsettime',100,'cellout',true);
