@@ -43,7 +43,7 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-K = 100;
+K = 250;
 PopParams.Kee   = K;        %Expected E->E In Degree
 PopParams.Kii   = K;        %Expected I->I In Degree
 PopParams.Kie   = K;        %Expected E->I In Degree
@@ -66,7 +66,7 @@ PopParams.p0spike = 0.15;
 
 %%
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 1000;
+TimeParams.SimTime = 4000;
 PopParams.I_e = 250;
 [SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
     'showprogress',true,'onsettime',100,'cellout',true);
