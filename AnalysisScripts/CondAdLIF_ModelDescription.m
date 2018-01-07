@@ -20,13 +20,6 @@ PopParams.theta = 1/10;        %noise time scale (1/ms)
 PopParams.EPopNum = 1;
 PopParams.IPopNum = 0;
 
-%Neuron properties
-PopParams.E_L     = -65;    %rev potential: leak (mV)
-PopParams.g_L     = 30;     %leak conductance (nS)
-PopParams.C       = 281;    %capacitance (pF)
-PopParams.V_th    = -55;    %spike threshold (mV)
-PopParams.V_reset = -85;    %reset potential (mV)
-PopParams.t_ref   = 0.2;    %refractory period (ms)
 
 %Neuron properties
 PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
@@ -34,23 +27,21 @@ PopParams.g_L     = [182/18 119/8];     %leak conductance (nS)
 PopParams.C       = [182 119];    %capacitance (pF)
 PopParams.V_th    = [-45 -47];    %spike threshold (mV)
 PopParams.V_reset = [-55 -55];    %reset potential (mV)
-PopParams.t_ref   = 0.2;    %refractory period (ms)
+PopParams.t_ref   = 0.5;    %refractory period (ms)
 
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
-PopParams.b_s     = 1;      %synaptic decay timescale (1/ms)
-PopParams.ds      = 0.5;    %synaptic activation duration (ms)
-PopParams.a       = 0.5;    %synaptic activation rate (1/ms)
+PopParams.b_s     = [0.5 0.5];      %synaptic decay timescale (1/ms)
+PopParams.a       = 0.3;    %synaptic activation rate (1/ms)
 
 %Adaptation Properties
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
-PopParams.dw      = 0.2;    %adaptation activation duration (ms)
-PopParams.b       = 0.1;    %adaptation activation rate (1/ms)
+PopParams.b       = 0;    %adaptation activation rate (1/ms)
 PopParams.delta_T = 0;     %subthreshold adaptation steepness
-PopParams.w_r = 0.1;        %adaptation at rest (0-1)
-PopParams.gwnorm = 0;       %magnitude of adaptation
+PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
+PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
 PopParams.Wee   = 0;        %E->E weight
@@ -263,13 +254,11 @@ PopParams.Kei   = 0;
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
 b_s     = [1 0.5 0.2 0.5 0.5 0.5];      %synaptic decay timescale (1/ms)
-PopParams.ds      = 0.5;    %synaptic activation duration (ms)
 a       = [0.3 0.3 0.3 0.1 0.3 0.5 ];    %synaptic activation rate (1/ms)
 
 %Adaptation Properties
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 b_w     = [0.10 0.05 0.02 0.02 0.02 0.02];   %adaptation decay rate (1/ms)
-PopParams.dw      = 0.2;    %adaptation activation duration (ms)
 b       = [1 1 1 0.5 1 2];    %adaptation activation rate (1/ms) (spike)
 PopParams.delta_T = 0;     %subthreshold adaptation steepness
 PopParams.w_r = 0.1;        %adaptation at rest (0-1)
@@ -318,7 +307,7 @@ figure
             plot(testvals(ii).t,testvals(ii).w(1,:),'color',Ecolors(ii,:),'linewidth',2)
         end
         legend(num2str(b_w(3)),num2str(b_w(2)),num2str(b_w(1)))
-        xlim(viewwin);ylim([0 0.3])
+        xlim(viewwin);ylim([0 0.5])
         ylabel('w_p_r_e')
     subplot(4,2,7)
         hold on
@@ -366,7 +355,7 @@ NiceSave('spikeparms',figfolder,'CondAdLIF')
 
 %% Synaptic Properties
 viewwin = [1025 1120];
-vrange = [-68 -55];
+vrange = [-68 -45];
 Ecolors = [0 0.2 0;0.35 0.55 0.35;0.7 0.9 0.7]; 
 Icolors = [0.2 0 0;0.55 0.35 0.35;0.9 0.7 0.7]; 
 figure
@@ -478,7 +467,8 @@ for ii = 1:6
     PopParams.b_w     = b_w(ii);
     PopParams.b_s = b_s(ii);
     PopParams.a       = a(ii);
-    [testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,'showfig',false);
+    [testvals(ii)] = EMAdLIFfunction(PopParams,TimeParams,...
+        'showfig',false,'save_dt',0.05);
 end
 
 %% Spiking Properties
