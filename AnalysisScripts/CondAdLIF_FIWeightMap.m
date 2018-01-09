@@ -1,3 +1,4 @@
+function [] = CondAdLIF_FIWeightMap(ii)
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
@@ -71,7 +72,6 @@ Jarray = [[1,0,0,0];
 Jnames = ['CondAdLIF_JeeFI','CondAdLIF_JeiFI','CondAdLIF_JieFI','CondAdLIF_JiiFI'];
 
 %% Jee
-for ii = 1:length(Jarray)
 for jj = 1:length(Jvals)
     
 Jee = Jarray(ii,1).*Jvals(jj);
@@ -90,5 +90,4 @@ PopParams.Wei   = Jei.*synscalefactor./sqrt(K);        %I->E weight
 [ Ivals,rate,voltagemean ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
     'showfig',[Jnames(ii),'_Jval_',num2str(Jvals(jj))],'figfolder',figfolder);
 save([datafolder,'/',Jnames(ii),'_Jval_',num2str(Jvals(jj))],'-struct','rate');
-end
 end
