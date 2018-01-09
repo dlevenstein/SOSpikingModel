@@ -105,7 +105,7 @@ end
 %Add: display parameters from PopParams in figure.
 %% Calculate Rate, Variable distributions
 %rate = zeros(1,numI);
-voltagebins = linspace(min([PopParams.V_reset,PopParams.E_L]),max(PopParams.V_th),100);
+voltagebins = linspace(min([PopParams_in.V_reset,PopParams_in.E_L]),max(PopParams_in.V_th),100);
 conductancebins = linspace(0,1,100);
 isibins = linspace(0,3.5,60);
 totaltime = timeparms.simtime;
@@ -115,8 +115,8 @@ for ii = 1:numI
     Espikes = ismember(SimValues(ii).spikes(:,2),SimValues(ii).EcellIDX);
     Ispikes = ismember(SimValues(ii).spikes(:,2),SimValues(ii).IcellIDX);
 
-    rate.E(ii) = sum(Espikes)./PopParams.EPopNum./(totaltime./1000); %units: spikes/cell/s
-    rate.I(ii) = sum(Ispikes)./PopParams.IPopNum./(totaltime./1000); %units: spikes/cell/s
+    rate.E(ii) = sum(Espikes)./PopParams_in.EPopNum./(totaltime./1000); %units: spikes/cell/s
+    rate.I(ii) = sum(Ispikes)./PopParams_in.IPopNum./(totaltime./1000); %units: spikes/cell/s
     
     %Calculating ISI/rate distributions
     cellrates = cellfun(@length,SimValues(ii).spikesbycell)./(totaltime./1000);
@@ -224,8 +224,8 @@ if SHOWFIG
         %add synaptic conductances...
         %add noise etc parm text in figure
 
-        vmin = min([PopParams.V_reset,PopParams.E_L]);
-        vmax = max(PopParams.V_th);
+        vmin = min([PopParams_in.V_reset,PopParams_in.E_L]);
+        vmax = max(PopParams_in.V_th);
         for ee = 1:numextraces
         subplot(numextraces,2,(ee.*2))
             plot(extime,exampletrace.E(:,ee),'color',Ecolor(end/2,:))
