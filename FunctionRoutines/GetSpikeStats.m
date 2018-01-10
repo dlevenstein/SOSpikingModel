@@ -17,10 +17,10 @@ sortrate.ratetype = [sortrate.Eonly sortrate.Ionly];
 %[~,sortrate.rasterI] = sort([nan(size(sortrate.Eonly)) sortrate.Ionly]);
 
 %% Calculate Rate, Vm, S, g, I over time
-dt = 0.5;   overlap = 4;   winsize = dt.*overlap;
-[spikemat,t,~] = SpktToSpkmat(SimValues.spikesbycell, [], dt,overlap);
-ratemat.E = sum(spikemat(:,SimValues.EcellIDX),2)./(winsize./1000)./length(SimValues.EcellIDX);
-ratemat.I = sum(spikemat(:,SimValues.IcellIDX),2)./(winsize./1000)./length(SimValues.IcellIDX);
+poprate.dt = 0.5;   overlap = 4;   winsize = poprate.dt.*overlap;
+[spikemat,t,~] = SpktToSpkmat(SimValues.spikesbycell, [], poprate.dt,overlap);
+poprate.E = sum(spikemat(:,SimValues.EcellIDX),2)./(winsize./1000)./length(SimValues.EcellIDX);
+poprate.I = sum(spikemat(:,SimValues.IcellIDX),2)./(winsize./1000)./length(SimValues.IcellIDX);
 
 %Membrane Potential (Vm)
 vm.bins = linspace(-65,max(SimValues.V(:)),100);
@@ -70,8 +70,22 @@ Isyn.IImean = mean(SimValues.Isyn_i(SimValues.IcellIDX,:),1);
 Isyn.Enetmean = mean(SimValues.Isyn_tot(SimValues.EcellIDX,:),1);
 Isyn.Inetmean = mean(SimValues.Isyn_tot(SimValues.IcellIDX,:),1);
 
-
+%% Figure: Spike Raster and Spike Rate
+figure
+    subplot(3,1,1:2)
+        plot(SimValues.spikes(:,1),sortrate.raster(SimValues.spikes(:,2)),'k.','markersize',2)
+        hold on
+        plot(SimValues.t([1 end]),min(SimValues.IcellIDX).*[1 1],'k')
+        ylim(max(SimValues.IcellIDX).*[0 1]);   xlim(timewin);
+    subplot(3,1,3)
+        plot(t,poprate.E,'k')
+        hold on
+        plot(t,poprate.I,'r')
+           xlim(timewin); 
+           
 %% Figure: Synaptic Inputs
+Ecolormap = makeColorMap([1 1 1],[0 0.5 0],[0.5 1 0.5]);
+Icolormap = makeColorMap([1 1 1],[0.8 0 0],[1 0.5 0.5]);
 EIcolormap = [flipud(Icolormap);Ecolormap];
 figure
     subplot(3,1,1)
@@ -85,7 +99,7 @@ figure
         %colorbar
         axis xy
         xlim(timewin);
-        ylim(Isyn.bins(end).*[-1 1])
+        ylim([min(Isyn.Ibins) max(Isyn.Ebins)])
         ylabel('E Cells: I_s_y_n')
     subplot(6,1,3)
         colormap(gca,Ecolormap)
@@ -109,7 +123,7 @@ figure
         %colorbar
         axis xy
         xlim(timewin);
-        ylim(Isyn.bins(end).*[-1 1])
+        ylim([min(Isyn.Ibins) max(Isyn.Ebins)])
         ylabel('I Cells: I_s_y_n')
     subplot(6,1,4)
         colormap(gca,Icolormap)
@@ -161,8 +175,7 @@ subplot(4,1,4)
 
 %% Figure: Synaptic Variable
 
-Ecolormap = makeColorMap([1 1 1],[0 0.5 0],[0.5 1 0.5]);
-Icolormap = makeColorMap([1 1 1],[0.8 0 0],[1 0.5 0.5]);
+
 
 figure
 subplot(4,1,1)
@@ -199,22 +212,11 @@ subplot(4,1,4)
     ylim([min(vm.bins) max(vm.bins)])   ;   xlim(timewin);
     xlabel('t (ms)');ylabel('V_I')
     
-%% Figure: Spike Raster and Spike Rate
-figure
-    subplot(3,1,1:2)
-        plot(SimValues.spikes(:,1),sortrate.raster(SimValues.spikes(:,2)),'k.','markersize',2)
-        hold on
-        plot(SimValues.t([1 end]),min(SimValues.IcellIDX).*[1 1],'k')
-        ylim(max(SimValues.IcellIDX).*[0 1]);   xlim(timewin);
-    subplot(3,1,3)
-        plot(t,ratemat.E,'k')
-        hold on
-        plot(t,ratemat.I,'r')
-           xlim(timewin);
+
 
         
 
-%%
+%% Figure: Firing Rate Distribution
 figure
 subplot(3,2,1)
 hist(log10(cellrates(SimValues.EcellIDX)),20)
@@ -244,7 +246,7 @@ vm.celldist = hist(SimValues.V',vm.bins)';
 
 
 
-%%
+%% Figure ISI, Vm distributions
 isicolormap = [1 1 1; makeColorMap([1 1 1],[0.8 0 0])];
 figure
     subplot(2,2,1)
@@ -263,23 +265,11 @@ figure
         plot(vm.bins([1 end]),min(SimValues.IcellIDX).*[1 1],'k')
         colorbar
         colormap(isicolormap)
-        %caxis([0 1])
+        %caxis([:0 1])
         xlabel('Vm (mV)')
 
 
-%%
-%cellrates(cellrates==0) = 0.1;
-figure
-subplot(3,2,1)
-hist(log10(cellrates(SimValues.EcellIDX)),20)
-xlabel('Firing Rate (Hz)');ylabel('# E Cells')
-LogScale('x',10)
-subplot(3,2,3)
-hist(log10(cellrates(SimValues.IcellIDX)),20)
-xlabel('Firing Rate (Hz)');ylabel('# I Cells')
-LogScale('x',10)
-%%
-
+%% Figure: Example Cell
 
 Excellidx = {SimValues.EcellIDX(1),SimValues.IcellIDX(1)};
 Excelltype = {'E','I'};
@@ -313,20 +303,15 @@ subplot(3,1,3)
     xlabel('t (ms)')
     xlim(timewin);
 
-    
-%%
-    
-%     figure
-%     plot(SimValues.g_e,SimValues.g_i,'.')
-%     xlabel('g_e');ylabel('g_i')
-%     
-%% Network
+   
+%% Network - in degree
 
 indegree.E = sum(SimValues.WeightMat(:,SimValues.EcellIDX)~=0,2);
 indegree.I = sum(SimValues.WeightMat(:,SimValues.IcellIDX)~=0,2);
 indegree.EIratio =     indegree.E./indegree.I;
 
-%%
+%% Figure: In Degree and rate (join with rate dist, ISI/Vm dist)
+%i.e. population heterogeneity measures
 figure
     subplot(2,2,1)
         scatter(indegree.E,indegree.I,2,log10(cellrates))
@@ -337,5 +322,34 @@ figure
         hold on
         plot(log10(indegree.EIratio(SimValues.IcellIDX)),log10(cellrates(SimValues.IcellIDX)),'r.','markersize',4)
         LogScale('y',10)
+        
+%% Calculate pop Synch/Rate distribution, Pop Autocorrelation
+%i.e. population dynamic measures
+poprate.bins = linspace(0,150,75);
+poprate.Edist = hist(poprate.E,poprate.bins);
+poprate.Idist = hist(poprate.I,poprate.bins);
+poprate.EIdist = hist3([poprate.E,poprate.I],{poprate.bins,poprate.bins});
+
+[poprate.autocorr,poprate.tcorr] = xcorr([poprate.E,poprate.I]);
+poprate.tcorr = poprate.tcorr.*poprate.dt;
+
+%%
+figure
+    subplot(2,2,1)
+        plot(log10(poprate.bins),poprate.Edist,'k')
+        hold on
+        plot(log10(poprate.bins),poprate.Idist,'r')
+    subplot(2,2,2)
+        imagesc(log10(poprate.EIdist))
+        axis xy
+    subplot(2,2,3)
+        plot(poprate.tcorr,poprate.autocorr(:,1),'k')
+        hold on
+        plot(poprate.tcorr,poprate.autocorr(:,4),'r')
+        plot(poprate.tcorr,poprate.autocorr(:,2),'k--')
+        xlim([-50 50])
+
+
+
 end
 

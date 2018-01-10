@@ -16,8 +16,8 @@ PopParams.sigma = 0;        %niose magnitude: variance
 PopParams.theta = 1/10;     %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 2000;
-PopParams.IPopNum = 500;
+PopParams.EPopNum = 1000;
+PopParams.IPopNum = 250;
 
 
 %Neuron properties
@@ -30,7 +30,7 @@ PopParams.t_ref   = 0.5;    %refractory period (ms)
 
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
-PopParams.E_i     = -80;    %rev potential: I (mV)
+PopParams.E_i     = -70;    %rev potential: I (mV)
 PopParams.b_s     = [0.5 0.5];      %synaptic decay timescale (1/ms)
 PopParams.a       = 0.3;    %synaptic activation rate (1/ms)
 
@@ -43,17 +43,17 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-K = 250;
+K = 150;
 PopParams.Kee   = K;        %Expected E->E In Degree
 PopParams.Kii   = K;        %Expected I->I In Degree
 PopParams.Kie   = K;        %Expected E->I In Degree
 PopParams.Kei   = K;        %Expected I->E In Degree
 
 Jee = 1;
-Jei = 1;
+Jei = 1.1;
 Jie = 1;
-Jii = 1;
-synscalefactor = 250; %Puts J in order 1
+Jii = 0.9;
+synscalefactor = 300; %Puts J in order 1
 %(rigorize this, should relate to synaptic effect magnitude)
 %synscalefactor should be a synaptic weight value such that with K=1 an
 %excitatory synapse is just strong enough to bring a cell to threshold
@@ -62,56 +62,17 @@ PopParams.Wii   = Jii.*synscalefactor./sqrt(K);        %I->I weight
 PopParams.Wie   = Jie.*synscalefactor./sqrt(K);        %E->I weight
 PopParams.Wei   = Jei.*synscalefactor./sqrt(K);        %I->E weight
 
-PopParams.p0spike = 0.15;
+PopParams.p0spike = 0.10;
 
 %%
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 4000;
-PopParams.I_e = 250;
+TimeParams.SimTime = 5000;
+PopParams.I_e = 350;
 [SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
     'showprogress',true,'onsettime',100,'cellout',true);
 
 
-%%
-isibins = linspace(0,3.5,60);
-ISIs = cellfun(@diff,SimValues.spikesbycell,'uniformoutput',false);
-ISIdist.E = hist(log10(cat(1,ISIs{SimValues.EcellIDX})),isibins);
-ISIdist.E = ISIdist.E./sum(ISIdist.E);
-ISIdist.I = hist(log10(cat(1,ISIs{SimValues.IcellIDX})),isibins);
-ISIdist.I = ISIdist.I./sum(ISIdist.I);
 
-ISIhist.all = cellfun(@(X) hist(log10(X),isibins),ISIs,'uniformoutput',false);
-ISIhist.all = cat(1,ISIhist.all{:});
-
-%%
-cellrates = cellfun(@length,SimValues.spikesbycell)./(TimeParams.SimTime./1000);
-sortrate.E = sort(cellrates(SimValues.EcellIDX));
-sortrate.I = sort(cellrates(SimValues.IcellIDX));
-[~,sortrate.all] =sort(cellrates);
-
-%%
-figure
-imagesc(isibins,[0 2500],ISIhist.all(sortrate.all,:))
-LogScale('x',10)
-xlabel('ISI (ms)')
-%%
-figure
-plot(isibins,ISIdist.E,'k')
-hold on
-plot(isibins,ISIdist.I,'r')
-LogScale('x',10)
-
-%%
-cellrates(cellrates==0) = 0.1;
-figure
-subplot(3,2,1)
-hist(log10(cellrates(SimValues.EcellIDX)),20)
-xlabel('Firing Rate (Hz)');ylabel('# E Cells')
-LogScale('x',10)
-subplot(3,2,3)
-hist(log10(cellrates(SimValues.IcellIDX)),20)
-xlabel('Firing Rate (Hz)');ylabel('# I Cells')
-LogScale('x',10)
 %%
 
 
@@ -155,7 +116,7 @@ colorbar
 %% Run the FI Curve function to calculate single neuron FI curves
 simfunction = @EMAdLIFfunction;
 
-Irange = [150 350];
+Irange = [100 400];
 numI = 20;
 
 [ Ivals,rate(ss),voltagemean(ss) ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
