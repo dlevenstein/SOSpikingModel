@@ -290,9 +290,12 @@ if isfield(PopParams,'p0spike')
 else
     p0spike = 0.0; %5 chance of initial spiking 
 end
-V0range = [min(E_L) max(V_th)]; %make this neuron vector
-V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
-
+if isfield(PopParams,'V0')
+    V(:,1) = PopParams.V0;
+else
+    V0range = [min(E_L) max(V_th)]; %make this neuron vector
+    V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
+end
 %% Time Loop
 savecounter = 1;
 timecounter = -onsettime-dt;

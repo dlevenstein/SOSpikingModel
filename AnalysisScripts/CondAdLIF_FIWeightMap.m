@@ -1,9 +1,10 @@
-function [] = CondAdLIF_FIWeightMap(ii)
+function [] = CondAdLIF_FIWeightMap(jj)
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
+%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
+repopath = '/scratch/jmg1030/SOSpikingModel'; 
 addpath(genpath(repopath))
 
 figfolder = [repopath,'/Figures/EIBalance'];
@@ -52,32 +53,31 @@ PopParams.p0spike = 0.15;
 
 %%
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 1000;
+TimeParams.SimTime = 4000;
 PopParams.I_e = 0;
 
 %% Run the FI Curve function to calculate single neuron FI curves
 simfunction = @EMAdLIFfunction;
 
 Irange = [0 400];
-numI = 36;
+numI = 20;
 
 %Simulate FI for 20 Weight levels
-Jvals = 0:0.5:10;
+Jvals = -0.2:0.05:0.2;
 
 Jarray = [[1,0,0,0];
           [0,1,0,0];
           [0,0,1,0];
           [0,0,0,1]];
       
-Jnames = ['CondAdLIF_JeeFI','CondAdLIF_JeiFI','CondAdLIF_JieFI','CondAdLIF_JiiFI'];
+Jnames = ["CondAdLIF_JeeFI","CondAdLIF_JeiFI","CondAdLIF_JieFI","CondAdLIF_JiiFI"];
 
-%% Jee
-for jj = 1:length(Jvals)
+for ii = 1:4
     
-Jee = Jarray(ii,1).*Jvals(jj);
-Jei = Jarray(ii,2).*Jvals(jj);
-Jie = Jarray(ii,3).*Jvals(jj);
-Jii = Jarray(ii,4).*Jvals(jj);
+Jee = Jvals(jj).*Jarray(ii,1) + 1;
+Jei = Jvals(jj).*Jarray(ii,2) + 1;
+Jie = Jvals(jj).*Jarray(ii,3) + 1;
+Jii = Jvals(jj).*Jarray(ii,4) + 1;
 synscalefactor = 250; %Puts J in order 1
 %(rigorize this, should relate to synaptic effect magnitude)
 %synscalefactor should be a synaptic weight value such that with K=1 an
@@ -88,6 +88,9 @@ PopParams.Wie   = Jie.*synscalefactor./sqrt(K);        %E->I weight
 PopParams.Wei   = Jei.*synscalefactor./sqrt(K);        %I->E weight
 
 [ Ivals,rate,voltagemean ] = SimulateFICurve(simfunction,PopParams,Irange,numI,...
-    'showfig',[Jnames(ii),'_Jval_',num2str(Jvals(jj))],'figfolder',figfolder);
-save([datafolder,'/',Jnames(ii),'_Jval_',num2str(Jvals(jj))],'-struct','rate');
+    'showfig',[char(Jnames(ii)),'_Jval_',num2str(Jvals(jj))],'figfolder',figfolder);
+
+csvwrite([datafolder,'/',char(Jnames(ii)),'_E_Jval_',num2str(Jvals(jj)),'.csv'],rate.E);
+csvwrite([datafolder,'/',char(Jnames(ii)),'_I_Jval_',num2str(Jvals(jj)),'.csv'],rate.I);
+
 end
