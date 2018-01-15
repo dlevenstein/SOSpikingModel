@@ -66,7 +66,7 @@ PopParams.p0spike = 0.10;
 
 %%
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 5000;
+TimeParams.SimTime = 2000;
 PopParams.I_e = 350;
 [SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
     'showprogress',true,'onsettime',100,'cellout',true);

@@ -255,7 +255,7 @@ figure
         plot(ISIdist.bins([1 end]),min(SimValues.IcellIDX).*[1 1],'k')
         LogScale('x',10)
         colorbar
-        colormap(isicolormap)
+        %colormap(isicolormap)
         %caxis([0 1])
         xlabel('ISI (ms)')
         
@@ -264,7 +264,7 @@ figure
         hold on
         plot(vm.bins([1 end]),min(SimValues.IcellIDX).*[1 1],'k')
         colorbar
-        colormap(isicolormap)
+        %colormap(isicolormap)
         %caxis([:0 1])
         xlabel('Vm (mV)')
 
@@ -304,7 +304,7 @@ subplot(3,1,3)
     xlim(timewin);
 
    
-%% Network - in degree
+%% Network - in degree, eigenvalues
 
 indegree.E = sum(SimValues.WeightMat(:,SimValues.EcellIDX)~=0,2);
 indegree.I = sum(SimValues.WeightMat(:,SimValues.IcellIDX)~=0,2);
