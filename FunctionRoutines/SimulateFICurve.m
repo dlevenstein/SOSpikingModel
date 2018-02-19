@@ -1,4 +1,4 @@
-function [ Ivals,rate,voltagemean ] = SimulateFICurve(simfunction,PopParams,Irange,numI,varargin)
+function [ Ivals,rate,voltagemean,SimValues ] = SimulateFICurve(simfunction,PopParams_in,Irange,numI,varargin)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -62,8 +62,8 @@ function [ Ivals,rate,voltagemean ] = SimulateFICurve(simfunction,PopParams,Iran
 %varargin = {};
 
 %% Input options
-defaulttimeparms.simtime = 5000; %ms, time to simulate each "trial"
-defaulttimeparms.onsettransient = 500; %ms, onsiet transient time to ignore
+defaulttimeparms.simtime = 4000; %ms, time to simulate each "trial"
+defaulttimeparms.onsettransient = 100; %ms, onsiet transient time to ignore
 figvalidation = @(x) islogical(x) || ischar(x);
 
 
@@ -88,39 +88,39 @@ if RAMP
 end
 %% Set the parameters
 onsettransient = timeparms.onsettransient; %Onset transient to ignore
-TimeParams.dt      = 0.01;
+TimeParams.dt      = 0.05;
 TimeParams.SimTime = timeparms.simtime;
 %% Run the simulations
 Ivals = linspace(Irange(1),Irange(2),numI);
 clear SimValues
-for ii = 1:numI
+parfor ii = 1:numI
     ii
-    PopParams.I_e     = Ivals(ii);
-    [SimValues(ii)] = simfunction(PopParams,TimeParams,'showfig',false);
+    PopParms = PopParams_in;
+    PopParms.I_e     = Ivals(ii);
+    [SimValues(ii)] = simfunction(PopParms,TimeParams,...
+        'showfig',false,'save_dt',0.5,'onsettime',onsettransient,...
+        'cellout',true,'showprogress',false);
 end
 
+%Add: display parameters from PopParams in figure.
 %% Calculate Rate, Variable distributions
 %rate = zeros(1,numI);
-voltagebins = linspace(min([PopParams.V_reset,PopParams.E_L]),max(PopParams.V_th),100);
+voltagebins = linspace(min([PopParams_in.V_reset,PopParams_in.E_L]),max(PopParams_in.V_th),100);
 conductancebins = linspace(0,1,100);
-isibins = linspace(0.5,3.5,60);
-totaltime = timeparms.simtime-onsettransient;
+isibins = linspace(0,3.5,60);
+totaltime = timeparms.simtime;
 clear voltagedist voltagemean adaptdist ISIdist rate
 for ii = 1:numI
-    afteronsetspikes = SimValues(ii).spikes(:,1)>onsettransient;
+    %afteronsetspikes = SimValues(ii).spikes(:,1)>onsettransient;
     Espikes = ismember(SimValues(ii).spikes(:,2),SimValues(ii).EcellIDX);
     Ispikes = ismember(SimValues(ii).spikes(:,2),SimValues(ii).IcellIDX);
 
-    rate.E(ii) = sum(afteronsetspikes&Espikes)./PopParams.EPopNum./(totaltime./1000); %units: spikes/cell/s
-    rate.I(ii) = sum(afteronsetspikes&Ispikes)./PopParams.IPopNum./(totaltime./1000); %units: spikes/cell/s
+    rate.E(ii) = sum(Espikes)./PopParams_in.EPopNum./(totaltime./1000); %units: spikes/cell/s
+    rate.I(ii) = sum(Ispikes)./PopParams_in.IPopNum./(totaltime./1000); %units: spikes/cell/s
     
     %Calculating ISI/rate distributions
-    for cc = 1:(PopParams.EPopNum+PopParams.IPopNum)
-        thiscell = SimValues(ii).spikes(:,2)==cc & afteronsetspikes;
-        cellspikes{cc} = SimValues(ii).spikes(thiscell,1);
-    end
-    cellrates = cellfun(@length,cellspikes)./(totaltime./1000);
-    ISIs = cellfun(@diff,cellspikes,'uniformoutput',false);
+    cellrates = cellfun(@length,SimValues(ii).spikesbycell)./(totaltime./1000);
+    ISIs = cellfun(@diff,SimValues(ii).spikesbycell,'uniformoutput',false);
     ISIdist.E(:,ii) = hist(log10(cat(1,ISIs{SimValues(ii).EcellIDX})),isibins);
     ISIdist.E(:,ii) = ISIdist.E(:,ii)./max(ISIdist.E(:,ii));
     ISIdist.I(:,ii) = hist(log10(cat(1,ISIs{SimValues(ii).IcellIDX})),isibins);
@@ -152,7 +152,7 @@ extraces = round(linspace((0.5./numextraces).*numI,...
 excells = [randsample(SimValues(1).EcellIDX,1) randsample(SimValues(1).IcellIDX,1)];
 if length(SimValues(1).EcellIDX)==1; excells(1)=SimValues(1).EcellIDX; end
 if length(SimValues(1).IcellIDX)==1; excells(1)=SimValues(1).IcellIDX; end
-exrange = onsettransient + [0 300]; 
+exrange = [0 300]; 
 extimeIDX = SimValues(1).t>=exrange(1) & SimValues(1).t<=exrange(2);
 extime = SimValues(1).t(extimeIDX);
 clear exampletrace
@@ -224,8 +224,8 @@ if SHOWFIG
         %add synaptic conductances...
         %add noise etc parm text in figure
 
-        vmin = min([PopParams.V_reset,PopParams.E_L]);
-        vmax = max(PopParams.V_th);
+        vmin = min([PopParams_in.V_reset,PopParams_in.E_L]);
+        vmax = max(PopParams_in.V_th);
         for ee = 1:numextraces
         subplot(numextraces,2,(ee.*2))
             plot(extime,exampletrace.E(:,ee),'color',Ecolor(end/2,:))
