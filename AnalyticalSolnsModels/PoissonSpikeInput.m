@@ -29,6 +29,8 @@ gvar = (w^2.*K.*tau.*R)./2;
 gsd = sqrt(gvar);
 
 [ghist.counts,ghist.bins] = hist(g(TimeStamps>0.1),20);
+
+%Calculate autocorrelation and fourrier 
 %% Figure
 figure
 subplot(2,1,1)
