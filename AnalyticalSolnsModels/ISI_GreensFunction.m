@@ -25,13 +25,8 @@ t_plot = 2:0.1:40;
 
 y = V_reset;
 
-<<<<<<< HEAD
 sol = G(v,y,t) - G(v,V_th(1) - y,t);
 isi = G(V_th(1),y,t) - G(V_th(1),V_th(1) - y,t);
-=======
-sol = G(v,V_th - y,t) - G(v,y,t);
-isi = G(V_th,V_th - y,t) - G(V_th,y,t);
->>>>>>> origin/Analytical-Solutions
 
 %%
 %Plot Solutions
