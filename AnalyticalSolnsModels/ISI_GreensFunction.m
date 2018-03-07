@@ -90,8 +90,8 @@ G = @(v,y,t) sqrt(-1./(pi.*(sigma.^2).*(1-exp(2.*t./tau_A)))).*exp(((v - mu - (y
 
 y = V_reset(1);
 
-sol = G(v,V_th(1) - y,t) - G(v,y,t);
-isi = G(V_th(1),V_th(1) - y,t) - G(V_th(1),y,t);
+sol = G(v,y,t) - G(v,V_th(1) - y,t);
+isi = G(V_th(1),y,t) - G(V_th(1),V_th(1) - y,t);
 
 %%
 %Plot Solutions
