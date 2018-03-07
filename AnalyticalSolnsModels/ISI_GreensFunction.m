@@ -20,7 +20,7 @@ G = @(v,y,t) sqrt(-1./(pi.*(sigma.^2).*(1-exp(2.*t./tau_A)))).*exp(((v - mu - (y
 
 %Find solutions
 v_plot = -100:0.1:10;
-t_plot = 2:0.1:40;
+t_plot = 0.5:0.1:100;
 [v,t] = meshgrid(v_plot,t_plot);
 
 y = V_reset;
@@ -36,6 +36,7 @@ plot(t_plot,real(isi))
 xlabel('Time (ms)');ylabel('Probability');title('Probability of Spike at time t')
 
 subplot(2,1,2)
-imagesc(t_plot,v_plot,sol')
+imagesc(t_plot,(v_plot),(sol)')
+xlabel('t (ms)');ylabel('V (mV')
 axis xy
 colorbar
