@@ -37,11 +37,7 @@ plot(t_plot,real(isi))
 xlabel('Time (ms)');ylabel('Probability');title('Probability of Spike at time t')
 
 subplot(2,1,2)
-<<<<<<< HEAD
-imagesc(v_plot,t_plot,sol)
-=======
 imagesc(t_plot,(v_plot),(sol)')
 xlabel('t (ms)');ylabel('V (mV')
->>>>>>> origin/Analytical-Solutions
 axis xy
 colorbar
