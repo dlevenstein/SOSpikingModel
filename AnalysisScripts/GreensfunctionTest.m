@@ -1,5 +1,6 @@
 
-mu = -50;
+
+mu = 10;
 sigma = 5;
 gamma = 2;
 [sol,isi] = ISI_GreensFunction(mu,sigma,gamma);
