@@ -101,39 +101,50 @@ Icells = EPopNum+1:PopNum;      IcellIDX = ismember(1:PopNum,Icells);
 
 %NOTE: presynaptic neurons are columns (dim2) and postsynaptic neurons are rows (dim1).
 
-%E->E Synapses
-Wee = PopParams.Wee;
-Kee = PopParams.Kee;
-Pee = Kee./(EPopNum-1); %-1 to account for self-connections (which are then removed)
+if isfield(PopParams,'W')
 
-EE_mat(Ecells,Ecells) = rand(EPopNum)<=Pee;
-EE_mat = EE_mat.*Wee;
-EE_mat(diag(diag(true(size(EE_mat)))))=0; %Remove selfconnections
+    EE_mat(EcellIDX,EcellIDX) = PopParams.W(EcellIDX,EcellIDX);
+    II_mat(IcellIDX,IcellIDX) = PopParams.W(IcellIDX,IcellIDX);
+    IE_mat(IcellIDX,EcellIDX) = PopParams.W(IcellIDX,EcellIDX);
+    EI_mat(EcellIDX,IcellIDX) = PopParams.W(EcellIDX,IcellIDX);
 
-%I->I Synapses
-Wii = PopParams.Wii;
-Kii = PopParams.Kii;
-Pii = Kii./(IPopNum-1);
+else
+    
+    %E->E Synapses
+    Wee = PopParams.Wee;
+    Kee = PopParams.Kee;
+    Pee = Kee./(EPopNum-1); %-1 to account for self-connections (which are then removed)
 
-II_mat(Icells,Icells) = rand(IPopNum)<=Pii;
-II_mat = II_mat.*Wii;
-II_mat(diag(diag(true(size(II_mat)))))=0; %Remove selfconnections
+    EE_mat(Ecells,Ecells) = rand(EPopNum)<=Pee;
+    EE_mat = EE_mat.*Wee;
+    EE_mat(diag(diag(true(size(EE_mat)))))=0; %Remove selfconnections
 
-%E->I Synapses
-Wie = PopParams.Wie;
-Kie = PopParams.Kie;
-Pie = Kie./EPopNum;
+    %I->I Synapses
+    Wii = PopParams.Wii;
+    Kii = PopParams.Kii;
+    Pii = Kii./(IPopNum-1);
 
-IE_mat(Icells,Ecells) = rand(IPopNum,EPopNum)<=Pie;
-IE_mat = IE_mat.*Wie;
+    II_mat(Icells,Icells) = rand(IPopNum)<=Pii;
+    II_mat = II_mat.*Wii;
+    II_mat(diag(diag(true(size(II_mat)))))=0; %Remove selfconnections
 
-%I->E Synapses
-Wei = PopParams.Wei;
-Kei = PopParams.Kei;
-Pei = Kei./IPopNum;
+    %E->I Synapses
+    Wie = PopParams.Wie;
+    Kie = PopParams.Kie;
+    Pie = Kie./EPopNum;
 
-EI_mat(Ecells,Icells) = rand(EPopNum,IPopNum)<=Pei;
-EI_mat = EI_mat.*Wei;
+    IE_mat(Icells,Ecells) = rand(IPopNum,EPopNum)<=Pie;
+    IE_mat = IE_mat.*Wie;
+
+    %I->E Synapses
+    Wei = PopParams.Wei;
+    Kei = PopParams.Kei;
+    Pei = Kei./IPopNum;
+
+    EI_mat(Ecells,Icells) = rand(EPopNum,IPopNum)<=Pei;
+    EI_mat = EI_mat.*Wei;
+
+end
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
@@ -167,7 +178,7 @@ b           = PopParams.b;       %Spike Adaptation (nS)
 E_e         = PopParams.E_e;     %Excitatory reversal potential (mV)
 E_i         = PopParams.E_i;     %Inhibitory reversal potential (mV)
 
-tau_s         = PopParams.tau_s;     %Synaptic decay (ms)
+tau_s       = PopParams.tau_s;     %Synaptic decay (ms)
 
 %STDP parameters
 EELearningRate = PopParams.EELearningRate;
@@ -201,6 +212,11 @@ w            = zeros(PopNum,1); %adaptation
 X_t          = zeros(PopNum,1); %OU noise
 t_r = zeros(PopNum,1);
 
+EELoss = NaN;
+IILoss = NaN;
+IELoss = NaN;
+EILoss = NaN;
+
 %Saved Variables
 SimValues.t               = nan(1,SaveTimeLength);
 SimValues.V               = nan(PopNum,SaveTimeLength);
@@ -212,8 +228,24 @@ SimValues.w               = nan(PopNum,SaveTimeLength);
 SimValues.a_w             = nan(PopNum,SaveTimeLength);
 SimValues.Input             = nan(PopNum,SaveTimeLength);
 
+SimValues.EELoss = zeros(1,SaveTimeLength);
+SimValues.IILoss = zeros(1,SaveTimeLength);
+SimValues.IELoss = zeros(1,SaveTimeLength);
+SimValues.EILoss = zeros(1,SaveTimeLength);
+
+SimValues.EEMeanWeight = zeros(1,SaveTimeLength);
+SimValues.IIMeanWeight = zeros(1,SaveTimeLength);
+SimValues.IEMeanWeight = zeros(1,SaveTimeLength);
+SimValues.EIMeanWeight = zeros(1,SaveTimeLength);
+
+SimValues.EEVarWeight = zeros(1,SaveTimeLength);
+SimValues.IIVarWeight = zeros(1,SaveTimeLength);
+SimValues.IEVarWeight = zeros(1,SaveTimeLength);
+SimValues.EIVarWeight = zeros(1,SaveTimeLength);
+
 spikes = nan(PopNum.*(SimTime+onsettime).*50,2); %assume mean rate 50Hz
 cellTimes = [[1:PopNum]',zeros(PopNum,1)];
+cellRates = [[1:PopNum]',zeros(PopNum,1)];
 
 %% EI Parameter Adjustments (ugly. needs cleaning)
 
@@ -316,19 +348,23 @@ for tt=1:SimTimeLength
     if sigma~=0
         dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*randn(PopNum,1).*sqrt(dt);
     end
+    
     %V - Voltage Equation
-    dVdt =  (- g_L.*(V-E_L) ...                      %Leak
-             - g_w.*(V-E_w) ...                      %Adaptation
-             - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
-             + I_e(timecounter) + X_t)./C;           %External input
+%     dVdt =  (- g_L.*(V-E_L) ...                      %Leak
+%              - g_w.*(V-E_w) ...                      %Adaptation
+%              - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
+%              + I_e(timecounter) + X_t)./C;           %External input
+
+    dVdt = ( V + ( (g_L./C).*E_L + (g_e./C).*E_e + (g_i./C).*E_i + (g_w./C).*E_w + (I_e(timecounter)./C) + (X_t./C)).*dt )./ ...
+           ( 1 + ( (g_L./C) + (g_e./C) + (g_i./C) + (g_w./C) ).*dt );
+    
     %s - Synaptic Output 
     dsdt =  - s./tau_s;
     %w - Adaptation Variable
     dwdt = a_w.*(1-w) - b_w.*w;
 
-    
     X_t = X_t + dX;
-    V   = V + dVdt.*dt;
+    V   = dVdt;
     s   = s + dsdt.*dt;
     w   = w + dwdt.*dt; 
     timecounter = round(timecounter+dt,4);  %Round to deal with computational error
@@ -345,6 +381,7 @@ for tt=1:SimTimeLength
         spikes(spikecounter+1:spikecounter+numspikers,:) = ...
             [timecounter.*ones(numspikers,1),spikeneurons];
         spikecounter = spikecounter+numspikers;
+        cellRates(spikeneurons,2) = timecounter.*ones(numspikers,1)-cellTimes(spikeneurons,2);
         cellTimes(spikeneurons,2) = timecounter.*ones(numspikers,1);
         %Jump the conductance
         s(spikeneurons) = s(spikeneurons) + 1;
@@ -364,20 +401,34 @@ for tt=1:SimTimeLength
     end
     
     %% Synaptic Weight Changes
-    
+
+%     if EELearningRate ~= 0
+%     [EE_mat,EELoss] = GradSTDP(EE_mat,cellRates,EELearningRate);
+%     end
+%     if IILearningRate ~= 0
+%     [II_mat,IILoss] = GradSTDP(II_mat,cellRates,IILearningRate);
+%     end
+%     if IELearningRate ~= 0
+%     [IE_mat,IELoss] = GradSTDP(IE_mat,cellRates,IELearningRate);
+%     end
+%     if EILearningRate ~= 0
+%     [EI_mat,EILoss] = GradSTDP(EI_mat,cellRates,EILearningRate);
+%     end
+        
     if EELearningRate ~= 0
-    EE_mat = STDP(EE_mat,cellTimes,EELearningRate,EEtau);
+    [EE_mat,EELoss] = STDP(EE_mat,cellTimes,EELearningRate,EEtau);
     end
     if IILearningRate ~= 0
-    II_mat = STDP(II_mat,cellTimes,IILearningRate,IItau);
+    [II_mat,IILoss] = STDP(II_mat,cellTimes,IILearningRate,IItau);
     end
     if IELearningRate ~= 0
-    IE_mat = STDP(IE_mat,cellTimes,IELearningRate,IEtau);
+    [IE_mat,IELoss] = STDP(IE_mat,cellTimes,IELearningRate,IEtau);
     end
     if EILearningRate ~= 0
-    EI_mat = STDP(EI_mat,cellTimes,EILearningRate,EItau);
+    [EI_mat,EILoss] = STDP(EI_mat,cellTimes,EILearningRate,EItau);
     end
-    
+
+        
     %% Synaptic,Adaptaion Conductances for the next time step
         g_w = gwnorm.*w;
         g_e = EE_mat*s + IE_mat*s;
@@ -394,7 +445,22 @@ for tt=1:SimTimeLength
          SimValues.s(:,savecounter)               = s;
          SimValues.w(:,savecounter)               = w;
          SimValues.a_w(:,savecounter)             = a_w;
-         SimValues.Input(:,savecounter)          = I_e(timecounter) + X_t;
+         SimValues.Input(:,savecounter)           = I_e(timecounter) + X_t;
+         
+         SimValues.EELoss(1,savecounter) = EELoss;
+         SimValues.IILoss(1,savecounter) = IILoss;
+         SimValues.IELoss(1,savecounter) = IELoss;
+         SimValues.EILoss(1,savecounter) = EILoss;
+         
+         SimValues.EEMeanWeight(1,savecounter) = mean(EE_mat(EE_mat > 0));
+         SimValues.IIMeanWeight(1,savecounter) = mean(II_mat(II_mat > 0));
+         SimValues.IEMeanWeight(1,savecounter) = mean(IE_mat(IE_mat > 0));
+         SimValues.EIMeanWeight(1,savecounter) = mean(EI_mat(EI_mat > 0));
+         
+         SimValues.EEVarWeight(1,savecounter) = var(EE_mat(EE_mat > 0));
+         SimValues.IIVarWeight(1,savecounter) = var(II_mat(II_mat > 0));
+         SimValues.IEVarWeight(1,savecounter) = var(IE_mat(IE_mat > 0));
+         SimValues.EIVarWeight(1,savecounter) = var(EI_mat(EI_mat > 0));
          
          savecounter = savecounter+1;
     end
