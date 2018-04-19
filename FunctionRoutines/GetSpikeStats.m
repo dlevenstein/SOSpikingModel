@@ -1,11 +1,10 @@
-function [ output_args ] = GetSpikeStats( SimValues )
+function [ output_args ] = GetSpikeStats( SimValues,PopParams,timewin )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
-
-%%
-timewin = [0 500]; %ms - window to show raster
+%
+%   timewin window to show raster (ms)
 %% Calcualte each cell's spike rate and rate sortings
-cellrates = cellfun(@length,SimValues.spikesbycell)./(TimeParams.SimTime./1000);
+cellrates = cellfun(@length,SimValues.spikesbycell)./(SimValues.t(end)./1000);
 
 [~,sortrate.all] =sort(cellrates);
 sortrate.Eonly = intersect(sortrate.all,SimValues.EcellIDX,'stable');
@@ -77,11 +76,14 @@ figure
         hold on
         plot(SimValues.t([1 end]),min(SimValues.IcellIDX).*[1 1],'k')
         ylim(max(SimValues.IcellIDX).*[0 1]);   xlim(timewin);
+        ylabel('Cell (Sorted by rate)')
+        
     subplot(3,1,3)
         plot(t,poprate.E,'k')
         hold on
         plot(t,poprate.I,'r')
            xlim(timewin); 
+           xlabel('t (s)');ylabel('Pop. Rate (Spks/cell/s)')
            
 %% Figure: Synaptic Inputs
 Ecolormap = makeColorMap([1 1 1],[0 0.5 0],[0.5 1 0.5]);
@@ -101,6 +103,7 @@ figure
         xlim(timewin);
         ylim([min(Isyn.Ibins) max(Isyn.Ebins)])
         ylabel('E Cells: I_s_y_n')
+        title('Synaptic Current Inputs Distribution')
     subplot(6,1,3)
         colormap(gca,Ecolormap)
         imagesc(SimValues.t,Isyn.netbins,Isyn.Enetdist)
@@ -125,6 +128,7 @@ figure
         xlim(timewin);
         ylim([min(Isyn.Ibins) max(Isyn.Ebins)])
         ylabel('I Cells: I_s_y_n')
+        xlabel('t (s)')
     subplot(6,1,4)
         colormap(gca,Icolormap)
         imagesc(SimValues.t,Isyn.netbins,Isyn.Inetdist)
@@ -135,6 +139,7 @@ figure
         xlim(timewin);
         ylim(Isyn.netbins([1 end]))
         ylabel('I Cells: I_s_y_n_,_n_e_t')
+        
         
 %% Figure: Synaptic Conductances
 
@@ -147,6 +152,7 @@ subplot(4,1,1)
     axis xy
     ylim([min(g.bins) max(g.bins)]);   xlim(timewin);
     ylabel('g_E_E')
+    title('Synaptic Conductance Distribution')
 subplot(4,1,2)
     imagesc(SimValues.t,g.bins,(g.EIdist))
     colormap(gca,Icolormap)
@@ -172,6 +178,7 @@ subplot(4,1,4)
     axis xy
     ylim([min(g.bins) max(g.bins)]);   xlim(timewin);
     ylabel('g_E_I')
+    xlabel('t (s)')
 
 %% Figure: Synaptic Variable
 
@@ -184,15 +191,16 @@ subplot(4,1,1)
     hold on
     plot(SimValues.t,s.Emean,'k')
     axis xy
-    ylim([0 max(SimValues.s(:))]);xlim(timewin);
+    ylim([0 2]);xlim(timewin);
     ylabel('s_E')
+    title('Synaptic Variable/Membrane Potential Distributions')
 subplot(4,1,2)
     imagesc(SimValues.t,s.bins,log10(s.Idist))
     colormap(gca,Icolormap)
     hold on
     plot(SimValues.t,s.Imean,'k')
     axis xy
-    ylim([0 max(SimValues.s(:))]);   xlim(timewin);
+    ylim([0 2]);   xlim(timewin);
     xlabel('t (ms)');ylabel('s_I')
     
 subplot(4,1,3)
@@ -254,6 +262,8 @@ figure
         hold on
         plot(ISIdist.bins([1 end]),min(SimValues.IcellIDX).*[1 1],'k')
         LogScale('x',10)
+        title('ISI Distirbution');
+        ylabel('Neuron (sorted by Rate, Type')
         colorbar
         %colormap(isicolormap)
         %caxis([0 1])
@@ -265,8 +275,9 @@ figure
         plot(vm.bins([1 end]),min(SimValues.IcellIDX).*[1 1],'k')
         colorbar
         %colormap(isicolormap)
-        %caxis([:0 1])
+        %caxis([0 1])
         xlabel('Vm (mV)')
+        title('V_m Distirbution');
 
 
 %% Figure: Example Cell
@@ -290,6 +301,7 @@ subplot(3,1,1)
     plot(SimValues.t,exNeu.E.g_i,'r')
     xlim(timewin);
     ylabel('Synaptic Conductance')
+    title('Example Excitatory cell Cell')
 subplot(3,1,2)
     plot(SimValues.t,exNeu.E.I_syne,'k')
     hold on
@@ -317,11 +329,15 @@ figure
         scatter(indegree.E,indegree.I,2,log10(cellrates))
         hold on
         xlabel('In Degree (E)');ylabel('In Degree (I)')
+        title('Network and Cell Rate (color)')
+        
     subplot(2,2,2)
-        plot(log10(indegree.EIratio(SimValues.EcellIDX)),log10(cellrates(SimValues.EcellIDX)),'k.','markersize',4)
+        plot(log2(indegree.EIratio(SimValues.EcellIDX)),log10(cellrates(SimValues.EcellIDX)),'k.','markersize',4)
         hold on
-        plot(log10(indegree.EIratio(SimValues.IcellIDX)),log10(cellrates(SimValues.IcellIDX)),'r.','markersize',4)
+        plot(log2(indegree.EIratio(SimValues.IcellIDX)),log10(cellrates(SimValues.IcellIDX)),'r.','markersize',4)
+        LogScale('x',2)
         LogScale('y',10)
+        xlabel('E:I In degree Ratio');ylabel('Firing Rate')
         
 %% Calculate pop Synch/Rate distribution, Pop Autocorrelation
 %i.e. population dynamic measures
@@ -339,9 +355,12 @@ figure
         plot(log10(poprate.bins),poprate.Edist,'k')
         hold on
         plot(log10(poprate.bins),poprate.Idist,'r')
+        LogScale('x',10)
+        xlabel('Population Rate');ylabel('P(time)')
     subplot(2,2,2)
-        imagesc(log10(poprate.EIdist))
+        imagesc(log10(poprate.bins),log10(poprate.bins),log10(poprate.EIdist))
         axis xy
+        %LogScale('xy',10)
     subplot(2,2,3)
         plot(poprate.tcorr,poprate.autocorr(:,1),'k')
         hold on

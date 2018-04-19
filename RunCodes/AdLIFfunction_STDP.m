@@ -63,12 +63,14 @@ addParameter(p,'showfig',true,@islogical)
 addParameter(p,'showprogress',false,@islogical)
 addParameter(p,'onsettime',0,@isnumeric)
 addParameter(p,'save_dt',0.5,@isnumeric)
+addParameter(p,'save_weights',10,@isnumeric)
 addParameter(p,'cellout',false,@islogical)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
 onsettime = p.Results.onsettime;
 save_dt = p.Results.save_dt;
+save_weights = p.Results.save_weights;
 cellout = p.Results.cellout;
 
 %%
@@ -85,6 +87,7 @@ dt          = TimeParams.dt;        %differential (ms)
 %Calculate time vector from time parameters
 SimTimeLength  = length([-onsettime:dt:SimTime]);   %Time Steps (simulated)
 SaveTimeLength  = length([0:save_dt:SimTime]);      %Time Steps (saved)
+WeightSaveLength  = length([0:save_weights:SimTime]);      %Time Steps (saved)
 
 %--------------------------------------------------------------------------
 %Weight Matrices
@@ -103,12 +106,11 @@ Icells = EPopNum+1:PopNum;      IcellIDX = ismember(1:PopNum,Icells);
 %NOTE: presynaptic neurons are columns (dim2) and postsynaptic neurons are rows (dim1).
 
 if isfield(PopParams,'W')
-
+    %If given a weight matrix, extract the E and I matrices
     EE_mat(EcellIDX,EcellIDX) = PopParams.W(EcellIDX,EcellIDX);
     II_mat(IcellIDX,IcellIDX) = PopParams.W(IcellIDX,IcellIDX);
     IE_mat(IcellIDX,EcellIDX) = PopParams.W(IcellIDX,EcellIDX);
     EI_mat(EcellIDX,IcellIDX) = PopParams.W(EcellIDX,IcellIDX);
-
 else
     
     %E->E Synapses
@@ -146,6 +148,7 @@ else
     EI_mat = EI_mat.*Wei;
 
 end
+isconnected = (EE_mat+II_mat+EI_mat+IE_mat)>0;
 
 %--------------------------------------------------------------------------
 %Simulation Parameters
@@ -182,15 +185,12 @@ E_i         = PopParams.E_i;     %Inhibitory reversal potential (mV)
 tau_s       = PopParams.tau_s;     %Synaptic decay (ms)
 
 %STDP parameters
-EELearningRate = PopParams.EELearningRate;
-IILearningRate = PopParams.IILearningRate;
-IELearningRate = PopParams.IELearningRate;
-EILearningRate = PopParams.EILearningRate;
+LearningRate = PopParams.LearningRate;
+TargetRate   = PopParams.TargetRate; %Target Rate for Excitatory cells (units of Hz)
+tauSTDP      = PopParams.tauSTDP;    %Time Constant for the STDP curve (Units of ms)
 
-EEtau = PopParams.EEtau;
-IItau = PopParams.IItau;
-IEtau = PopParams.IEtau;
-EItau = PopParams.EItau;
+alpha = 2.*(TargetRate./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
+%Note target rate is converted to spks/ms
 
 %% Input: convert into function of t
 if isa(I_e, 'function_handle')
@@ -213,15 +213,7 @@ w            = zeros(PopNum,1); %adaptation
 X_t          = zeros(PopNum,1); %OU noise
 t_r = zeros(PopNum,1);
 
-xEE            = zeros(EPopNum,1); %Synaptic trace
-xII            = zeros(IPopNum,1); %Synaptic trace
-xIE            = zeros(EPopNum,1); %Synaptic trace
-xEI            = zeros(IPopNum,1); %Synaptic trace
-
-EELoss = NaN;
-IILoss = NaN;
-IELoss = NaN;
-EILoss = NaN;
+x            = zeros(PopNum,1); %Synaptic trace
 
 %Saved Variables
 SimValues.t               = nan(1,SaveTimeLength);
@@ -233,16 +225,8 @@ SimValues.s               = nan(PopNum,SaveTimeLength);
 SimValues.w               = nan(PopNum,SaveTimeLength);
 SimValues.a_w             = nan(PopNum,SaveTimeLength);
 SimValues.Input           = nan(PopNum,SaveTimeLength);
-
-SimValues.xEE = zeros(1,SaveTimeLength); %Synaptic Trace
-SimValues.xII = zeros(1,SaveTimeLength); %Synaptic Trace
-SimValues.xIE = zeros(1,SaveTimeLength); %Synaptic Trace
-SimValues.xEI = zeros(1,SaveTimeLength); %Synaptic Trace
-
-SimValues.EELoss = zeros(1,SaveTimeLength);
-SimValues.IILoss = zeros(1,SaveTimeLength);
-SimValues.IELoss = zeros(1,SaveTimeLength);
-SimValues.EILoss = zeros(1,SaveTimeLength);
+SimValues.t_weight        = nan(1,WeightSaveLength);
+SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
 
 spikes = nan(PopNum.*(SimTime+onsettime).*50,2); %assume mean rate 50Hz
 
@@ -324,7 +308,7 @@ end
 if isfield(PopParams,'p0spike') 
     p0spike = PopParams.p0spike;
 else
-    p0spike = 0.0; %5 chance of initial spiking 
+    p0spike = 0.0; %chance of initial spiking 
 end
 if isfield(PopParams,'V0')
     V(:,1) = PopParams.V0;
@@ -334,6 +318,7 @@ else
 end
 %% Time Loop
 savecounter = 1;
+weightcounter = 1;
 timecounter = -onsettime-dt;
 spikecounter = 0;
 for tt=1:SimTimeLength
@@ -349,36 +334,23 @@ for tt=1:SimTimeLength
     end
     
     %V - Voltage Equation
-%     dVdt =  (- g_L.*(V-E_L) ...                      %Leak
-%              - g_w.*(V-E_w) ...                      %Adaptation
-%              - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
-%              + I_e(timecounter) + X_t)./C;           %External input
-
-    dVdt = ( V + ( (g_L./C).*E_L + (g_e./C).*E_e + (g_i./C).*E_i + (g_w./C).*E_w + (I_e(timecounter)./C) + (X_t./C)).*dt )./ ...
-           ( 1 + ( (g_L./C) + (g_e./C) + (g_i./C) + (g_w./C) ).*dt );
+    dVdt =  (- g_L.*(V-E_L) ...                      %Leak
+             - g_w.*(V-E_w) ...                      %Adaptation
+             - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
+             + I_e(timecounter) + X_t)./C;           %External input
     
     %s - Synaptic Output 
     dsdt =  - s./tau_s;
     %w - Adaptation Variable
     dwdt = a_w.*(1-w) - b_w.*w;
-    
-    %Synaptic Trace
-    dxEEdt = - xEE./EEtau;
-    dxIIdt = - xII./IItau;
-
-    dxIEdt = - xIE./IEtau;
-    dxEIdt = - xEI./EItau;
-
+    %x - Synaptic Trace
+    dxdt =  - x./tauSTDP;
     
     X_t = X_t + dX;
-    V   = dVdt;
+    V   = V + dVdt.*dt;
     s   = s + dsdt.*dt;
     w   = w + dwdt.*dt;
-    
-    xEE   = xEE + dxEEdt.*dt;
-    xII   = xII + dxIIdt.*dt;
-    xIE   = xIE + dxIEdt.*dt;
-    xEI   = xEI + dxEIdt.*dt;
+    x   = x + dxdt.*dt;
 
     timecounter = round(timecounter+dt,4);  %Round to deal with computational error
     
@@ -390,10 +362,7 @@ for tt=1:SimTimeLength
     if any(V > V_th)
         %Find neurons that crossed threshold and record the spiketimes 
         spikeneurons = find(V > V_th);
-        
-        Espikeneurons = find(V > V_th & EcellIDX);
-        Ispikeneurons = find(V > V_th & IcellIDX);
-        
+
         numspikers = length(spikeneurons);
         spikes(spikecounter+1:spikecounter+numspikers,:) = ...
             [timecounter.*ones(numspikers,1),spikeneurons];
@@ -404,11 +373,18 @@ for tt=1:SimTimeLength
         %Set spiking neurons refractory period 
         t_r(spikeneurons) = t_ref(spikeneurons);
         
-        %Set Synaptic Trace
-        xEE(Espikeneurons) = xEE(Espikeneurons) + 1;
-        xII(Ispikeneurons) = xII(Ispikeneurons) + 1;
-        xIE(Espikeneurons) = xIE(Espikeneurons) + 1;
-        xEI(Ispikeneurons) = xEI(Ispikeneurons) + 1;
+        %Jump the synaptic trace
+        x(spikeneurons) = x(spikeneurons) + 1;
+        
+        %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
+        %Presynaptic I Cells
+        PreIspikes = intersect(spikeneurons,Icells);
+        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
+        %Postsynaptic E cells
+        PostEspikes = intersect(spikeneurons,Ecells);
+        EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
+        
+        EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         
     end
 
@@ -422,25 +398,6 @@ for tt=1:SimTimeLength
         %Count down the refractory period
         t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
     end
-    
-    %% Synaptic Weight Changes
-        
-    if EELearningRate ~= 0
-        [EE_mat,EELoss]=STDP(EE_mat,xEE,EELearningRate);
-    end
-
-    if IILearningRate ~= 0
-        [II_mat,IILoss]=STDP(II_mat,xII,IILearningRate);
-    end
-
-    if IELearningRate ~= 0
-        [IE_mat,IELoss]=STDP(IE_mat,xIE,IELearningRate);
-    end
-
-    if EILearningRate ~= 0
-        [EI_mat,EILoss]=STDP(EI_mat,xEI,EILearningRate);
-    end
-
         
     %% Synaptic,Adaptaion Conductances for the next time step
         g_w = gwnorm.*w;
@@ -459,15 +416,16 @@ for tt=1:SimTimeLength
          SimValues.w(:,savecounter)               = w;
          SimValues.a_w(:,savecounter)             = a_w;
          SimValues.Input(:,savecounter)           = I_e(timecounter) + X_t;
-         
-         SimValues.EELoss(1,savecounter) = EELoss;
-         SimValues.IILoss(1,savecounter) = IILoss;
-         SimValues.IELoss(1,savecounter) = IELoss;
-         SimValues.EILoss(1,savecounter) = EILoss;
-                  
+        
+
          savecounter = savecounter+1;
     end
     
+    if mod(timecounter,save_weights)==0 && timecounter>=0
+        SimValues.t_weight(savecounter)            = timecounter;
+        SimValues.WeightMat(:,:,weightcounter)     = EE_mat+II_mat+EI_mat+IE_mat;
+    	weightcounter = weightcounter+1;
+    end
     %%Idea: add a catch for silent network or excessive firing network?
 end
 
@@ -506,6 +464,6 @@ SimValues.spikes          = spikes;
 
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
-SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
+%SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
 
 end

@@ -30,8 +30,7 @@ PopParams.t_ref   = 0.5;    %refractory period (ms)
 %Synaptic Properties 
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
-PopParams.tau_s   = [5 10];      %synaptic decay timescale (1/ms)
-PopParams.a       = 10;    %synaptic activation rate (1/ms)
+PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
 
 %Adaptation Properties (No adaptation)
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
@@ -42,48 +41,58 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-PopParams.Wee   = 50;        %E->E weight (pS)
-PopParams.Wii   = 50;        %I->I weight
-PopParams.Wie   = 50;        %E->I weight
-PopParams.Wei   = 10;        %I->E weight
+PopParams.Wee   = 3;        %E->E weight (nS)
+PopParams.Wii   = 3;        %I->I weight
+PopParams.Wie   = 3;        %E->I weight
+PopParams.Wei   = 3;        %I->E weight
 PopParams.Kee   = 50;        %Expected E->E In Degree
 PopParams.Kii   = 50;        %Expected I->I In Degree
 PopParams.Kie   = 50;        %Expected E->I In Degree
 PopParams.Kei   = 50;        %Expected I->E In Degree
 
 %% Noise Input Properties
-TimeParams.dt      = 0.1;
-TimeParams.SimTime = 500;
+TimeParams.dt      = 0.05;
+TimeParams.SimTime = 6000;
 
 close all
 
 %%
 
 %STDP Properties
+PopParams.LearningRate = 1e-2;
+PopParams.TargetRate = 1; %Target E rate 1Hz
+PopParams.tauSTDP = 20;
 
-PopParams.EELearningRate = 0;
-PopParams.IILearningRate = 0;
-PopParams.IELearningRate = 0;
-PopParams.EILearningRate = 1e-2;
-
-PopParams.EEtau = 1;
-PopParams.IItau = 1;
-PopParams.IEtau = 1;
-PopParams.EItau = 1;
 
 tic
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true);
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true);
 toc
 
+
 %%
-timebins = 0.05:0.05:TimeParams.SimTime;
-rate = zeros(1,length(timebins));
+figure
+subplot(3,1,1)
+plot(squeeze(SimValues.WeightMat(1,SimValues.EcellIDX,:))','k')
+hold on
+plot(squeeze(SimValues.WeightMat(1,SimValues.IcellIDX,:))','r')
+subplot(3,1,2)
+plot(SimValues.g_e(1,:),'k')
+hold on
+plot(SimValues.g_i(1,:),'r')
+subplot(3,1,3)
+plot(SimValues.V(1,:),'k')
+%ylim([-80 0])
 
-for tt = 1:length(timebins)
 
-    rate(tt) = length(find(SimValues.spikes(:,1) >= timebins(tt) - 10 & SimValues.spikes(:,1) < timebins(tt)))./(10*(PopParams.EPopNum+PopParams.IPopNum));
-    
-end
+%%
+timewin = TimeParams.SimTime+[-500 0];
+GetSpikeStats(SimValues,PopParams,timewin)
+%%
+dt = 5; %ms
+[spikemat,t_spikemat] = SpktToSpkmat(SimValues.spikesbycell,[],5);
+poprate.E = sum(spikemat(:,SimValues.EcellIDX),2)./length(SimValues.EcellIDX)./(dt./1000);
+poprate.I = sum(spikemat(:,SimValues.IcellIDX),2)./length(SimValues.IcellIDX)./(dt./1000);
+
 %%
 
 figure
@@ -91,38 +100,6 @@ subplot(2,1,1)
 plot(SimValues.spikes(:,1),SimValues.spikes(:,2),'k.', 'Markersize' , 0.1)
 xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot')
 subplot(2,1,2)
-plot(timebins,rate,'k', 'Markersize' , 1)
-xlabel('Time (ms)');ylabel('Firing Rate');title('Firing Rate')
-
-figure
-
-subplot(3,1,1)
-plot(SimValues.t,SimValues.IILoss,'k', 'Markersize' , 1)
-xlabel('Time (ms)');ylabel('Synaptic Change');title('II Synaptic Changes')
-subplot(3,1,2)
-plot(SimValues.t,log10(SimValues.IIMeanWeight),'k', 'Markersize' , 1)
-xlabel('Time (ms)');ylabel('Synaptic Change LogScale');title('II Weight Mean')
-subplot(3,1,3)
-plot(SimValues.t,log10(SimValues.IIVarWeight),'k', 'Markersize' , 1)
-xlabel('Time (ms)');ylabel('Synaptic Change LogScale');title('II Weight Variance')
-
-figure
-
-subplot(3,1,1)
-plot(SimValues.t,SimValues.EILoss,'k', 'Markersize' , 1)
-xlabel('Time (ms)');ylabel('Synaptic Change');title('EI Synaptic Changes')
-subplot(3,1,2)
-plot(SimValues.t,log10(SimValues.EIMeanWeight),'k', 'Markersize' , 1)
-xlabel('Time (ms)');ylabel('Synaptic Change LogScale');title('EI Weight Mean')
-subplot(3,1,3)
-plot(SimValues.t,log10(SimValues.EIVarWeight),'k', 'Markersize' , 1)
-xlabel('Time (ms)');ylabel('Synaptic Change LogScale');title('EI Weight Variance')
-
-figure
-subplot(2,1,1)
-plot(SimValues.spikes(:,1),SimValues.spikes(:,2),'k.', 'Markersize' , 0.1)
-xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot')
-subplot(2,1,2)
-imagesc(SimValues.V)
-xlabel('Time (ms)');ylabel('Membrane Potential');title('Membrane Potential')
+plot(t_spikemat,poprate.E,'k', 'Markersize' , 1)
+xlabel('Time (ms)');ylabel('Firing Rate (Spks/cell/s)');title('Firing Rate')
 
