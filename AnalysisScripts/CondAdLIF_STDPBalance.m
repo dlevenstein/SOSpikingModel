@@ -63,7 +63,7 @@ PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the 
 %%
 
 %STDP Properties
-PopParams.LearningRate = 5e-2;
+PopParams.LearningRate = 1;
 PopParams.TargetRate = 1; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 

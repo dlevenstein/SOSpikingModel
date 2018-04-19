@@ -386,6 +386,7 @@ for tt=1:SimTimeLength
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
+        EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
         
     end
 
