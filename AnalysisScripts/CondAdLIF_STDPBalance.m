@@ -56,14 +56,14 @@ PopParams.Kei   = 50;        %Expected I->E In Degree
 
 
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 10000;
+TimeParams.SimTime = 40000;
 
 close all
 PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the simulation
 %%
 
 %STDP Properties
-PopParams.LearningRate = 1;
+PopParams.LearningRate = 0.5;
 PopParams.TargetRate = 1; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
@@ -74,7 +74,7 @@ SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress
 toc
 
 if SAVESIM==true
-    save(fullfile(simfolder,'longinhSTDP_strongerweights'),'-v7.3')
+    save(fullfile(simfolder,'longinhSTDP_fastrate'),'-v7.3')
 end
 %%
 figure
