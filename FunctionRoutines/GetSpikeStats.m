@@ -356,11 +356,11 @@ figure
         hold on
         plot(log10(poprate.bins),poprate.Idist,'r')
         LogScale('x',10)
-        xlabel('Population Rate');ylabel('P(time)')
+        xlabel('Population Rate (Spks/cell/s)');ylabel('P(time)')
     subplot(2,2,2)
-        imagesc((poprate.bins(2:end)),(poprate.bins(2:end)),log10(poprate.EIdist))
+        imagesc((poprate.bins(2:end)),(poprate.bins(2:end)),log10(poprate.EIdist)')
         axis xy
-        xlabel('E Pop Rate');ylabel('I Pop Rate')
+        xlabel('E Pop Rate (Spks/cell/s)');ylabel('I Pop Rate (Spks/cell/s)')
         %LogScale('xy',10)
     subplot(2,2,3)
         plot(poprate.tcorr,poprate.autocorr(:,1),'k')

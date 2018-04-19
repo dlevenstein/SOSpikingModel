@@ -15,7 +15,7 @@ SAVESIM = false;
 clear PopParams
 
 %Input 
-PopParams.I_e  = 250;
+PopParams.I_e  = 250;       %External input
 PopParams.sigma = 0;        %niose magnitude: variance
 PopParams.theta = 0;        %noise time scale (1/ms)
 
@@ -45,21 +45,21 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-PopParams.Wee   = 3;        %E->E weight (nS)
-PopParams.Wii   = 2;        %I->I weight
-PopParams.Wie   = 3;        %E->I weight
-PopParams.Wei   = 3;        %I->E weight
+PopParams.Wee   = 10;        %E->E weight (nS)
+PopParams.Wii   = 10;        %I->I weight
+PopParams.Wie   = 10;        %E->I weight
+PopParams.Wei   = 10;        %I->E weight
 PopParams.Kee   = 50;        %Expected E->E In Degree
 PopParams.Kii   = 50;        %Expected I->I In Degree
 PopParams.Kie   = 50;        %Expected E->I In Degree
 PopParams.Kei   = 50;        %Expected I->E In Degree
 
-%% Noise Input Properties
+
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 20000;
+TimeParams.SimTime = 10000;
 
 close all
-
+PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the simulation
 %%
 
 %STDP Properties
@@ -70,11 +70,11 @@ PopParams.tauSTDP = 20;
 
 tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,...
-    'save_weights',100);
+    'save_weights',1000,'save_dt',1);
 toc
 
 if SAVESIM==true
-    save(fullfile(simfolder,'longinhSTDP'),'-v7.3')
+    save(fullfile(simfolder,'longinhSTDP_strongerweights'),'-v7.3')
 end
 %%
 figure

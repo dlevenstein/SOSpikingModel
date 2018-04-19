@@ -303,7 +303,7 @@ if sigma==0
 end
 
 %% Initial Conditions - random voltages
-%Improvement: set # initial spiking neurons instead of hard coding 
+%Improvement?: set # initial spiking neurons instead of hard coding 
 %range: E_L-Vth
 if isfield(PopParams,'p0spike') 
     p0spike = PopParams.p0spike;
@@ -329,6 +329,7 @@ for tt=1:SimTimeLength
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     
     %Noise input (independent for each neuron... could also be correlated)
+    %To do: precompte drive, so don't need random number generation each dt
     if sigma~=0
         dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*randn(PopNum,1).*sqrt(dt);
     end
@@ -343,7 +344,7 @@ for tt=1:SimTimeLength
     dsdt =  - s./tau_s;
     %w - Adaptation Variable
     dwdt = a_w.*(1-w) - b_w.*w;
-    %x - Synaptic Trace
+    %x - Synaptic Trace for STDP
     dxdt =  - x./tauSTDP;
     
     X_t = X_t + dX;
@@ -421,6 +422,7 @@ for tt=1:SimTimeLength
          savecounter = savecounter+1;
     end
     
+    %Save the weights (less frequently for space concerns)
     if mod(timecounter,save_weights)==0 && timecounter>=0
         SimValues.t_weight(savecounter)            = timecounter;
         SimValues.WeightMat(:,:,weightcounter)     = EE_mat+II_mat+EI_mat+IE_mat;
