@@ -425,7 +425,7 @@ for tt=1:SimTimeLength
     
     %Save the weights (less frequently for space concerns)
     if mod(timecounter,save_weights)==0 && timecounter>=0
-        SimValues.t_weight(savecounter)            = timecounter;
+        SimValues.t_weight(weightcounter)            = timecounter;
         SimValues.WeightMat(:,:,weightcounter)     = EE_mat+II_mat+EI_mat+IE_mat;
     	weightcounter = weightcounter+1;
     end

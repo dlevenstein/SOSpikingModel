@@ -76,6 +76,63 @@ toc
 if SAVESIM==true
     save(fullfile(simfolder,'longinhSTDP_fastrate'),'-v7.3')
 end
+%% Change in I->E Synaptic Statistics 
+
+EImat = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,:);
+AllEIweights = reshape(EImat,[],size(EImat,3));
+nosyns = sum(AllEIweights,2)==0;
+AllEIweights(nosyns,:) = [];
+%Input Mean/Variance
+Iinstats.mean = squeeze(mean(EImat,2));
+Iinstats.std = squeeze(std(EImat,[],2));
+
+%Output Mean/Variance
+Ioutstats.mean = squeeze(mean(EImat,1));
+Ioutstats.std = squeeze(std(EImat,[],1));
+
+Iallstats.mean = mean(AllEIweights,1);
+Iallstats.std = std(AllEIweights,1);
+
+Iallstats.distbins = linspace(0,75,75);
+Iallstats.dist = hist(AllEIweights,Iallstats.distbins);
+
+figure
+    subplot(4,1,1)
+        plot(Iinstats.mean')
+    subplot(4,1,2)
+        plot(Iinstats.std')
+    subplot(4,1,3)
+        plot(Ioutstats.mean')
+    subplot(4,1,4)
+        plot(Ioutstats.std')
+        
+figure
+    subplot(4,2,1)
+        plot(Iallstats.mean)
+        ylabel('Mean I->E Weight')
+        axis tight
+    subplot(4,2,3)
+        plot(Iallstats.std)
+        ylabel('Std I->E Weight')
+        axis tight
+    subplot(2,2,3)
+        imagesc(Iallstats.dist)
+        axis xy
+        %colorbar
+        caxis([0 0.5e4])
+        xlabel('t')
+        ylabel('I->E Weight Distribution')
+        
+    subplot(1,2,2)
+        plot(Iallstats.distbins,Iallstats.dist(:,1))
+        hold on
+        plot(Iallstats.distbins,Iallstats.dist(:,11))
+        plot(Iallstats.distbins,Iallstats.dist(:,21))
+        plot(Iallstats.distbins,Iallstats.dist(:,31))
+        plot(Iallstats.distbins,Iallstats.dist(:,41))
+        legend('t=0','t=10','t=20','t=30','t=40','location','northeast')
+        xlabel('I->E Weight');ylabel('# Synapses')
+
 %%
 figure
 subplot(3,1,1)
