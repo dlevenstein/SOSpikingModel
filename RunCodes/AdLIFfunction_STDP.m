@@ -71,6 +71,7 @@ onsettime = p.Results.onsettime;
 save_dt = p.Results.save_dt;
 cellout = p.Results.cellout;
 
+%%
 %--------------------------------------------------------------------------
 %Simulation Parameters
 EPopNum     = PopParams.EPopNum;    %Number of excitatory neurons
@@ -212,6 +213,11 @@ w            = zeros(PopNum,1); %adaptation
 X_t          = zeros(PopNum,1); %OU noise
 t_r = zeros(PopNum,1);
 
+xEE            = zeros(EPopNum,1); %Synaptic trace
+xII            = zeros(IPopNum,1); %Synaptic trace
+xIE            = zeros(EPopNum,1); %Synaptic trace
+xEI            = zeros(IPopNum,1); %Synaptic trace
+
 EELoss = NaN;
 IILoss = NaN;
 IELoss = NaN;
@@ -226,26 +232,19 @@ SimValues.g_i             = nan(PopNum,SaveTimeLength);
 SimValues.s               = nan(PopNum,SaveTimeLength);
 SimValues.w               = nan(PopNum,SaveTimeLength);
 SimValues.a_w             = nan(PopNum,SaveTimeLength);
-SimValues.Input             = nan(PopNum,SaveTimeLength);
+SimValues.Input           = nan(PopNum,SaveTimeLength);
+
+SimValues.xEE = zeros(1,SaveTimeLength); %Synaptic Trace
+SimValues.xII = zeros(1,SaveTimeLength); %Synaptic Trace
+SimValues.xIE = zeros(1,SaveTimeLength); %Synaptic Trace
+SimValues.xEI = zeros(1,SaveTimeLength); %Synaptic Trace
 
 SimValues.EELoss = zeros(1,SaveTimeLength);
 SimValues.IILoss = zeros(1,SaveTimeLength);
 SimValues.IELoss = zeros(1,SaveTimeLength);
 SimValues.EILoss = zeros(1,SaveTimeLength);
 
-SimValues.EEMeanWeight = zeros(1,SaveTimeLength);
-SimValues.IIMeanWeight = zeros(1,SaveTimeLength);
-SimValues.IEMeanWeight = zeros(1,SaveTimeLength);
-SimValues.EIMeanWeight = zeros(1,SaveTimeLength);
-
-SimValues.EEVarWeight = zeros(1,SaveTimeLength);
-SimValues.IIVarWeight = zeros(1,SaveTimeLength);
-SimValues.IEVarWeight = zeros(1,SaveTimeLength);
-SimValues.EIVarWeight = zeros(1,SaveTimeLength);
-
 spikes = nan(PopNum.*(SimTime+onsettime).*50,2); %assume mean rate 50Hz
-cellTimes = [[1:PopNum]',zeros(PopNum,1)];
-cellRates = [[1:PopNum]',zeros(PopNum,1)];
 
 %% EI Parameter Adjustments (ugly. needs cleaning)
 
@@ -362,11 +361,25 @@ for tt=1:SimTimeLength
     dsdt =  - s./tau_s;
     %w - Adaptation Variable
     dwdt = a_w.*(1-w) - b_w.*w;
+    
+    %Synaptic Trace
+    dxEEdt = - xEE./EEtau;
+    dxIIdt = - xII./IItau;
 
+    dxIEdt = - xIE./IEtau;
+    dxEIdt = - xEI./EItau;
+
+    
     X_t = X_t + dX;
     V   = dVdt;
     s   = s + dsdt.*dt;
-    w   = w + dwdt.*dt; 
+    w   = w + dwdt.*dt;
+    
+    xEE   = xEE + dxEEdt.*dt;
+    xII   = xII + dxIIdt.*dt;
+    xIE   = xIE + dxIEdt.*dt;
+    xEI   = xEI + dxEIdt.*dt;
+
     timecounter = round(timecounter+dt,4);  %Round to deal with computational error
     
     %a_w - Adaptation activation rate for the next time step (unless spike)
@@ -377,16 +390,26 @@ for tt=1:SimTimeLength
     if any(V > V_th)
         %Find neurons that crossed threshold and record the spiketimes 
         spikeneurons = find(V > V_th);
+        
+        Espikeneurons = find(V > V_th & EcellIDX);
+        Ispikeneurons = find(V > V_th & IcellIDX);
+        
         numspikers = length(spikeneurons);
         spikes(spikecounter+1:spikecounter+numspikers,:) = ...
             [timecounter.*ones(numspikers,1),spikeneurons];
         spikecounter = spikecounter+numspikers;
-        cellRates(spikeneurons,2) = timecounter.*ones(numspikers,1)-cellTimes(spikeneurons,2);
-        cellTimes(spikeneurons,2) = timecounter.*ones(numspikers,1);
+
         %Jump the conductance
         s(spikeneurons) = s(spikeneurons) + 1;
         %Set spiking neurons refractory period 
         t_r(spikeneurons) = t_ref(spikeneurons);
+        
+        %Set Synaptic Trace
+        xEE(Espikeneurons) = xEE(Espikeneurons) + 1;
+        xII(Ispikeneurons) = xII(Ispikeneurons) + 1;
+        xIE(Espikeneurons) = xIE(Espikeneurons) + 1;
+        xEI(Ispikeneurons) = xEI(Ispikeneurons) + 1;
+        
     end
 
     %%  Refractory period Countdowns
@@ -401,31 +424,21 @@ for tt=1:SimTimeLength
     end
     
     %% Synaptic Weight Changes
-
-%     if EELearningRate ~= 0
-%     [EE_mat,EELoss] = GradSTDP(EE_mat,cellRates,EELearningRate);
-%     end
-%     if IILearningRate ~= 0
-%     [II_mat,IILoss] = GradSTDP(II_mat,cellRates,IILearningRate);
-%     end
-%     if IELearningRate ~= 0
-%     [IE_mat,IELoss] = GradSTDP(IE_mat,cellRates,IELearningRate);
-%     end
-%     if EILearningRate ~= 0
-%     [EI_mat,EILoss] = GradSTDP(EI_mat,cellRates,EILearningRate);
-%     end
         
     if EELearningRate ~= 0
-    [EE_mat,EELoss] = STDP(EE_mat,cellTimes,EELearningRate,EEtau);
+        [EE_mat,EELoss]=STDP(EE_mat,xEE,EELearningRate);
     end
+
     if IILearningRate ~= 0
-    [II_mat,IILoss] = STDP(II_mat,cellTimes,IILearningRate,IItau);
+        [II_mat,IILoss]=STDP(II_mat,xII,IILearningRate);
     end
+
     if IELearningRate ~= 0
-    [IE_mat,IELoss] = STDP(IE_mat,cellTimes,IELearningRate,IEtau);
+        [IE_mat,IELoss]=STDP(IE_mat,xIE,IELearningRate);
     end
+
     if EILearningRate ~= 0
-    [EI_mat,EILoss] = STDP(EI_mat,cellTimes,EILearningRate,EItau);
+        [EI_mat,EILoss]=STDP(EI_mat,xEI,EILearningRate);
     end
 
         
@@ -451,17 +464,7 @@ for tt=1:SimTimeLength
          SimValues.IILoss(1,savecounter) = IILoss;
          SimValues.IELoss(1,savecounter) = IELoss;
          SimValues.EILoss(1,savecounter) = EILoss;
-         
-         SimValues.EEMeanWeight(1,savecounter) = mean(EE_mat(EE_mat > 0));
-         SimValues.IIMeanWeight(1,savecounter) = mean(II_mat(II_mat > 0));
-         SimValues.IEMeanWeight(1,savecounter) = mean(IE_mat(IE_mat > 0));
-         SimValues.EIMeanWeight(1,savecounter) = mean(EI_mat(EI_mat > 0));
-         
-         SimValues.EEVarWeight(1,savecounter) = var(EE_mat(EE_mat > 0));
-         SimValues.IIVarWeight(1,savecounter) = var(II_mat(II_mat > 0));
-         SimValues.IEVarWeight(1,savecounter) = var(IE_mat(IE_mat > 0));
-         SimValues.EIVarWeight(1,savecounter) = var(EI_mat(EI_mat > 0));
-         
+                  
          savecounter = savecounter+1;
     end
     

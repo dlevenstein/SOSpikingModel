@@ -7,37 +7,17 @@
 %   tau       "Targetted" spike rate
 %   n         Learning rate
 
-function [Wlearned,L] = STDP(W,times,tau,n)
+function [W,L] = STDP(W,x,n)
 
-Wlearned = zeros(length(W(1,:)),length(W(:,1)));
-dWvec = nan(length(W(1,:)),length(W(:,1)));
+L = [];
+for ii = 1:length(W(:,1))
 
-parfor ii = 1:length(times(:,1))
-    
-    preTime = times(ii,2); 
-    w = zeros(1,length(W(times(ii,1),:)));
-    temp = nan(length(W(times(ii,1),:)),1);
-    
-    for jj = 1:length(W(times(ii,1),:))
-        
-        if W(times(ii,1),jj) > 0 && times(ii,1) ~= jj
-            
-            postTime = times(jj,2);
-            dt = postTime - preTime;
-            
-            dW = n.*exp(-abs(dt)/tau);
-                    
-            temp(jj) = dW;
-            w(jj) = W(times(ii,1),jj) + dW;
-        
-        end
-    end
-    
-    Wlearned(ii,:) = w;
-    dWvec(ii,:) = temp;
+    Windex = find(W(ii,:) ~= 0);
+    W(Windex,:) = W(Windex,:) + n.*x(Windex);
+    L = [L mean(n.*x(Windex))];
     
 end
 
-L = nanmean(nanmean(dWvec));
-
+L = mean(L);    
+    
 end
