@@ -12,8 +12,8 @@ PopParams.sigma = 0;        %niose magnitude: variance
 PopParams.theta = 0;        %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 100;
-PopParams.IPopNum = 50;
+PopParams.EPopNum = 1000;
+PopParams.IPopNum = 250;
 
 %Neuron properties
 PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
@@ -42,14 +42,17 @@ PopParams.Wee   = 50;        %E->E weight
 PopParams.Wii   = 50;        %I->I weight
 PopParams.Wie   = 50;        %E->I weight
 PopParams.Wei   = 10;        %I->E weight
-PopParams.Kee   = 5;        %Expected E->E In Degree
-PopParams.Kii   = 5;        %Expected I->I In Degree
-PopParams.Kie   = 5;        %Expected E->I In Degree
-PopParams.Kei   = 5;        %Expected I->E In Degree
+PopParams.Kee   = 100;        %Expected E->E In Degree
+PopParams.Kii   = 100;        %Expected I->I In Degree
+PopParams.Kie   = 100;        %Expected E->I In Degree
+PopParams.Kei   = 100;        %Expected I->E In Degree
 
 %% Noise Input Properties
+
+disp('parallel computing')
+
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 500;
+TimeParams.SimTime = 1000;
 
 close all
 
