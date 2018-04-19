@@ -5,10 +5,14 @@ repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
 %repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
 addpath(genpath(repopath))
 
+dropboxpath = '/Users/dlevenstein/Dropbox/Share Folders/DLJG'; 
+
 figfolder = [repopath,'/Figures'];
+simfolder = [dropboxpath,'/Simulation_Data'];
+SAVESIM = false;
 %% Example Neuron Properties
 
-clear all
+clear PopParams
 
 %Input 
 PopParams.I_e  = 250;
@@ -42,7 +46,7 @@ PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
 PopParams.Wee   = 3;        %E->E weight (nS)
-PopParams.Wii   = 3;        %I->I weight
+PopParams.Wii   = 2;        %I->I weight
 PopParams.Wie   = 3;        %E->I weight
 PopParams.Wei   = 3;        %I->E weight
 PopParams.Kee   = 50;        %Expected E->E In Degree
@@ -52,40 +56,68 @@ PopParams.Kei   = 50;        %Expected I->E In Degree
 
 %% Noise Input Properties
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 6000;
+TimeParams.SimTime = 20000;
 
 close all
 
 %%
 
 %STDP Properties
-PopParams.LearningRate = 1e-2;
+PopParams.LearningRate = 5e-2;
 PopParams.TargetRate = 1; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 
 tic
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true);
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,...
+    'save_weights',100);
 toc
 
-
+if SAVESIM==true
+    save(fullfile(simfolder,'longinhSTDP'),'-v7.3')
+end
 %%
 figure
 subplot(3,1,1)
-plot(squeeze(SimValues.WeightMat(1,SimValues.EcellIDX,:))','k')
-hold on
-plot(squeeze(SimValues.WeightMat(1,SimValues.IcellIDX,:))','r')
+    plot(squeeze(SimValues.WeightMat(1,SimValues.IcellIDX,:))','r')
+    title('Example Exc Cell')
+    ylabel('I->E Input Weights')
+    axis tight
 subplot(3,1,2)
-plot(SimValues.g_e(1,:),'k')
-hold on
-plot(SimValues.g_i(1,:),'r')
+    plot(SimValues.g_e(1,:),'k')
+    hold on
+    plot(SimValues.g_i(1,:),'r')
+    axis tight
+    ylabel('Input Conductances')
 subplot(3,1,3)
-plot(SimValues.V(1,:),'k')
-%ylim([-80 0])
+    plot(SimValues.V(1,:),'k')
+    ylabel('Vm')
+    %ylim([-80 0])
+axis tight
+
+
+
+figure
+subplot(3,1,1)
+    plot(squeeze(SimValues.WeightMat(SimValues.EcellIDX,end,:))','r')
+    title('Example Inh Cell')
+    ylabel('I->E Output Weights')
+    axis tight
+subplot(3,1,2)
+    plot(SimValues.g_e(end,:),'k')
+    hold on
+    plot(SimValues.g_i(end,:),'r')
+    axis tight
+    ylabel('Input Conductances')
+subplot(3,1,3)
+    plot(SimValues.V(end,:),'k')
+    %ylim([-80 0])
+    axis tight
+    ylabel('Vm')
 
 
 %%
-timewin = TimeParams.SimTime+[-500 0];
+timewin = TimeParams.SimTime+[-1000 0];
 GetSpikeStats(SimValues,PopParams,timewin)
 %%
 dt = 5; %ms
