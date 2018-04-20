@@ -228,7 +228,7 @@ SimValues.Input           = nan(PopNum,SaveTimeLength);
 SimValues.t_weight        = nan(1,WeightSaveLength);
 SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
 
-spikes = nan(PopNum.*(SimTime+onsettime).*10,2); %assume mean rate 10Hz
+spikes = nan(PopNum.*(SimTime+onsettime).*20,2,'single'); %assume mean rate 20Hz
 
 %% EI Parameter Adjustments (ugly. needs cleaning)
 

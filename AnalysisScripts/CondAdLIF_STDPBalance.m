@@ -48,7 +48,7 @@ PopParams.gwnorm  = 0;       %magnitude of adaptation
 PopParams.Wee   = 10;        %E->E weight (nS)
 PopParams.Wii   = 10;        %I->I weight
 PopParams.Wie   = 10;        %E->I weight
-PopParams.Wei   = 10;        %I->E weight
+PopParams.Wei   = 12;        %I->E weight
 PopParams.Kee   = 50;        %Expected E->E In Degree
 PopParams.Kii   = 50;        %Expected I->I In Degree
 PopParams.Kie   = 50;        %Expected E->I In Degree
@@ -56,12 +56,28 @@ PopParams.Kei   = 50;        %Expected I->E In Degree
 
 
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 40000;
 
 close all
 PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the simulation
+%% Test Simulation before STDP
+%WARNING - THIS SIMULATION TAKES V LONG (or completely fails) if population
+%is too unbalanced (i.e. Wei is too low).
+TimeParams.SimTime = 1000;
+%STDP Properties
+PopParams.LearningRate = 0;
+PopParams.TargetRate = 1; %Target E rate 1Hz
+PopParams.tauSTDP = 20;
+SimValues_pre = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,...
+    'save_weights',1000,'save_dt',1);
+
+%% Check balance 
+timewin = TimeParams.SimTime + [-1000 0];
+[ corrhist,condx,currx,currPETH ] = CheckBalance( SimValues_pre,PopParams,timewin);
+
+
 %%
 
+TimeParams.SimTime = 20000;
 %STDP Properties
 PopParams.LearningRate = 0.5;
 PopParams.TargetRate = 1; %Target E rate 1Hz
@@ -76,6 +92,11 @@ toc
 if SAVESIM==true
     save(fullfile(simfolder,'longinhSTDP_fastrate'),'-v7.3')
 end
+
+%% Check balance 
+timewin = TimeParams.SimTime + [-1000 0];
+[ corrhist,condx,currx,currPETH ] = CheckBalance( SimValues,PopParams,timewin);
+
 %% Change in I->E Synaptic Statistics 
 
 EImat = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,:);
