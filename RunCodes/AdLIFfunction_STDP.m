@@ -65,6 +65,8 @@ addParameter(p,'onsettime',0,@isnumeric)
 addParameter(p,'save_dt',0.5,@isnumeric)
 addParameter(p,'save_weights',10,@isnumeric)
 addParameter(p,'cellout',false,@islogical)
+addParameter(p,'recordInterval',0,@isnumeric)
+addParameter(p,'recordIntervalPath',nan,@ischar)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
@@ -72,6 +74,8 @@ onsettime = p.Results.onsettime;
 save_dt = p.Results.save_dt;
 save_weights = p.Results.save_weights;
 cellout = p.Results.cellout;
+recordInterval = p.Results.recordInterval;
+recordIntervalPath = p.Results.recordIntervalPath;
 
 %%
 %--------------------------------------------------------------------------
@@ -228,8 +232,11 @@ SimValues.Input           = nan(PopNum,SaveTimeLength);
 SimValues.t_weight        = nan(1,WeightSaveLength);
 SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
 
+if recordInterval == 0
 spikes = nan(PopNum.*(SimTime+onsettime).*20,2,'single'); %assume mean rate 20Hz
-
+else
+spikes = nan(PopNum.*(recordInterval+onsettime).*20,2,'single'); %assume mean rate 20Hz
+end
 %% EI Parameter Adjustments (ugly. needs cleaning)
 
 if length(E_L) == 2 
@@ -429,6 +436,15 @@ for tt=1:SimTimeLength
         SimValues.WeightMat(:,:,weightcounter)     = EE_mat+II_mat+EI_mat+IE_mat;
     	weightcounter = weightcounter+1;
     end
+    
+    if recordInterval > 0    
+        if mod(timecounter,recordInterval)==0 && timecounter>0
+            csvwrite(fullfile([recordIntervalPath num2str(timecounter) '.csv']),spikes);
+            disp('Saving Spikes');
+            spikes = nan(PopNum.*(recordInterval).*20,2,'single'); %assume mean rate 20Hz
+        end
+    end
+            
     %%Idea: add a catch for silent network or excessive firing network?
 end
 
