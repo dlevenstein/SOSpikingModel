@@ -86,3 +86,6 @@ if SAVESIM==true
 end
 
 end
+
+%%
+exit
