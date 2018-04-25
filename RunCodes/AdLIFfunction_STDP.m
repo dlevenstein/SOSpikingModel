@@ -439,7 +439,7 @@ for tt=1:SimTimeLength
     
     if recordInterval > 0    
         if mod(timecounter,recordInterval)==0 && timecounter>0
-            csvwrite(fullfile([recordIntervalPath '-' num2str(timecounter) '.csv']),spikes);
+            csvwrite(fullfile([recordIntervalPath '_' num2str(timecounter) '.csv']),spikes);
             disp('Saving Spikes');
             spikes = nan(PopNum.*(recordInterval).*20,2,'single'); %assume mean rate 20Hz
         end
