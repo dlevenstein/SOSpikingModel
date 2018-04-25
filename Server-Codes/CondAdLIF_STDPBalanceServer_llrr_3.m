@@ -63,7 +63,7 @@ PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the 
 
 %%
 
-TimeParams.SimTime = 2000;
+TimeParams.SimTime = 250000;
 %STDP Properties
 
 LearningRates = [1e-4, 1e-3, 1e-2 1e-1, 1];
@@ -71,7 +71,7 @@ LearningRateNames = ["1e-4", "1e-3", "1e-2", "1e-1", "1"];
 
 %%
 
-llrr = 1;
+llrr = 3;
 
 PopParams.LearningRate = LearningRates(llrr);
 PopParams.TargetRate = 1; %Target E rate 1Hz
@@ -80,7 +80,7 @@ PopParams.tauSTDP = 20;
 tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,...
     'save_weights',1000,'save_dt',1,...
-    'recordInterval',200,'recordIntervalPath',['/home/jmg1030/SOSpikingModel/Data/Balance/spikeData-' char(LearningRateNames(llrr))]);
+    'recordInterval',10000,'recordIntervalPath',['/home/jmg1030/SOSpikingModel/Data/Balance/spikeData-' char(LearningRateNames(llrr))]);
 toc 
 
 if SAVESIM==true
