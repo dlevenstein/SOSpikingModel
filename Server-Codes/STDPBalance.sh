@@ -2,8 +2,8 @@
 #SBATCH --nodes=1
 #SBATCH --array=1-5
 #SBATCH --cpus-per-task=20
-#SBATCH --time=24:00:00
-#SBATCH --mem=225GB
+#SBATCH --time=48:00:00
+#SBATCH --mem=100GB
 #SBATCH --job-name=STDP_Balance
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
