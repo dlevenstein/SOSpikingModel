@@ -437,12 +437,10 @@ for tt=1:SimTimeLength
     	weightcounter = weightcounter+1;
     end
     
-    if recordInterval > 0    
-        if mod(timecounter,recordInterval)==0 && timecounter>0
-            csvwrite(fullfile([recordIntervalPath '_' num2str(timecounter) '.csv']),spikes);
-            disp('Saving Spikes');
-            spikes = nan(PopNum.*(recordInterval).*20,2,'single'); %assume mean rate 20Hz
-        end
+    if mod(timecounter,recordInterval)==0 && timecounter>0
+        csvwrite(fullfile([recordIntervalPath '_' num2str(timecounter) '.csv']),spikes);
+        disp('Saving Spikes');
+        spikes = nan(PopNum.*(recordInterval).*20,2,'single'); %assume mean rate 20Hz
     end
             
     %%Idea: add a catch for silent network or excessive firing network?
