@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --array=1-5
-#SBATCH --cpus-per-task=20
-#SBATCH --time=48:00:00
+#SBATCH --array=1-4
+#SBATCH --cpus-per-task=10
+#SBATCH --time=36:00:00
 #SBATCH --mem=100GB
 #SBATCH --job-name=STDP_Balance
 #SBATCH --mail-type=END
