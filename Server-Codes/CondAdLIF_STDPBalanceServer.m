@@ -69,7 +69,7 @@ PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the 
 
 %%
 
-TimeParams.SimTime = 250000;
+TimeParams.SimTime = 1000;
 %STDP Properties
 
 LearningRates = [1e-4, 1e-3, 1e-2 1e-1, 1];
@@ -83,7 +83,7 @@ PopParams.tauSTDP = 20;
 
 tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,...
-    'save_weights',10000,'save_dt',1,...
+    'save_weights',100,'save_dt',1,...
     'recordInterval',[50,150;500,750]);
 toc 
 
