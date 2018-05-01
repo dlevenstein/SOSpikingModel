@@ -1,14 +1,18 @@
-function CondAdLIF_STDPBalanceServer(llrr)
+%function CondAdLIF_STDPBalanceServer(llrr)
+
+llrr = 1;
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-repopath = '/home/jmg1030/SOSpikingModel'; 
+repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
+%repopath = '/home/jmg1030/SOSpikingModel'; 
 addpath(genpath(repopath))
 
 %dropboxpath = '/Users/dlevenstein/Dropbox/Share Folders/DLJG'; 
-dropboxpath = ['/archive/j/jmg1030/Balance']; 
+dropboxpath = ['~/Desktop']; 
+%dropboxpath = ['/archive/j/jmg1030/Balance']; 
 
 figfolder = [repopath,'/Figures'];
 simfolder = dropboxpath;
@@ -79,8 +83,8 @@ PopParams.tauSTDP = 20;
 
 tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,...
-    'save_weights',1000,'save_dt',1,...
-    'recordInterval',0,'recordIntervalPath',[dropboxpath '/spikeData-' char(LearningRateNames(llrr))]);
+    'save_weights',10000,'save_dt',1,...
+    'recordInterval',[50,150;500,750]);
 toc 
 
 if SAVESIM==true

@@ -65,8 +65,7 @@ addParameter(p,'onsettime',0,@isnumeric)
 addParameter(p,'save_dt',0.5,@isnumeric)
 addParameter(p,'save_weights',10,@isnumeric)
 addParameter(p,'cellout',false,@islogical)
-addParameter(p,'recordInterval',0,@isnumeric)
-addParameter(p,'recordIntervalPath',nan,@ischar)
+addParameter(p,'recordInterval',[],@isnumeric)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
@@ -74,8 +73,9 @@ onsettime = p.Results.onsettime;
 save_dt = p.Results.save_dt;
 save_weights = p.Results.save_weights;
 cellout = p.Results.cellout;
-recordInterval = p.Results.recordInterval;
-recordIntervalPath = p.Results.recordIntervalPath;
+recordIntervals = p.Results.recordInterval;
+
+recordVALs = createRecorder(recordIntervals,TimeParams);
 
 %%
 %--------------------------------------------------------------------------
@@ -232,11 +232,13 @@ SimValues.Input           = nan(PopNum,SaveTimeLength);
 SimValues.t_weight        = nan(1,WeightSaveLength);
 SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
 
-if recordInterval == 0
+if length(recordIntervals) == 0
+recordVALs = ones(1,SimTimeLength);
 spikes = nan(PopNum.*(SimTime+onsettime).*20,2,'single'); %assume mean rate 20Hz
 else
-spikes = nan(PopNum.*(recordInterval+onsettime).*20,2,'single'); %assume mean rate 20Hz
+spikes = nan(PopNum.*(round(length(find(recordVALs~=0)).*TimeParams.dt)+onsettime).*20,2,'single'); %assume mean rate 20Hz
 end
+
 %% EI Parameter Adjustments (ugly. needs cleaning)
 
 if length(E_L) == 2 
@@ -372,10 +374,14 @@ for tt=1:SimTimeLength
         spikeneurons = find(V > V_th);
 
         numspikers = length(spikeneurons);
-        spikes(spikecounter+1:spikecounter+numspikers,:) = ...
-            [timecounter.*ones(numspikers,1),spikeneurons];
+        
+        if recordVALs(tt)
+            spikes(spikecounter+1:spikecounter+numspikers,:) = ...
+                [timecounter.*ones(numspikers,1),spikeneurons];
+        end
+        
         spikecounter = spikecounter+numspikers;
-
+        
         %Jump the conductance
         s(spikeneurons) = s(spikeneurons) + 1;
         %Set spiking neurons refractory period 
@@ -415,6 +421,7 @@ for tt=1:SimTimeLength
         
     %% Add data to the output variables
     %Question: is accessing structure slower than doubles?
+
     if mod(timecounter,save_dt)==0 && timecounter>=0
          SimValues.t(savecounter)                 = timecounter;
          SimValues.V(:,savecounter)               = V;
@@ -435,12 +442,6 @@ for tt=1:SimTimeLength
         SimValues.t_weight(weightcounter)            = timecounter;
         SimValues.WeightMat(:,:,weightcounter)     = EE_mat+II_mat+EI_mat+IE_mat;
     	weightcounter = weightcounter+1;
-    end
-    
-    if mod(timecounter,recordInterval)==0 && timecounter>0
-        csvwrite(fullfile([recordIntervalPath '_' num2str(timecounter) '.csv']),spikes);
-        disp('Saving Spikes');
-        spikes = nan(PopNum.*(recordInterval).*20,2,'single'); %assume mean rate 20Hz
     end
             
     %%Idea: add a catch for silent network or excessive firing network?
