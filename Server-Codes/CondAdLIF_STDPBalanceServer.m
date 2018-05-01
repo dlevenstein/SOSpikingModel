@@ -1,18 +1,16 @@
-%function CondAdLIF_STDPBalanceServer(llrr)
-
-llrr = 1;
+function CondAdLIF_STDPBalanceServer(llrr)
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
-%repopath = '/home/jmg1030/SOSpikingModel'; 
+%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
+repopath = '/home/jmg1030/SOSpikingModel'; 
 addpath(genpath(repopath))
 
 %dropboxpath = '/Users/dlevenstein/Dropbox/Share Folders/DLJG'; 
-dropboxpath = ['~/Desktop']; 
-%dropboxpath = ['/archive/j/jmg1030/Balance']; 
+%dropboxpath = ['~/Desktop']; 
+dropboxpath = ['/archive/j/jmg1030/Balance']; 
 
 figfolder = [repopath,'/Figures'];
 simfolder = dropboxpath;
@@ -69,7 +67,7 @@ PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the 
 
 %%
 
-TimeParams.SimTime = 1000;
+TimeParams.SimTime = 310000;
 %STDP Properties
 
 LearningRates = [1e-4, 1e-3, 1e-2 1e-1, 1];
@@ -83,8 +81,8 @@ PopParams.tauSTDP = 20;
 
 tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,...
-    'save_weights',100,'save_dt',1,...
-    'recordInterval',[50,150;500,750]);
+    'save_weights',10000,'save_dt',1,...
+    'recordInterval',[0:20000:300000;(0:20000:300000)+4000]);
 toc 
 
 if SAVESIM==true
