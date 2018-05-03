@@ -233,6 +233,7 @@ SimValues.t_weight        = nan(1,WeightSaveLength);
 SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
 
 if length(recordIntervals) == 0
+recordIntervals = [0 SimTime];
 recordVALs = ones(1,SimTimeLength);
 spikes = nan(PopNum.*(SimTime+onsettime).*20,2,'single'); %assume mean rate 20Hz
 else
@@ -422,7 +423,8 @@ for tt=1:SimTimeLength
     %% Add data to the output variables
     %Question: is accessing structure slower than doubles?
 
-    if mod(timecounter,save_dt)==0 && timecounter>=0 && recordVALs(tt)
+    if mod(timecounter,save_dt)==0 && timecounter>=0
+        if recordVALs(tt)
          SimValues.t(savecounter)                 = timecounter;
          SimValues.V(:,savecounter)               = V;
          SimValues.g_w(:,savecounter)             = g_w;
@@ -435,13 +437,16 @@ for tt=1:SimTimeLength
         
 
          savecounter = savecounter+1;
+        end
     end
     
     %Save the weights (less frequently for space concerns)
-    if mod(timecounter,save_weights)==0 && timecounter>=0 && recordVALs(tt)
+    if mod(timecounter,save_weights)==0 && timecounter>=0 
+        if recordVALs(tt)
         SimValues.t_weight(weightcounter)            = timecounter;
         SimValues.WeightMat(:,:,weightcounter)     = EE_mat+II_mat+EI_mat+IE_mat;
     	weightcounter = weightcounter+1;
+        end
     end
             
     %%Idea: add a catch for silent network or excessive firing network?

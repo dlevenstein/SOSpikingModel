@@ -45,20 +45,20 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-PopParams.Wee   = 10;        %E->E weight (nS)
-PopParams.Wii   = 10;        %I->I weight
-PopParams.Wie   = 10;        %E->I weight
-PopParams.Wei   = 12;        %I->E weight
-PopParams.Kee   = 50;        %Expected E->E In Degree
-PopParams.Kii   = 50;        %Expected I->I In Degree
-PopParams.Kie   = 50;        %Expected E->I In Degree
-PopParams.Kei   = 50;        %Expected I->E In Degree
+PopParams.Wee   = 5;        %E->E weight (nS)
+PopParams.Wii   = 5;        %I->I weight
+PopParams.Wie   = 5;        %E->I weight
+PopParams.Wei   = 5;        %I->E weight
+PopParams.Kee   = 100;        %Expected E->E In Degree
+PopParams.Kii   = 100;        %Expected I->I In Degree
+PopParams.Kie   = 100;        %Expected E->I In Degree
+PopParams.Kei   = 100;        %Expected I->E In Degree
 
 
 TimeParams.dt      = 0.05;
 
 close all
-PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the simulation
+%PopParams.p0spike = 0; %Proportion of neurons spiking in the beginning of the simulation
 %% Test Simulation before STDP
 %WARNING - THIS SIMULATION TAKES V LONG (or completely fails) if population
 %is too unbalanced (i.e. Wei is too low).
@@ -77,10 +77,10 @@ timewin = TimeParams.SimTime + [-1000 0];
 
 %%
 
-TimeParams.SimTime = 20000;
+TimeParams.SimTime = 5000;
 %STDP Properties
-PopParams.LearningRate = 0.5;
-PopParams.TargetRate = 1; %Target E rate 1Hz
+PopParams.LearningRate = 0.05;
+PopParams.TargetRate = 2; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 
