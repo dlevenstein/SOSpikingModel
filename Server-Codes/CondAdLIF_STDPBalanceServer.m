@@ -54,10 +54,10 @@ PopParams.Wee   = 10;        %E->E weight (nS)
 PopParams.Wii   = 10;        %I->I weight
 PopParams.Wie   = 10;        %E->I weight
 PopParams.Wei   = 12;        %I->E weight
-PopParams.Kee   = 50;        %Expected E->E In Degree
-PopParams.Kii   = 50;        %Expected I->I In Degree
-PopParams.Kie   = 50;        %Expected E->I In Degree
-PopParams.Kei   = 50;        %Expected I->E In Degree
+PopParams.Kee   = 100;        %Expected E->E In Degree
+PopParams.Kii   = 100;        %Expected I->I In Degree
+PopParams.Kie   = 100;        %Expected E->I In Degree
+PopParams.Kei   = 100;        %Expected I->E In Degree
 
 
 TimeParams.dt      = 0.05;
@@ -76,7 +76,7 @@ LearningRateNames = ["1e-4", "1e-3", "1e-2", "1e-1", "1"];
 %%
 
 PopParams.LearningRate = LearningRates(llrr);
-PopParams.TargetRate = 1; %Target E rate 1Hz
+PopParams.TargetRate = 2; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 tic
@@ -86,5 +86,5 @@ SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress
 toc 
 
 if SAVESIM==true
-    save(fullfile(simfolder,['longinhSTDP_fastrate-' char(LearningRateNames(llrr))]),'-v7.3')
+    save(['longinhSTDP_fastrate-' char(LearningRateNames(llrr))],'-v7.3')
 end
