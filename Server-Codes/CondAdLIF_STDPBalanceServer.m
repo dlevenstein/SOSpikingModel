@@ -8,12 +8,6 @@ function CondAdLIF_STDPBalanceServer(llrr)
 repopath = '/home/jmg1030/SOSpikingModel';
 addpath(genpath(repopath))
 
-%dropboxpath = '/Users/dlevenstein/Dropbox/Share Folders/DLJG';
-%dropboxpath = ['~/Desktop'];
-dropboxpath = ['/archive/j/jmg1030/Balance'];
-
-figfolder = [repopath,'/Figures'];
-simfolder = dropboxpath;
 SAVESIM = true;
 %% Example Neuron Properties
 
@@ -21,8 +15,8 @@ clear PopParams
 
 %Input
 PopParams.I_e  = 250;       %External input
-PopParams.sigma = 0;        %niose magnitude: variance
-PopParams.theta = 0;        %noise time scale (1/ms)
+PopParams.sigma = 50;        %niose magnitude: variance
+PopParams.theta = 0.1;        %noise time scale (1/ms)
 
 % One neuron
 PopParams.EPopNum = 1000;
@@ -53,7 +47,7 @@ PopParams.gwnorm  = 0;       %magnitude of adaptation
 PopParams.Wee   = 3;        %E->E weight (nS)
 PopParams.Wii   = 3;        %I->I weight
 PopParams.Wie   = 3;        %E->I weight
-PopParams.Wei   = 3;        %I->E weight
+PopParams.Wei   = 2;        %I->E weight
 PopParams.Kee   = 100;        %Expected E->E In Degree
 PopParams.Kii   = 100;        %Expected I->I In Degree
 PopParams.Kie   = 100;        %Expected E->I In Degree
@@ -67,11 +61,11 @@ close all
 
 %%
 
-TimeParams.SimTime = 310000;
+TimeParams.SimTime = 1e4;
 %STDP Properties
 
-LearningRates = [1e-4, 1e-3, 1e-2 1e-1, 1];
-LearningRateNames = ["1e-4", "1e-3", "1e-2", "1e-1", "1"];
+LearningRates = [1e-3, 1e-2 1e-1];
+LearningRateNames = ["1e-3", "1e-2", "1e-1"];
 
 %%
 
@@ -80,11 +74,13 @@ PopParams.TargetRate = 2; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 tic
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,...
-    'save_weights',1000,'save_dt',100,...
-    'recordInterval',[0:20000:300000;(0:20000:300000)+4000]);
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
+    'save_weights',1e4,'save_dt',1e5,...
+    'recordInterval',[0:1e3:1e4;(0:1e3:1e4) + 1e2]);
 toc
 
 if SAVESIM==true
-    save(['longinhSTDP_fastrate-' char(LearningRateNames(llrr))],'-v7.3')
+    save(['/scratch/jmg1030/longinhSTDP_fastrate-' char(LearningRateNames(llrr))],'-v7.3')
+end
+
 end

@@ -425,6 +425,7 @@ for tt=1:SimTimeLength
 
     if mod(timecounter,save_dt)==0 && timecounter>=0
         if recordVALs(tt)
+            
          SimValues.t(savecounter)                 = timecounter;
          SimValues.V(:,savecounter)               = V;
          SimValues.g_w(:,savecounter)             = g_w;
@@ -486,6 +487,6 @@ SimValues.spikes          = spikes;
 
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
-%SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
+SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
 
 end
