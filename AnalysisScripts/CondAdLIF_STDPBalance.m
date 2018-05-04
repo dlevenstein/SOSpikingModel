@@ -236,3 +236,17 @@ subplot(2,1,2)
 plot(t_spikemat,poprate.E,'k', 'Markersize' , 1)
 xlabel('Time (ms)');ylabel('Firing Rate (Spks/cell/s)');title('Firing Rate')
 
+
+%% DImensionality of the VOltage/spike rates (Not complete)
+
+[~, ~, ~, ~, EXPLAINED_E] = pca(SimValues.V(SimValues.EcellIDX,:));
+[~, ~, ~, ~, EXPLAINED_I] = pca(SimValues.V(SimValues.IcellIDX,:));
+
+%calculate: dim(M) = (sum(eigenvalues).^2)./sum(eigenvalues.^2)
+%%
+figure
+plot(EXPLAINED_E,'k')
+hold on
+plot(EXPLAINED_I,'r')
+xlim([0 100])
+
