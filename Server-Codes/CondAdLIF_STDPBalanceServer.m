@@ -3,14 +3,14 @@ function CondAdLIF_STDPBalanceServer(llrr)
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
-repopath = '/home/jmg1030/SOSpikingModel'; 
+%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
+%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
+repopath = '/home/jmg1030/SOSpikingModel';
 addpath(genpath(repopath))
 
-%dropboxpath = '/Users/dlevenstein/Dropbox/Share Folders/DLJG'; 
-%dropboxpath = ['~/Desktop']; 
-dropboxpath = ['/archive/j/jmg1030/Balance']; 
+%dropboxpath = '/Users/dlevenstein/Dropbox/Share Folders/DLJG';
+%dropboxpath = ['~/Desktop'];
+dropboxpath = ['/archive/j/jmg1030/Balance'];
 
 figfolder = [repopath,'/Figures'];
 simfolder = dropboxpath;
@@ -19,7 +19,7 @@ SAVESIM = true;
 
 clear PopParams
 
-%Input 
+%Input
 PopParams.I_e  = 250;       %External input
 PopParams.sigma = 0;        %niose magnitude: variance
 PopParams.theta = 0;        %noise time scale (1/ms)
@@ -36,7 +36,7 @@ PopParams.V_th    = [-45 -47];    %spike threshold (mV)
 PopParams.V_reset = [-55 -55];    %reset potential (mV)
 PopParams.t_ref   = 0.5;    %refractory period (ms)
 
-%Synaptic Properties 
+%Synaptic Properties
 PopParams.E_e     = 0;      %rev potential: E (mV)
 PopParams.E_i     = -80;    %rev potential: I (mV)
 PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
@@ -81,9 +81,9 @@ PopParams.tauSTDP = 20;
 
 tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,...
-    'save_weights',1000,'save_dt',1,...
+    'save_weights',1000,'save_dt',100,...
     'recordInterval',[0:20000:300000;(0:20000:300000)+4000]);
-toc 
+toc
 
 if SAVESIM==true
     save(['longinhSTDP_fastrate-' char(LearningRateNames(llrr))],'-v7.3')
