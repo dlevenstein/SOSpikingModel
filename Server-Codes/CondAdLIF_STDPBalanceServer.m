@@ -4,8 +4,8 @@ function CondAdLIF_STDPBalanceServer(llrr)
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
-repopath = '/home/jmg1030/SOSpikingModel'; 
+repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
+%repopath = '/home/jmg1030/SOSpikingModel'; 
 addpath(genpath(repopath))
 
 %dropboxpath = '/Users/dlevenstein/Dropbox/Share Folders/DLJG'; 
@@ -50,20 +50,20 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-PopParams.Wee   = 10;        %E->E weight (nS)
-PopParams.Wii   = 10;        %I->I weight
-PopParams.Wie   = 10;        %E->I weight
-PopParams.Wei   = 12;        %I->E weight
+PopParams.Wee   = 3;        %E->E weight (nS)
+PopParams.Wii   = 3;        %I->I weight
+PopParams.Wie   = 3;        %E->I weight
+PopParams.Wei   = 3;        %I->E weight
 PopParams.Kee   = 100;        %Expected E->E In Degree
 PopParams.Kii   = 100;        %Expected I->I In Degree
 PopParams.Kie   = 100;        %Expected E->I In Degree
 PopParams.Kei   = 100;        %Expected I->E In Degree
 
-
 TimeParams.dt      = 0.05;
 
 close all
-PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the simulation
+
+%PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the simulation
 
 %%
 
@@ -81,7 +81,7 @@ PopParams.tauSTDP = 20;
 
 tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,...
-    'save_weights',10000,'save_dt',1,...
+    'save_weights',1000,'save_dt',1,...
     'recordInterval',[0:20000:300000;(0:20000:300000)+4000]);
 toc 
 

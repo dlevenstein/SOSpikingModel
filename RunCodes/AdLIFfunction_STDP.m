@@ -435,7 +435,6 @@ for tt=1:SimTimeLength
          SimValues.a_w(:,savecounter)             = a_w;
          SimValues.Input(:,savecounter)           = I_e(timecounter) + X_t;
         
-
          savecounter = savecounter+1;
         end
     end
