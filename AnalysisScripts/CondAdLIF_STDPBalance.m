@@ -117,6 +117,15 @@ Iallstats.std = std(AllEIweights,1);
 Iallstats.distbins = linspace(0,75,75);
 Iallstats.dist = hist(AllEIweights,Iallstats.distbins);
 
+%Change in weights dw/dt
+Iallstats.dwbins = linspace(-20,100,121);
+dw = diff(AllEIweights,1,2);
+
+Iallstats.dwhist = hist(dw,Iallstats.dwbins);
+Iallstats.dwmean = mean(dw,1);
+Iallstats.dwstd = std(dw,1);
+
+%%
 figure
     subplot(4,1,1)
         plot(Iinstats.mean')
@@ -154,6 +163,20 @@ figure
         legend('t=0','t=10','t=20','t=30','t=40','location','northeast')
         xlabel('I->E Weight');ylabel('# Synapses')
 
+%%
+figure
+subplot(2,2,1)
+    imagesc(log10(Iallstats.dwhist))
+    axis xy
+subplot(4,2,2)
+    plot(Iallstats.dwmean)
+subplot(4,2,4)
+    plot(Iallstats.dwstd)
+
+
+%%
+figure
+plot(dw')
 %%
 figure
 subplot(3,1,1)
