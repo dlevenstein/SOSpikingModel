@@ -61,7 +61,7 @@ close all
 
 %%
 
-TimeParams.SimTime = 1e6;
+TimeParams.SimTime = 1e4;
 %STDP Properties
 
 LearningRates = [1e-3, 1e-2 1e-1];
@@ -75,8 +75,8 @@ PopParams.tauSTDP = 20;
 
 tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',1e4,'save_dt',1e5,...
-    'recordInterval',[0:1e5:1e6;(0:1e5:1e6) + 1e4]);
+    'save_weights',1e2,'save_dt',1e5,...
+    'recordInterval',[0:2e3:1e4;(0:2e3:1e4) + 1e3]);
 toc
 
 if SAVESIM==true
