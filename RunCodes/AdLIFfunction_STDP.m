@@ -487,6 +487,6 @@ SimValues.spikes          = spikes;
 
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
-SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
+%SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
 
 end
