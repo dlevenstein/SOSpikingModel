@@ -2,9 +2,13 @@
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
-repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
+repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel/';
 %repopath = '/home/jmg1030/SOSpikingModel';
+
+datafolder = 'Data/Balance/05-5-2018/';
+
 addpath(genpath(repopath))
+addpath([repopath datafolder])
 
 %%
 %Input
