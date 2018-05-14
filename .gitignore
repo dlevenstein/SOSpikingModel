@@ -2,3 +2,5 @@
 *.m~
 *.DS_Store
 .DS_Store
+
+Figures/STDPBalance/STARTPopRate_LearningRate1e-1.png
