@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --array=1-3
+#SBATCH --array=1-2
 #SBATCH --cpus-per-task=10
-#SBATCH --time=12:00:00
-#SBATCH --mem=70GB
+#SBATCH --time=48:00:00
+#SBATCH --mem=100GB
 #SBATCH --job-name=STDP_Balance
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
