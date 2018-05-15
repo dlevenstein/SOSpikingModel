@@ -7,6 +7,8 @@ repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel/';
 
 datafolder = 'Data/Balance/05-5-2018/';
 
+figfolder = '~/Desktop/';
+
 addpath(genpath(repopath))
 addpath([repopath datafolder])
 
@@ -68,7 +70,7 @@ PopParamsAnalysis.tauSTDP = 20;
 %% Untrained Simulation
 
 tic
-SimValuesPreTrain = AdLIFfunction_STDP(PopParamsAnalysis,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+SimValuesPreTrain = AdLIFfunction_STDP(PopParamsAnalysis,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',false);
 toc
 
 %% Trained Simulation 1e-1
@@ -78,7 +80,7 @@ load('longinhSTDP_fastrate-1e-1.mat')
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,11);
 
 tic
-SimValuesPostTrain1e1 = AdLIFfunction_STDP(PopParamsAnalysis,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+SimValuesPostTrain1e1 = AdLIFfunction_STDP(PopParamsAnalysis,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',false);
 toc
 
 %% Trained Simulation 1e-2
@@ -105,7 +107,7 @@ eRandIndex = randperm(1000);
 iRandIndex = randperm(250) + 1000;
 
 for ee = 1:length(eRandIndex)
-for ii = 1:length(iRandIndex)x
+for ii = 1:length(iRandIndex)
     
     PopParamsAnalysis.W(ee,ii+1000) = SimValues.WeightMat(eRandIndex(ee),iRandIndex(ii),11);
     
@@ -114,7 +116,7 @@ end
 
 %%
 tic
-ScrambledSimValuesPostTrain1e1 = AdLIFfunction_STDP(PopParamsAnalysis,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+ScrambledSimValuesPostTrain1e1 = AdLIFfunction_STDP(PopParamsAnalysis,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',false);
 toc
 
 %% Scrambled Matrix Simulation 1e-2
@@ -152,7 +154,7 @@ ISIdiffPostTrainScrambled1e1 = [];
 ISIdiffPostTrainScrambled1e2 = [];
 
 for n = 1:1250
-    ISIdiffPreTrain = [ISIdiffPreTrain;diff(SimValues_pre.spikesbycell{n})];
+    ISIdiffPreTrain = [ISIdiffPreTrain;diff(SimValuesPreTrain.spikesbycell{n})];
     ISIdiffPostTrain1e1 = [ISIdiffPostTrain1e1;diff(SimValuesPostTrain1e1.spikesbycell{n})];
     ISIdiffPostTrain1e2 = [ISIdiffPostTrain1e2;diff(SimValuesPostTrain1e2.spikesbycell{n})];
     ISIdiffPostTrainScrambled1e1 = [ISIdiffPostTrainScrambled1e1;diff(ScrambledSimValuesPostTrain1e1.spikesbycell{n})];
@@ -167,24 +169,6 @@ end
 [ISIvecPostTrainScrambled1e1,ISImapPostTrainScrambled1e1] = hist(ISIdiffPostTrainScrambled1e1,linspace(0,1000,10));
 [ISIvecPostTrainScrambled1e2,ISImapPostTrainScrambled1e2] = hist(ISIdiffPostTrainScrambled1e2,linspace(0,1000,10));
 
-%% Separate ISI Curves
-
-% figure
-% plot(ISImapPreTrain,ISIvecPreTrain,'k');
-% xlabel('Time (ms)');ylabel('Frequency');title('ISI No Training');
-% figure
-% plot(ISImapPostTrain1e1,ISIvecPostTrain1e1,'k')
-% xlabel('Time (ms)');ylabel('Frequency');title('ISI Training: 1e-1');
-% figure
-% plot(ISImapPostTrain1e2,ISIvecPostTrain1e2,'k')
-% xlabel('Time (ms)');ylabel('Frequency');title('ISI Training: 1e-2');
-% figure
-% plot(ISImapPostTrainScrambled1e1,ISIvecPostTrainScrambled1e1,'k')
-% xlabel('Time (ms)');ylabel('Frequency');title('ISI Training (Scrambled): 1e-1');
-% figure
-% plot(ISImapPostTrainScrambled1e2,ISIvecPostTrainScrambled1e2,'k')
-% xlabel('Time (ms)');ylabel('Frequency');title('ISI Training (Scrambled): 1e-2');
-
 %% ISI Curves
 
 figure
@@ -193,12 +177,17 @@ hold on
 plot(ISImapPostTrainScrambled1e1,ISIvecPostTrainScrambled1e1,'r','LineWidth',2)
 xlabel('Time (ms)');ylabel('Frequency');title('ISI Training: 1e-1');
 legend('Trained','Scrambled Matrix')
+
+saveas(gcf,[figfolder 'ISI_1e-1.png']);
+
 figure
 plot(ISImapPostTrain1e2,ISIvecPostTrain1e2,'k','LineWidth',2)
 hold on
 plot(ISImapPostTrainScrambled1e2,ISIvecPostTrainScrambled1e2,'r','LineWidth',2)
 legend('Trained','Scrambled Matrix')
 xlabel('Time (ms)');ylabel('Frequency');title('ISI Training: 1e-2');
+
+saveas(gcf,[figfolder 'ISI_1e-2.png']);
 
 %% Raster Plots
 
@@ -214,6 +203,8 @@ xlabel('Time (ms)');ylabel('Neuron ID');title('Trained Raster 1e-1 (Scrambled)')
 xlim([0 TimeParamsAnalysis.SimTime])
 ylim([0 1250])
 
+saveas(gcf,[figfolder 'Raster1e-1.png']);
+
 figure
 subplot(2,1,1)
 plot(SimValuesPostTrain1e2.spikes(:,1),SimValuesPostTrain1e2.spikes(:,2),'.k','MarkerSize',1)
@@ -225,6 +216,8 @@ plot(ScrambledSimValuesPostTrain1e2.spikes(:,1),ScrambledSimValuesPostTrain1e2.s
 xlabel('Time (ms)');ylabel('Neuron ID');title('Trained Raster 1e-2 (Scrambled)')
 xlim([0 TimeParamsAnalysis.SimTime])
 ylim([0 1250])
+
+saveas(gcf,[figfolder 'Raster1e-2.png']);
 
 %% Weight Analysis
 
@@ -252,8 +245,10 @@ xlabel('Times (ms)');ylabel('Weight (nS)');title('Distribution of Weight: 1e-1')
 xticks(1:6)
 xticklabels(SimValues.t_weight(1:2:11))
 set(gca,'YDir','normal')
-caxis([0 11006])
+caxis([0 12000])
 colorbar
+
+saveas(gcf,[figfolder 'WeightDist1e-1.png']);
 
 %%
 eigStart = eig(SimValues.WeightMat(:,:,1));
@@ -294,6 +289,25 @@ plot(real(eigScrambled),imag(eigScrambled),'.k','MarkerSize',1)
 xlabel('Real');ylabel('Imaginary');title('Eigenvalues End Scrambled')
 xlim([-70 70])
 
+saveas(gcf,[figfolder 'Eig1e-1.png']);
+
+%%
+
+Wstart = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,1);
+Wend = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11);
+
+Wstart(Wstart <= mean(mean(Wstart(Wstart > 0)))) = 0;
+Wstart(Wstart > 0) = 1;
+
+Wend(Wend <= mean(mean(Wend(Wend > 0)))) = 0;
+Wend(Wend > 0) = 1;
+
+figure;imagesc(Wstart)
+figure;imagesc(Wend)
+
+Hstart = entropy(Wstart)
+Hend = entropy(Wend)
+
 %% Weight Analysis
 
 load('longinhSTDP_fastrate-1e-2.mat')
@@ -321,8 +335,10 @@ xlabel('Times (ms)');ylabel('Weight (nS)');title('Distribution of Weight: 1e-2')
 xticks(1:6)
 xticklabels(SimValues.t_weight(1:2:11))
 set(gca,'YDir','normal')
-caxis([0 11006])
+caxis([0 12000])
 colorbar
+
+saveas(gcf,[figfolder 'WeightDist1e-2.png']);
 
 %% Eigenvalues
 
@@ -363,3 +379,22 @@ subplot(3,1,3)
 plot(real(eigScrambled),imag(eigScrambled),'.k','MarkerSize',1)
 xlabel('Real');ylabel('Imaginary');title('Eigenvalues End Scrambled')
 xlim([-50 50])
+
+saveas(gcf,[figfolder 'Eig1e-2.png']);
+
+%%
+
+Wstart = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,1);
+Wend = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11);
+
+Wstart(Wstart <= mean(mean(Wstart(Wstart > 0)))) = 0;
+Wstart(Wstart > 0) = 1;
+
+Wend(Wend <= mean(mean(Wend(Wend > 0)))) = 0;
+Wend(Wend > 0) = 1;
+
+figure;imagesc(Wstart)
+figure;imagesc(Wend)
+
+Hstart = entropy(Wstart)
+Hend = entropy(Wend)
