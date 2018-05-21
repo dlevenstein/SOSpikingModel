@@ -87,126 +87,126 @@ MeanPopParams1e2 = PopParamsAnalysis;
 % tic
 % SimValuesPreTrain = AdLIFfunction_STDP(PreTainPopParams,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',false);
 % toc
-% 
-% %% Trained Simulation 1e-1
-% 
-% load('longinhSTDP_fastrate-1e-1.mat')
-% 
-% PostTrainPopParams1e1.W = SimValues.WeightMat(:,:,11);
-% 
-% tic
-% SimValuesPostTrain1e1 = AdLIFfunction_STDP(PostTrainPopParams1e1,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',false);
-% toc
-% 
-% %% Trained Simulation 1e-2
-% 
-% load('longinhSTDP_fastrate-1e-2.mat')
-% 
-% PostTrainPopParams1e2.W = SimValues.WeightMat(:,:,11);
-% 
-% tic
-% SimValuesPostTrain1e2 = AdLIFfunction_STDP(PostTrainPopParams1e2,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
-% toc
-% 
-% %% Scrambled Matrix Simulation 1e-1
-% 
-% load('longinhSTDP_fastrate-1e-1.mat')
-% 
-% ScrambledPopParams1e1.W = zeros(1250,1250);
-% 
-% ScrambledPopParams1e1.W(SimValues.EcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.EcellIDX,SimValues.EcellIDX,11);
-% ScrambledPopParams1e1.W(SimValues.IcellIDX,SimValues.IcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.IcellIDX,11);
-% ScrambledPopParams1e1.W(SimValues.IcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.EcellIDX,11);
-% 
-% EImatrix = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11);
-% EIindex = find(EImatrix > 0);
-% EIvalues = EImatrix(EIindex);
-% EIscrambled = zeros(length(SimValues.EcellIDX),length(SimValues.IcellIDX));
-% 
-% randIndex = randperm(length(EIvalues));
-% 
-% for ei = 1:length(EIvalues)
-%    
-%     EIscrambled(EIindex(ei)) = EIvalues(randIndex(ei));
-%     
-% end
-% 
-% ScrambledPopParams1e1.W(SimValues.EcellIDX,SimValues.IcellIDX) = EIscrambled;
-% 
-% tic
-% ScrambledSimValuesPostTrain1e1 = AdLIFfunction_STDP(ScrambledPopParams1e1,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
-% toc
-% 
-% %% Scrambled Matrix Simulation 1e-2
-% 
-% load('longinhSTDP_fastrate-1e-2.mat')
-% 
-% ScrambledPopParams1e2.W = zeros(1250,1250);
-% 
-% ScrambledPopParams1e2.W(SimValues.EcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.EcellIDX,SimValues.EcellIDX,11);
-% ScrambledPopParams1e2.W(SimValues.IcellIDX,SimValues.IcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.IcellIDX,11);
-% ScrambledPopParams1e2.W(SimValues.IcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.EcellIDX,11);
-% 
-% EImatrix = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11);
-% EIindex = find(EImatrix > 0);
-% EIvalues = EImatrix(EIindex);
-% EIscrambled = zeros(length(SimValues.EcellIDX),length(SimValues.IcellIDX));
-% 
-% randIndex = randperm(length(EIvalues));
-% 
-% for ei = 1:length(EIvalues)
-%    
-%     EIscrambled(EIindex(ei)) = EIvalues(randIndex(ei));
-%     
-% end
-% 
-% ScrambledPopParams1e2.W(SimValues.EcellIDX,SimValues.IcellIDX) = EIscrambled;
-% 
-% tic
-% ScrambledSimValuesPostTrain1e2 = AdLIFfunction_STDP(ScrambledPopParams1e2,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',false);
-% toc
-% 
-% %% Mean Matrix Simulation 1e-1
-% 
-% load('longinhSTDP_fastrate-1e-1.mat')
-% 
-% MeanPopParams1e1.W = zeros(1250,1250);
-% 
-% MeanPopParams1e1.W(SimValues.EcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.EcellIDX,SimValues.EcellIDX,11);
-% MeanPopParams1e1.W(SimValues.IcellIDX,SimValues.IcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.IcellIDX,11);
-% MeanPopParams1e1.W(SimValues.IcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.EcellIDX,11);
-% 
-% EImatrix = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11);
-% EIindex = find(SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11) > 0);
-% EImeanMatrix = zeros(length(SimValues.EcellIDX),length(SimValues.IcellIDX));
-% EImeanMatrix(EIindex) = mean(EImatrix(EIindex));
-% 
-% MeanPopParams1e1.W(SimValues.EcellIDX,SimValues.IcellIDX) = EImeanMatrix;
-% 
-% tic
-% MeanSimValuesPostTrain1e1 = AdLIFfunction_STDP(MeanPopParams1e1,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
-% toc
-% 
-% %% Mean Matrix Simulation 1e-2
-% 
-% load('longinhSTDP_fastrate-1e-2.mat')
-% 
-% MeanPopParams1e2.W = zeros(1250,1250);
-% 
-% MeanPopParams1e2.W(SimValues.EcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.EcellIDX,SimValues.EcellIDX,11);
-% MeanPopParams1e2.W(SimValues.IcellIDX,SimValues.IcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.IcellIDX,11);
-% MeanPopParams1e2.W(SimValues.IcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.EcellIDX,11);
-% 
-% EImatrix = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11);
-% EIindex = find(SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11) > 0);
-% EImeanMatrix = zeros(length(SimValues.EcellIDX),length(SimValues.IcellIDX));
-% EImeanMatrix(EIindex) = mean(EImatrix(EIindex));
-% 
-% MeanPopParams1e2.W(SimValues.EcellIDX,SimValues.IcellIDX) = EImeanMatrix;
-% 
-% tic
-% MeanSimValuesPostTrain1e2 = AdLIFfunction_STDP(MeanPopParams1e2,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
-% toc
+
+%% Trained Simulation 1e-1
+
+load('longinhSTDP_fastrate-1e-1.mat')
+
+PostTrainPopParams1e1.W = SimValues.WeightMat(:,:,11);
+
+tic
+SimValuesPostTrain1e1 = AdLIFfunction_STDP(PostTrainPopParams1e1,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',false);
+toc
+
+%% Trained Simulation 1e-2
+
+load('longinhSTDP_fastrate-1e-2.mat')
+
+PostTrainPopParams1e2.W = SimValues.WeightMat(:,:,11);
+
+tic
+SimValuesPostTrain1e2 = AdLIFfunction_STDP(PostTrainPopParams1e2,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+toc
+
+%% Scrambled Matrix Simulation 1e-1
+
+load('longinhSTDP_fastrate-1e-1.mat')
+
+ScrambledPopParams1e1.W = zeros(1250,1250);
+
+ScrambledPopParams1e1.W(SimValues.EcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.EcellIDX,SimValues.EcellIDX,11);
+ScrambledPopParams1e1.W(SimValues.IcellIDX,SimValues.IcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.IcellIDX,11);
+ScrambledPopParams1e1.W(SimValues.IcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.EcellIDX,11);
+
+EImatrix = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11);
+EIindex = find(EImatrix > 0);
+EIvalues = EImatrix(EIindex);
+EIscrambled = zeros(length(SimValues.EcellIDX),length(SimValues.IcellIDX));
+
+randIndex = randperm(length(EIvalues));
+
+for ei = 1:length(EIvalues)
+   
+    EIscrambled(EIindex(ei)) = EIvalues(randIndex(ei));
+    
+end
+
+ScrambledPopParams1e1.W(SimValues.EcellIDX,SimValues.IcellIDX) = EIscrambled;
+
+tic
+ScrambledSimValuesPostTrain1e1 = AdLIFfunction_STDP(ScrambledPopParams1e1,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+toc
+
+%% Scrambled Matrix Simulation 1e-2
+
+load('longinhSTDP_fastrate-1e-2.mat')
+
+ScrambledPopParams1e2.W = zeros(1250,1250);
+
+ScrambledPopParams1e2.W(SimValues.EcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.EcellIDX,SimValues.EcellIDX,11);
+ScrambledPopParams1e2.W(SimValues.IcellIDX,SimValues.IcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.IcellIDX,11);
+ScrambledPopParams1e2.W(SimValues.IcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.EcellIDX,11);
+
+EImatrix = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11);
+EIindex = find(EImatrix > 0);
+EIvalues = EImatrix(EIindex);
+EIscrambled = zeros(length(SimValues.EcellIDX),length(SimValues.IcellIDX));
+
+randIndex = randperm(length(EIvalues));
+
+for ei = 1:length(EIvalues)
+   
+    EIscrambled(EIindex(ei)) = EIvalues(randIndex(ei));
+    
+end
+
+ScrambledPopParams1e2.W(SimValues.EcellIDX,SimValues.IcellIDX) = EIscrambled;
+
+tic
+ScrambledSimValuesPostTrain1e2 = AdLIFfunction_STDP(ScrambledPopParams1e2,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',false);
+toc
+
+%% Mean Matrix Simulation 1e-1
+
+load('longinhSTDP_fastrate-1e-1.mat')
+
+MeanPopParams1e1.W = zeros(1250,1250);
+
+MeanPopParams1e1.W(SimValues.EcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.EcellIDX,SimValues.EcellIDX,11);
+MeanPopParams1e1.W(SimValues.IcellIDX,SimValues.IcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.IcellIDX,11);
+MeanPopParams1e1.W(SimValues.IcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.EcellIDX,11);
+
+EImatrix = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11);
+EIindex = find(SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11) > 0);
+EImeanMatrix = zeros(length(SimValues.EcellIDX),length(SimValues.IcellIDX));
+EImeanMatrix(EIindex) = mean(EImatrix(EIindex));
+
+MeanPopParams1e1.W(SimValues.EcellIDX,SimValues.IcellIDX) = EImeanMatrix;
+
+tic
+MeanSimValuesPostTrain1e1 = AdLIFfunction_STDP(MeanPopParams1e1,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+toc
+
+%% Mean Matrix Simulation 1e-2
+
+load('longinhSTDP_fastrate-1e-2.mat')
+
+MeanPopParams1e2.W = zeros(1250,1250);
+
+MeanPopParams1e2.W(SimValues.EcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.EcellIDX,SimValues.EcellIDX,11);
+MeanPopParams1e2.W(SimValues.IcellIDX,SimValues.IcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.IcellIDX,11);
+MeanPopParams1e2.W(SimValues.IcellIDX,SimValues.EcellIDX) = SimValues.WeightMat(SimValues.IcellIDX,SimValues.EcellIDX,11);
+
+EImatrix = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11);
+EIindex = find(SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,11) > 0);
+EImeanMatrix = zeros(length(SimValues.EcellIDX),length(SimValues.IcellIDX));
+EImeanMatrix(EIindex) = mean(EImatrix(EIindex));
+
+MeanPopParams1e2.W(SimValues.EcellIDX,SimValues.IcellIDX) = EImeanMatrix;
+
+tic
+MeanSimValuesPostTrain1e2 = AdLIFfunction_STDP(MeanPopParams1e2,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+toc
 
 %% Deriving ISI Curves
 
@@ -830,19 +830,19 @@ plot([9000 9200],[1000 1000],'r','LineWidth',1)
 xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Pre-Training')
 xlim([9000 9200]);ylim([0 1250])
 subplot(3,4,2)
-plot(SimValuesPostTrain1e1.spikes(:,1),SimValuesPostTrain1e1.spikes(:,2),'.k','MarkerSize',1)
+plot(SimValuesPostTrain1e2.spikes(:,1),SimValuesPostTrain1e2.spikes(:,2),'.k','MarkerSize',1)
 hold on
 plot([9000 9200],[1000 1000],'r','LineWidth',1)
 xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Trained: 1e2')
 xlim([9000 9200]);ylim([0 1250])
 subplot(3,4,3)
-plot(ScrambledSimValuesPostTrain1e1.spikes(:,1),ScrambledSimValuesPostTrain1e1.spikes(:,2),'.k','MarkerSize',1)
+plot(ScrambledSimValuesPostTrain1e2.spikes(:,1),ScrambledSimValuesPostTrain1e2.spikes(:,2),'.k','MarkerSize',1)
 hold on
 plot([9000 9200],[1000 1000],'r','LineWidth',1)
 xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Scrambled: 1e2')
 xlim([9000 9200]);ylim([0 1250])
 subplot(3,4,4)
-plot(MeanSimValuesPostTrain1e1.spikes(:,1),MeanSimValuesPostTrain1e1.spikes(:,2),'.k','MarkerSize',1)
+plot(MeanSimValuesPostTrain1e2.spikes(:,1),MeanSimValuesPostTrain1e2.spikes(:,2),'.k','MarkerSize',1)
 hold on
 plot([9000 9200],[1000 1000],'r','LineWidth',1)
 xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Mean: 1e2')
