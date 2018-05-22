@@ -78,7 +78,7 @@ SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress
 toc
 
 if SAVESIM==true
-    save(['/scratch/jmg1030/bistability_weight-' num2str(Weights(llrr)],'-v7.3')
+    save(['/scratch/jmg1030/bistability_weight-' num2str(Weights(llrr))],'-v7.3')
 end
 
 end
