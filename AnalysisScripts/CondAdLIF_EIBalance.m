@@ -3,8 +3,8 @@
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
+repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
 addpath(genpath(repopath))
 
 figfolder = [repopath,'/Figures/EIBalance'];
@@ -12,12 +12,12 @@ figfolder = [repopath,'/Figures/EIBalance'];
 %% Define the Population Parameters to feed the FI Cuve function
 
 %Input Noise
-PopParams.sigma = 0;        %niose magnitude: variance
-PopParams.theta = 1/10;     %noise time scale (1/ms)
+PopParams.sigma = 200;        %niose magnitude: variance
+PopParams.theta = 1/5;     %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 1000;
-PopParams.IPopNum = 250;
+PopParams.EPopNum = 1600;
+PopParams.IPopNum = 400;
 
 
 %Neuron properties
@@ -43,17 +43,17 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-K = 150;
+K = 300;
 PopParams.Kee   = K;        %Expected E->E In Degree
 PopParams.Kii   = K;        %Expected I->I In Degree
 PopParams.Kie   = K;        %Expected E->I In Degree
 PopParams.Kei   = K;        %Expected I->E In Degree
 
-Jee = 1;
-Jei = 1.1;
-Jie = 1;
+Jee = 1.1;
+Jei = 1.05;
+Jie = 1.0;
 Jii = 0.9;
-synscalefactor = 300; %Puts J in order 1
+synscalefactor = 1000; %Puts J in order 1
 %(rigorize this, should relate to synaptic effect magnitude)
 %synscalefactor should be a synaptic weight value such that with K=1 an
 %excitatory synapse is just strong enough to bring a cell to threshold
@@ -62,17 +62,22 @@ PopParams.Wii   = Jii.*synscalefactor./sqrt(K);        %I->I weight
 PopParams.Wie   = Jie.*synscalefactor./sqrt(K);        %E->I weight
 PopParams.Wei   = Jei.*synscalefactor./sqrt(K);        %I->E weight
 
-PopParams.p0spike = 0.10;
+PopParams.p0spike = 0.000;
 
 %%
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 2000;
+TimeParams.SimTime = 40000;
 PopParams.I_e = 350;
 [SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
-    'showprogress',true,'onsettime',100,'cellout',true);
+    'showprogress',true,'onsettime',100,'cellout',true,...
+    'save_dt',1);
 
 
-
+%%
+timewin=[1000 1500];
+[ corrhist,condx,currx,currPETH ] = CheckBalance( SimValues,PopParams,timewin );
+%%
+GetSpikeStats( SimValues,PopParams,timewin );
 %%
 
 

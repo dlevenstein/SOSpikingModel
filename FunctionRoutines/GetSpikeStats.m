@@ -1,4 +1,4 @@
-function [ output_args ] = GetSpikeStats( SimValues,PopParams,timewin )
+function [  ] = GetSpikeStats( SimValues,PopParams,timewin )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -71,20 +71,21 @@ Isyn.Inetmean = mean(SimValues.Isyn_tot(SimValues.IcellIDX,:),1);
 
 %% Figure: Spike Raster and Spike Rate
 figure
-    subplot(3,1,1:2)
-        plot(SimValues.spikes(:,1),sortrate.raster(SimValues.spikes(:,2)),'k.','markersize',2)
+    subplot(2,1,1)
+        plot(SimValues.spikes(:,1),sortrate.raster(SimValues.spikes(:,2)),'k.','markersize',4)
         hold on
         plot(SimValues.t([1 end]),min(SimValues.IcellIDX).*[1 1],'k')
         ylim(max(SimValues.IcellIDX).*[0 1]);   xlim(timewin);
         ylabel('Cell (Sorted by rate)')
         
-    subplot(3,1,3)
-        plot(t,poprate.E,'k')
+    subplot(6,1,4)
+        plot(t,poprate.E,'k','Linewidth',1)
         hold on
-        plot(t,poprate.I,'r')
+        plot(t,poprate.I,'r','Linewidth',1)
+        axis tight
            xlim(timewin); 
            xlabel('t (s)');ylabel('Pop. Rate (Spks/cell/s)')
-           
+ NiceSave('raster2',pwd,'Balanced')
 %% Figure: Synaptic Inputs
 Ecolormap = makeColorMap([1 1 1],[0 0.5 0],[0.5 1 0.5]);
 Icolormap = makeColorMap([1 1 1],[0.8 0 0],[1 0.5 0.5]);
@@ -224,21 +225,10 @@ subplot(4,1,4)
 
         
 
-%% Figure: Firing Rate Distribution
-figure
-subplot(3,2,1)
-hist(log10(cellrates(SimValues.EcellIDX)),20)
-xlabel('Firing Rate (Hz)');ylabel('# E Cells')
-LogScale('x',10)
-subplot(3,2,3)
-hist(log10(cellrates(SimValues.IcellIDX)),20)
-xlabel('Firing Rate (Hz)');ylabel('# I Cells')
-LogScale('x',10)
-
 
 %% Calculate ISI distirbution, Vm distribution, Spike/Vm Autocorr
 
-ISIdist.bins = linspace(0,3.5,60);
+ISIdist.bins = linspace(0,4,60);
 ISIs = cellfun(@diff,SimValues.spikesbycell,'uniformoutput',false);
 ISIdist.E = hist(log10(cat(1,ISIs{SimValues.EcellIDX})),ISIdist.bins);
 ISIdist.E = ISIdist.E./sum(ISIdist.E);
@@ -247,7 +237,7 @@ ISIdist.I = ISIdist.I./sum(ISIdist.I);
 
 ISIdist.all = cellfun(@(X) hist(log10(X),ISIdist.bins),ISIs,'uniformoutput',false);
 ISIdist.all = cat(1,ISIdist.all{:});
-ISIdist.allscaled = bsxfun(@(X,Y) X./Y,ISIdist.all,max(ISIdist.all,[],2));
+ISIdist.allscaled = bsxfun(@(X,Y) X./Y,ISIdist.all,sum(ISIdist.all,2));
 
 vm.celldist = hist(SimValues.V',vm.bins)';
 
@@ -255,17 +245,17 @@ vm.celldist = hist(SimValues.V',vm.bins)';
 
 
 %% Figure ISI, Vm distributions
-isicolormap = [1 1 1; makeColorMap([1 1 1],[0.8 0 0])];
+isicolormap = [makeColorMap([1 1 1],[0.8 0 0]);makeColorMap([0.8 0 0],[0.2 0 0])];
 figure
     subplot(2,2,1)
-        imagesc(ISIdist.bins,[0 max(SimValues.IcellIDX)],log10(ISIdist.all(sortrate.ratetype,:)))
+        imagesc(ISIdist.bins,[0 max(SimValues.IcellIDX)],(ISIdist.allscaled(sortrate.ratetype,:)))
         hold on
         plot(ISIdist.bins([1 end]),min(SimValues.IcellIDX).*[1 1],'k')
         LogScale('x',10)
-        title('ISI Distirbution');
-        ylabel('Neuron (sorted by Rate, Type')
+        title('ISI Distribution');
+        ylabel('Neuron (sorted by Rate, Type)')
         colorbar
-        %colormap(isicolormap)
+        colormap(isicolormap)
         %caxis([0 1])
         xlabel('ISI (ms)')
         
@@ -277,8 +267,18 @@ figure
         %colormap(isicolormap)
         %caxis([0 1])
         xlabel('Vm (mV)')
-        title('V_m Distirbution');
+        title('V_m Distribution');
 
+subplot(3,2,5)
+hist(log10(cellrates(SimValues.EcellIDX)),20)
+xlabel('Firing Rate (Hz)');ylabel('# E Cells')
+LogScale('x',10)
+subplot(3,2,6)
+hist(log10(cellrates(SimValues.IcellIDX)),20)
+xlabel('Firing Rate (Hz)');ylabel('# I Cells')
+LogScale('x',10)
+        
+NiceSave('ISIVmdists2',pwd,'Balanced')
 
 %% Figure: Example Cell
 
@@ -332,13 +332,13 @@ figure
         title('Network and Cell Rate (color)')
         
     subplot(2,2,2)
-        plot(log2(indegree.EIratio(SimValues.EcellIDX)),log10(cellrates(SimValues.EcellIDX)),'k.','markersize',4)
+        plot((indegree.EIratio(SimValues.EcellIDX)),log10(cellrates(SimValues.EcellIDX)),'k.','markersize',4)
         hold on
-        plot(log2(indegree.EIratio(SimValues.IcellIDX)),log10(cellrates(SimValues.IcellIDX)),'r.','markersize',4)
-        LogScale('x',2)
+        plot((indegree.EIratio(SimValues.IcellIDX)),log10(cellrates(SimValues.IcellIDX)),'r.','markersize',4)
+        %LogScale('x',2)
         LogScale('y',10)
         xlabel('E:I In degree Ratio');ylabel('Firing Rate')
-        
+         NiceSave('InDegreeRate2',pwd,'Balanced')
 %% Calculate pop Synch/Rate distribution, Pop Autocorrelation
 %i.e. population dynamic measures
 poprate.bins = linspace(0,150,75);
