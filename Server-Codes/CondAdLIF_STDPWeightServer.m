@@ -1,13 +1,11 @@
-%function CondAdLIF_STDPWeightServer(w)
-
-w = 3;
+function CondAdLIF_STDPWeightServer(w)
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
-repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
-%repopath = '/home/jmg1030/SOSpikingModel';
+%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
+repopath = '/home/jmg1030/SOSpikingModel';
 addpath(genpath(repopath))
 
 SAVESIM = true;
@@ -63,11 +61,7 @@ close all
 
 %%
 
-TimeParams.SimTime = 1e3;
-%STDP Properties
-
-LearningRates = 1e-2;
-LearningRateNames = "1e-2";
+TimeParams.SimTime = 510000;
 
 %%
 
@@ -77,13 +71,13 @@ PopParams.tauSTDP = 20;
 
 %%
 tic
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',true,...
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',1e4,'save_dt',1e5,...
-    'recordInterval',[0:2e5:1e6;(0:2e5:1e6) + 1e4]);
+    'recordInterval',[0:1e5:500000;(0:1e5:500000) + 1e4]);
 toc
 
-% if SAVESIM==true
-%     save(['/scratch/jmg1030/longinhSTDP_fastrate-' char(LearningRateNames(llrr))],'-v7.3')
-% end
+if SAVESIM==true
+    save(['/scratch/jmg1030/largePop'],'-v7.3')
+end
 
-% end
+end
