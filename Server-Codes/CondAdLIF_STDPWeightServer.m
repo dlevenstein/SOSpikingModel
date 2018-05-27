@@ -1,5 +1,7 @@
 function CondAdLIF_STDPWeightServer(w)
 
+Weights = [1,3,10];
+
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
@@ -19,8 +21,8 @@ PopParams.sigma = 50;        %niose magnitude: variance
 PopParams.theta = 0.1;        %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 8000;
-PopParams.IPopNum = 2000;
+PopParams.EPopNum = 4000;
+PopParams.IPopNum = 1000;
 
 %Neuron properties
 PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
@@ -44,14 +46,14 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-PopParams.Wee   = w;        %E->E weight (nS)
-PopParams.Wii   = w;        %I->I weight
-PopParams.Wie   = w;        %E->I weight
-PopParams.Wei   = w;        %I->E weight
-PopParams.Kee   = 1000;        %Expected E->E In Degree
-PopParams.Kii   = 1000;        %Expected I->I In Degree
-PopParams.Kie   = 1000;        %Expected E->I In Degree
-PopParams.Kei   = 1000;        %Expected I->E In Degree
+PopParams.Wee   = Weights(w);        %E->E weight (nS)
+PopParams.Wii   = Weights(w);        %I->I weight
+PopParams.Wie   = Weights(w);        %E->I weight
+PopParams.Wei   = Weights(w);        %I->E weight
+PopParams.Kee   = 500;        %Expected E->E In Degree
+PopParams.Kii   = 500;        %Expected I->I In Degree
+PopParams.Kie   = 500;        %Expected E->I In Degree
+PopParams.Kei   = 500;        %Expected I->E In Degree
 
 TimeParams.dt      = 0.05;
 
@@ -72,12 +74,12 @@ PopParams.tauSTDP = 20;
 %%
 tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',1e4,'save_dt',1e5,...
-    'recordInterval',[0:1e5:500000;(0:1e5:500000) + 1e4]);
+    'save_weights',1e6,'save_dt',1e5,...
+    'recordInterval',[0:1e5:500000;(0:1e5:500000) + 1e3]);
 toc
 
 if SAVESIM==true
-    save(['/scratch/jmg1030/largePop'],'-v7.3')
+    save(['/scratch/jmg1030/largePopWeight' num2str(Weights(w))],'-v7.3')
 end
 
 end
