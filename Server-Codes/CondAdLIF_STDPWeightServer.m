@@ -74,8 +74,8 @@ PopParams.tauSTDP = 20;
 %%
 tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',1e6,'save_dt',1e5,...
-    'recordInterval',[0:1e5:500000;(0:1e5:500000) + 1e3]);
+    'save_weights',1e4,'save_dt',500000,...
+    'recordInterval',[0:1e5:500000;(0:1e5:500000) + 1e4]);
 toc
 
 if SAVESIM==true

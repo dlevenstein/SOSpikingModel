@@ -3,7 +3,7 @@
 #SBATCH --array=1-3
 #SBATCH --cpus-per-task=10
 #SBATCH --time=48:00:00
-#SBATCH --mem=100GB
+#SBATCH --mem=150GB
 #SBATCH --job-name=BigSim
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
