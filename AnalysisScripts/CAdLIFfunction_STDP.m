@@ -314,7 +314,7 @@ else
 end
 
 ELearningRate = PopParams.LearningRate.*ones(EPopNum,1);
-ILearningRate = PopParams.LearningRate.*ones(IPopNum,1);
+ILearningRate = PopParams.LearningRate.*ones(1,IPopNum);
 TargetRate   = PopParams.TargetRate.*ones(PopNum,1); %Target Rate for Excitatory cells (units of Hz)
 tauSTDP      = PopParams.tauSTDP.*ones(PopNum,1);    %Time Constant for the STDP curve (Units of ms)
 
@@ -469,8 +469,8 @@ for tt=1:SimTimeLength
         %Postsynaptic E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
         PostEspikes = spikeneurons(find(spikeneurons <= EPopNum));
-        dW = ILearningRate.*(x(IcellIDX)').*ones(1,length(IcellIDX));
-        EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + ILearningRate.*(x(IcellIDX)');
+        dWI = ILearningRate.*(x(IcellIDX)');
+        EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + dWI;
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
