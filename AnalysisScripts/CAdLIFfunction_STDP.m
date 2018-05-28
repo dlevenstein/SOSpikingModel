@@ -202,7 +202,7 @@ isconnected = (EE_mat+II_mat+EI_mat+IE_mat)>0;
 % TargetRate   = PopParams.TargetRate; %Target Rate for Excitatory cells (units of Hz)
 % tauSTDP      = PopParams.tauSTDP;    %Time Constant for the STDP curve (Units of ms)
 
-alpha = 2.*(TargetRate./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
+% alpha = 2.*(PopParams.TargetRate./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
 %Note target rate is converted to spks/ms
 
 if length(PopParams.E_L) == 2 
@@ -301,7 +301,7 @@ else
     E_e = PopParams.E_e.*ones(PopNum,1);
 end
 
-if length(PopParams.E_L) == 2 
+if length(PopParams.E_i) == 2 
     E_i = [PopParams.E_i(1).*ones(EPopNum,1);PopParams.E_i(2).*ones(IPopNum,1)];
 else
     E_i = PopParams.E_i.*ones(PopNum,1);
@@ -312,6 +312,8 @@ if length(PopParams.E_L) == 2
 else
     tau_s = PopParams.tau_s.*ones(PopNum,1);
 end
+
+alpha = 2.*(PopParams.TargetRate./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
 
 %% Input: convert into function of t
 % if isa(I_e, 'function_handle')
