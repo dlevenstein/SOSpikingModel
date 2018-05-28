@@ -24,9 +24,19 @@
 #include "CAdLIFfunction_STDP_types.h"
 
 /* Function Declarations */
-extern void CAdLIFfunction_STDP(const emlrtStack *sp, const struct0_T *PopParams,
-  const struct1_T *TimeParams, struct2_T *SimValues);
+#ifdef __cplusplus
 
+extern "C" {
+
+#endif
+
+  extern void CAdLIFfunction_STDP(const struct0_T *PopParams, const struct1_T
+    *TimeParams, struct2_T *SimValues);
+
+#ifdef __cplusplus
+
+}
+#endif
 #endif
 
 /* End of code generation (CAdLIFfunction_STDP.h) */

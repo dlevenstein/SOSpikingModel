@@ -25,15 +25,7 @@
 
 /* Variable Declarations */
 extern emlrtCTX emlrtRootTLSGlobal;
-extern const volatile char_T *emlrtBreakCheckR2012bFlagVar;
 extern emlrtContext emlrtContextGlobal;
-extern emlrtRSInfo hb_emlrtRSI;
-extern emlrtRSInfo ib_emlrtRSI;
-extern emlrtRSInfo kb_emlrtRSI;
-extern emlrtRSInfo rb_emlrtRSI;
-extern emlrtRSInfo rc_emlrtRSI;
-extern emlrtRTEInfo f_emlrtRTEI;
-extern emlrtRTEInfo bi_emlrtRTEI;
 
 #endif
 

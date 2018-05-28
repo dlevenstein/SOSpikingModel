@@ -24,10 +24,20 @@
 #include "CAdLIFfunction_STDP_types.h"
 
 /* Function Declarations */
-extern void mexFunction(int32_T nlhs, mxArray *plhs[], int32_T nrhs, const
-  mxArray *prhs[]);
-extern emlrtCTX mexFunctionCreateRootTLS(void);
+#ifdef __cplusplus
 
+extern "C" {
+
+#endif
+
+  extern void mexFunction(int32_T nlhs, mxArray *plhs[], int32_T nrhs, const
+    mxArray *prhs[]);
+  extern emlrtCTX mexFunctionCreateRootTLS(void);
+
+#ifdef __cplusplus
+
+}
+#endif
 #endif
 
 /* End of code generation (_coder_CAdLIFfunction_STDP_mex.h) */

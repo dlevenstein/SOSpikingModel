@@ -3,7 +3,7 @@
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
  *
- * CAdLIFfunction_STDP_initialize.c
+ * CAdLIFfunction_STDP_initialize.cu
  *
  * Code generation for function 'CAdLIFfunction_STDP_initialize'
  *
@@ -19,17 +19,11 @@
 /* Function Definitions */
 void CAdLIFfunction_STDP_initialize(void)
 {
-  emlrtStack st = { NULL,              /* site */
-    NULL,                              /* tls */
-    NULL                               /* prev */
-  };
-
   mexFunctionCreateRootTLS();
-  emlrtBreakCheckR2012bFlagVar = emlrtGetBreakCheckFlagAddressR2012b();
-  st.tls = emlrtRootTLSGlobal;
-  emlrtClearAllocCountR2012b(&st, false, 0U, 0);
-  emlrtEnterRtStackR2012b(&st);
+  emlrtClearAllocCountR2012b(emlrtRootTLSGlobal, false, 0U, 0);
+  emlrtEnterRtStackR2012b(emlrtRootTLSGlobal);
+  emlrtLicenseCheckR2012b(emlrtRootTLSGlobal, "Distrib_Computing_Toolbox", 2);
   emlrtFirstTimeR2012b(emlrtRootTLSGlobal);
 }
 
-/* End of code generation (CAdLIFfunction_STDP_initialize.c) */
+/* End of code generation (CAdLIFfunction_STDP_initialize.cu) */

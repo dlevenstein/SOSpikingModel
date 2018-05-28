@@ -16,6 +16,36 @@
 #include "rtwtypes.h"
 
 /* Type Definitions */
+#ifndef struct_emxArray_real_T
+#define struct_emxArray_real_T
+
+struct emxArray_real_T
+{
+  real_T *data;
+  int32_T *size;
+  int32_T allocatedSize;
+  int32_T numDimensions;
+  boolean_T canFreeData;
+};
+
+#endif                                 /*struct_emxArray_real_T*/
+
+#ifndef typedef_emxArray_real_T
+#define typedef_emxArray_real_T
+
+typedef struct emxArray_real_T emxArray_real_T;
+
+#endif                                 /*typedef_emxArray_real_T*/
+
+#ifndef typedef_cell_wrap_1
+#define typedef_cell_wrap_1
+
+typedef struct {
+  emxArray_real_T *f1;
+} cell_wrap_1;
+
+#endif                                 /*typedef_cell_wrap_1*/
+
 #ifndef struct_emxArray_boolean_T
 #define struct_emxArray_boolean_T
 
@@ -58,6 +88,27 @@ typedef struct emxArray_int32_T emxArray_int32_T;
 
 #endif                                 /*typedef_emxArray_int32_T*/
 
+#ifndef struct_emxArray_int8_T
+#define struct_emxArray_int8_T
+
+struct emxArray_int8_T
+{
+  int8_T *data;
+  int32_T *size;
+  int32_T allocatedSize;
+  int32_T numDimensions;
+  boolean_T canFreeData;
+};
+
+#endif                                 /*struct_emxArray_int8_T*/
+
+#ifndef typedef_emxArray_int8_T
+#define typedef_emxArray_int8_T
+
+typedef struct emxArray_int8_T emxArray_int8_T;
+
+#endif                                 /*typedef_emxArray_int8_T*/
+
 #ifndef struct_emxArray_real32_T
 #define struct_emxArray_real32_T
 
@@ -78,27 +129,6 @@ struct emxArray_real32_T
 typedef struct emxArray_real32_T emxArray_real32_T;
 
 #endif                                 /*typedef_emxArray_real32_T*/
-
-#ifndef struct_emxArray_real_T
-#define struct_emxArray_real_T
-
-struct emxArray_real_T
-{
-  real_T *data;
-  int32_T *size;
-  int32_T allocatedSize;
-  int32_T numDimensions;
-  boolean_T canFreeData;
-};
-
-#endif                                 /*struct_emxArray_real_T*/
-
-#ifndef typedef_emxArray_real_T
-#define typedef_emxArray_real_T
-
-typedef struct emxArray_real_T emxArray_real_T;
-
-#endif                                 /*typedef_emxArray_real_T*/
 
 #ifndef typedef_struct0_T
 #define typedef_struct0_T

@@ -24,9 +24,19 @@
 #include "CAdLIFfunction_STDP_types.h"
 
 /* Function Declarations */
-extern void CAdLIFfunction_STDP_api(const mxArray * const prhs[2], int32_T nlhs,
-  const mxArray *plhs[1]);
+#ifdef __cplusplus
 
+extern "C" {
+
+#endif
+
+  extern void CAdLIFfunction_STDP_api(const mxArray * const prhs[2], int32_T
+    nlhs, const mxArray *plhs[1]);
+
+#ifdef __cplusplus
+
+}
+#endif
 #endif
 
 /* End of code generation (_coder_CAdLIFfunction_STDP_api.h) */

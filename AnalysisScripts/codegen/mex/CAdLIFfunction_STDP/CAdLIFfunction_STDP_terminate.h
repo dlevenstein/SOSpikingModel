@@ -24,9 +24,19 @@
 #include "CAdLIFfunction_STDP_types.h"
 
 /* Function Declarations */
-extern void CAdLIFfunction_STDP_atexit(void);
-extern void CAdLIFfunction_STDP_terminate(void);
+#ifdef __cplusplus
 
+extern "C" {
+
+#endif
+
+  extern void CAdLIFfunction_STDP_atexit(void);
+  extern void CAdLIFfunction_STDP_terminate(void);
+
+#ifdef __cplusplus
+
+}
+#endif
 #endif
 
 /* End of code generation (CAdLIFfunction_STDP_terminate.h) */

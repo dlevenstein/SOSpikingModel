@@ -24,9 +24,19 @@
 #include "CAdLIFfunction_STDP_types.h"
 
 /* Function Declarations */
-MEXFUNCTION_LINKAGE mxArray *emlrtMexFcnProperties(void);
-extern const mxArray *emlrtMexFcnResolvedFunctionsInfo(void);
+#ifdef __cplusplus
 
+extern "C" {
+
+#endif
+
+  MEXFUNCTION_LINKAGE mxArray *emlrtMexFcnProperties(void);
+  extern const mxArray *emlrtMexFcnResolvedFunctionsInfo(void);
+
+#ifdef __cplusplus
+
+}
+#endif
 #endif
 
 /* End of code generation (_coder_CAdLIFfunction_STDP_info.h) */
