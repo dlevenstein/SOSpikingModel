@@ -60,7 +60,7 @@ close all
 
 %%
 
-TimeParams.SimTime = 5000;
+TimeParams.SimTime = 2100;
 
 %%
 
