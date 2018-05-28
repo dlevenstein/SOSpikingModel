@@ -10,7 +10,7 @@ if length(recordIntervals) > 0
     
 recordVALs = zeros(1,T);
 
-saveINT = nan(1,length(recordIntervals(1,:)));
+saveINT = nan(2,length(recordIntervals(1,:)));
 
 numINT = length(recordIntervals(1,:));
 
