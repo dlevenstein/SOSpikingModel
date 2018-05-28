@@ -368,10 +368,7 @@ end
 b(b==0) = w_r(b==0).*b_w(b==0)./(1 - w_r(b==0)).*exp((V_reset(b==0)-E_L(b==0)).*delta_T(b==0));
 
 %% If no noise
-if sigma==0
-    dX = 0;
-end
-
+dX = 0;
 %V - Voltage Equation
 dVdt = 0;
 %s - Synaptic Output 
@@ -469,7 +466,7 @@ for tt=1:SimTimeLength
         %Postsynaptic E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
         PostEspikes = spikeneurons(find(spikeneurons <= EPopNum));
-        dWI = ILearningRate.*(x(IcellIDX)');
+        dWI = ILearningRate.*(x(IcellIDX)').*ones(length(PostEspikes),1);
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + dWI;
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
