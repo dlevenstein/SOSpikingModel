@@ -6,8 +6,8 @@ Weights = [1,3,10];
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
-%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
-repopath = '/home/jmg1030/SOSpikingModel';
+repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
+%repopath = '/home/jmg1030/SOSpikingModel';
 addpath(genpath(repopath))
 
 SAVESIM = true;
