@@ -357,70 +357,6 @@ else
 spikes = nan(PopNum.*(round(length(find(recordVALs~=0)).*TimeParams.dt)+onsettime).*20,2,'single'); %assume mean rate 20Hz
 end
 
-%% EI Parameter Adjustments (ugly. needs cleaning)
-
-if length(E_L) == 2 
-E_L         = transpose([E_L(1).*ones(1,EPopNum),     E_L(2).*ones(1,IPopNum)]);
-end
-if length(g_L) == 2 
-g_L         = transpose([g_L(1).*ones(1,EPopNum),     g_L(2).*ones(1,IPopNum)]);
-end
-if length(C) == 2 
-C           = transpose([C(1).*ones(1,EPopNum),       C(2).*ones(1,IPopNum)]);
-end
-if length(I_e) == 2 
-I_e         = transpose([I_e(1).*ones(1,EPopNum),     I_e(2).*ones(1,IPopNum)]);
-end
-if length(V_th) == 2 
-V_th        = transpose([V_th(1).*ones(1,EPopNum),    V_th(2).*ones(1,IPopNum)]);
-end
-if length(V_reset) == 2 
-V_reset     = transpose([V_reset(1).*ones(1,EPopNum), V_reset(2).*ones(1,IPopNum)]);
-elseif length(V_reset) == 1
-V_reset     = transpose([V_reset.*ones(1,EPopNum), V_reset.*ones(1,IPopNum)]);
-end
-if length(t_ref) == 2 
-t_ref       = transpose([t_ref(1).*ones(1,EPopNum),   t_ref(2).*ones(1,IPopNum)]);
-elseif length(t_ref) == 1
-t_ref       = transpose([t_ref.*ones(1,EPopNum),   t_ref.*ones(1,IPopNum)]);
-end
-if length(sigma) == 2 
-sigma       = transpose([sigma(1).*ones(1,EPopNum),   sigma(2).*ones(1,IPopNum)]);
-end
-if length(theta) == 2 
-theta       = transpose([theta(1).*ones(1,EPopNum),   theta(2).*ones(1,IPopNum)]);
-end
-
-if length(E_w) == 2 
-E_w         = transpose([E_w(1).*ones(1,EPopNum),     E_w(2).*ones(1,IPopNum)]);
-end
-if length(b_w) == 2 
-b_w         = transpose([b_w(1).*ones(1,EPopNum),     b_w(2).*ones(1,IPopNum)]);
-elseif length(b_w)==1
-b_w         = transpose([b_w.*ones(1,EPopNum),     b_w.*ones(1,IPopNum)]);  
-end
-if length(delta_T) == 2 
-delta_T     = transpose([delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,IPopNum)]);
-elseif length(delta_T) == 1
-delta_T     = transpose([delta_T(1).*ones(1,EPopNum), 0.*ones(1,IPopNum)]);
-end
-if length(gwnorm) == 2 
-gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)]);
-end
-if length(w_r) == 2 
-w_r         = transpose([w_r(1).*ones(1,EPopNum),     w_r(2).*ones(1,IPopNum)]);
-elseif length(w_r) == 1  %1 w_r input is assumed to be for E cells
-w_r         = transpose([w_r(1).*ones(1,EPopNum),     0.*ones(1,IPopNum)]);
-end
-if length(b) == 2 
-b           = transpose([b(1).*ones(1,EPopNum),       b(2).*ones(1,IPopNum)]);
-elseif length(b) == 1
-b           = transpose([b.*ones(1,EPopNum),       0.*ones(1,IPopNum)]);
-end
-if length(tau_s) == 2 
-tau_s         = transpose([tau_s(1).*ones(1,EPopNum),     tau_s(2).*ones(1,IPopNum)]);
-end
-
 %% if no spike adaptation, set to steady state????? or set to alpha(v_th)
 b(b==0) = w_r(b==0).*b_w(b==0)./(1 - w_r(b==0)).*exp((V_reset(b==0)-E_L(b==0)).*delta_T(b==0));
 
@@ -460,7 +396,7 @@ spikecounter = 0;
 for tt=1:SimTimeLength
     %% Time Counter
     if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
-        display([num2str(round(100.*tt./SimTimeLength)),'% Done!']) %clearly, this needs improvement
+        round(100.*tt./SimTimeLength) %clearly, this needs improvement
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     
