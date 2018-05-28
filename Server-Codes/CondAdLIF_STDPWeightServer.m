@@ -21,8 +21,8 @@ PopParams.sigma = 50;        %niose magnitude: variance
 PopParams.theta = 0.1;        %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 4000;
-PopParams.IPopNum = 1000;
+PopParams.EPopNum = 2000;
+PopParams.IPopNum = 500;
 
 %Neuron properties
 PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
@@ -50,10 +50,10 @@ PopParams.Wee   = Weights(w);        %E->E weight (nS)
 PopParams.Wii   = Weights(w);        %I->I weight
 PopParams.Wie   = Weights(w);        %E->I weight
 PopParams.Wei   = Weights(w);        %I->E weight
-PopParams.Kee   = 500;        %Expected E->E In Degree
-PopParams.Kii   = 500;        %Expected I->I In Degree
-PopParams.Kie   = 500;        %Expected E->I In Degree
-PopParams.Kei   = 500;        %Expected I->E In Degree
+PopParams.Kee   = 250;        %Expected E->E In Degree
+PopParams.Kii   = 250;        %Expected I->I In Degree
+PopParams.Kie   = 250;        %Expected E->I In Degree
+PopParams.Kei   = 250;        %Expected I->E In Degree
 
 TimeParams.dt      = 0.05;
 
@@ -63,7 +63,7 @@ close all
 
 %%
 
-TimeParams.SimTime = 510000;
+TimeParams.SimTime = 200000;
 
 %%
 
@@ -72,11 +72,9 @@ PopParams.TargetRate = 2; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%
-tic
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',1e4,'save_dt',500000,...
-    'recordInterval',[0:1e5:500000;(0:1e5:500000) + 1e4]);
-toc
+    'recordInterval',[0:1e5:200000;(0:1e5:200000) + 1e4]);
 
 if SAVESIM==true
     save(['/scratch/jmg1030/largePopWeight' num2str(Weights(w))],'-v7.3')
