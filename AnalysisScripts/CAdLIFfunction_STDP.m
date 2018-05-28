@@ -313,12 +313,12 @@ else
     tau_s = PopParams.tau_s.*ones(PopNum,1);
 end
 
-ELearningRate = PopParams.LearningRate.*ones(PopParams.EPopNum,1);
-ILearningRate = PopParams.LearningRate.*ones(PopParams.IPopNum,1);
-TargetRate   = PopParams.TargetRate.*ones(PopParams.EPopNum,1); %Target Rate for Excitatory cells (units of Hz)
-tauSTDP      = PopParams.tauSTDP.*ones(PopParams.EPopNum,1);    %Time Constant for the STDP curve (Units of ms)
+ELearningRate = PopParams.LearningRate.*ones(EPopNum,1);
+ILearningRate = PopParams.LearningRate.*ones(IPopNum,1);
+TargetRate   = PopParams.TargetRate.*ones(PopNum,1); %Target Rate for Excitatory cells (units of Hz)
+tauSTDP      = PopParams.tauSTDP.*ones(PopNum,1);    %Time Constant for the STDP curve (Units of ms)
 
-alpha = 2.*(TargetRate./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
+alpha = 2.*(PopParams.TargetRate./1000).*PopParams.tauSTDP.*ones(EPopNum,1); %Alpha parameter from Vogels eqn5
 
 %% Input: convert into function of t
 % if isa(I_e, 'function_handle')
@@ -464,10 +464,12 @@ for tt=1:SimTimeLength
         %Presynaptic I Cells
         %PreIspikes = intersect(spikeneurons,Icells);
         PreIspikes = spikeneurons(find(spikeneurons > EPopNum));
-        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + ELearningRate.*(x(EcellIDX)-alpha);
+        dWE = ELearningRate.*(x(EcellIDX)-alpha).*ones(1,length(PreIspikes));
+        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + dWE;
         %Postsynaptic E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
         PostEspikes = spikeneurons(find(spikeneurons <= EPopNum));
+        dW = ILearningRate.*(x(IcellIDX)').*ones(1,length(IcellIDX));
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + ILearningRate.*(x(IcellIDX)');
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
