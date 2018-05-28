@@ -70,5 +70,5 @@ PopParams.tauSTDP = 20;
 
 %%
 tic
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams);
+SimValues = CAdLIFfunction_STDP(PopParams,TimeParams);
 toc
