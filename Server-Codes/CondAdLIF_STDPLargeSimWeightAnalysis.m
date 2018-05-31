@@ -5,7 +5,7 @@ function CondAdLIF_STDPLargeSimWeightAnalysis(ww)
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
 %repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel/';
-repopath = '/archive/j/jmg1030/WeightAnalysisSOSpikingModel';
+repopath = '/archive/j/jmg1030/WeightAnalysis/SOSpikingModel';
 
 %buzpath = '/Users/jonathangornet/Documents/GitHub/buzcode/';
 %datafolder = '/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/05-5-2018/';
@@ -73,12 +73,12 @@ PopParamsAnalysis.tauSTDP = 20;
 
 %%
 
-PreTainPopParams = PopParamsAnalysis;
-PostTrainPopParams = PopParamsAnalysis;
-ScrambledPopParams = PopParamsAnalysis;
-MeanPopParams = PopParamsAnalysis;
-PopParamsTrainingPreWeight = PopParamsAnalysis;
-PopParamsTrainingPostWeight = PopParamsAnalysis;
+PreTainPopParams        = PopParamsAnalysis;
+PostTrainPopParams      = PopParamsAnalysis;
+ScrambledPopParams      = PopParamsAnalysis;
+MeanPopParams           = PopParamsAnalysis;
+PopParamsTrainingSTART  = PopParamsAnalysis;
+PopParamsTrainingEND    = PopParamsAnalysis;
 
 %% Trained Simulation 1e-1
 
@@ -100,7 +100,7 @@ if ww == 2
     
 PostTrainPopParams.W = SimValues.WeightMat(:,:,4);
 
-SimValuesPostTrain = AdLIFfunction_STDP(PostTrainPopParams1e2,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+SimValuesPostTrain = AdLIFfunction_STDP(PostTrainPopParams,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
 
 save('/scratch/jmg1030/WeightAnalysis/Weight_Post','-v7.3')
 
@@ -166,9 +166,9 @@ if ww == 5
     
 PopParamsTrainingPreWeight.LearningRate = 1e-2;
 
-SimValuesPostTrain = AdLIFfunction_STDP(PopParamsTrainingPreWeight,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+SimValuesTrainingSTART = AdLIFfunction_STDP(PopParamsTrainingSTART,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
 
-save('/scratch/jmg1030/WeightAnalysis/TrainingWeight_Post','-v7.3')
+save('/scratch/jmg1030/WeightAnalysis/TrainingWeight_START','-v7.3')
 
 end
 
@@ -180,8 +180,8 @@ PopParamsTrainingPostWeight.LearningRate = 1e-2;
     
 PopParamsTrainingPostWeight.W = SimValues.WeightMat(:,:,4);
 
-SimValuesPostTrain = AdLIFfunction_STDP(PopParamsTrainingPostWeight,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+SimValuesTrainingEND = AdLIFfunction_STDP(PopParamsTrainingEND,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
 
-save('/scratch/jmg1030/WeightAnalysis/TrainingWeight_Post','-v7.3')
+save('/scratch/jmg1030/WeightAnalysis/TrainingWeight_END','-v7.3')
 
 end
