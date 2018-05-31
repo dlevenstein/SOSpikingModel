@@ -5,7 +5,7 @@ function CondAdLIF_STDPLargeSimWeightAnalysis(ww)
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
 %repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel/';
-repopath = '/archive/j/jmg1030/WeightAnalysis/SOSpikingModel';
+repopath = '/scratch/jmg1030/WeightAnalysis/SOSpikingModel';
 
 %buzpath = '/Users/jonathangornet/Documents/GitHub/buzcode/';
 %datafolder = '/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/05-5-2018/';
