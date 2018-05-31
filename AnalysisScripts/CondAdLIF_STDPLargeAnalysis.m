@@ -7,151 +7,56 @@ repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
 addpath(genpath(repopath))
 
 SAVESIM = true;
-%% Example Neuron Properties
+%% Pretrain Analysis
 
-load('largePopWeight3.mat');
-
-clear PopParams
-
-%Input
-PopParams.I_e  = 250;       %External input
-PopParams.sigma = 50;        %niose magnitude: variance
-PopParams.theta = 0.1;        %noise time scale (1/ms)
-
-% One neuron
-PopParams.EPopNum = 2000;
-PopParams.IPopNum = 500;
-
-%Neuron properties
-PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
-PopParams.g_L     = [182/18 119/8];     %leak conductance (nS)
-PopParams.C       = [182 119];    %capacitance (pF)
-PopParams.V_th    = [-45 -47];    %spike threshold (mV)
-PopParams.V_reset = [-55 -55];    %reset potential (mV)
-PopParams.t_ref   = 0.5;    %refractory period (ms)
-
-%Synaptic Properties
-PopParams.E_e     = 0;      %rev potential: E (mV)
-PopParams.E_i     = -80;    %rev potential: I (mV)
-PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
-
-%Adaptation Properties (No adaptation)
-PopParams.E_w     = -70;    %rev potential: adaptation (mV)
-PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
-PopParams.b       = 0;    %adaptation activation rate (1/ms)
-PopParams.delta_T = 0;     %subthreshold adaptation steepness
-PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
-PopParams.gwnorm  = 0;       %magnitude of adaptation
-
-%Network Properties
-PopParams.Wee   = 3;        %E->E weight (nS)
-PopParams.Wii   = 3;        %I->I weight
-PopParams.Wie   = 3;        %E->I weight
-PopParams.Wei   = 3;        %I->E weight
-PopParams.Kee   = 250;        %Expected E->E In Degree
-PopParams.Kii   = 250;        %Expected I->I In Degree
-PopParams.Kie   = 250;        %Expected E->I In Degree
-PopParams.Kei   = 250;        %Expected I->E In Degree
-
-PopParams.W = SimValues.WeightMat(:,:,4);
-
-TimeParams.dt      = 0.05;
-
-close all
-
-%PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the simulation
+load('/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/05-31-2018/Weight_Pre')
 
 %%
+figure
 
-TimeParams.SimTime = 10000;
+subplot(2,2,1)
+    
+    plot(SimValues.spikes(:,1),SimValues.spikes(:,2),'.k','markersize',1)
+    hold on
+    plot([9800 10000],[2000 2000],'r','linewidth',2)
+    xlim([9800 10000]);ylim([0 2500])
+    xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
 
-%%
+subplot(2,2,3)
 
-PopParams.LearningRate = 0;
-PopParams.TargetRate = 2; %Target E rate 1Hz
-PopParams.tauSTDP = 20;
+    plot(SimValues.t,exNeu.E.I_syne,'b')
+    hold on
+    plot(SimValues.t,exNeu.E.I_syni,'r')
+    hold on
+    plot(SimValues.t,exNeu.E.I,'k')
+    xlim([9800 10000]);
+    legend('Excitatory','Inhibitory')
+    xlabel('Time (ms)');ylabel('Synaptic Conductance');title('Example Excitatory cell Cell')
 
-%%
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',true,'save_weights',1e4);
+subplot(4,2,2)
+    
+    plot(t_ccg*1000,ccg(:,1,1)./length(SimValues.EcellIDX),'b','linewidth',1)
+    hold on
+    plot(t_ccg*1000,ccg(:,1,2)./length(SimValues.IcellIDX),'r','linewidth',1)
+    legend('Excitatory','Inhibitory')
+    xlabel('t lag from E spike (ms)');ylabel('Rate')
 
-save('/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/05-30-2018/trainedsim3','-v7.3')
+subplot(4,2,4)
+    
+    plot(t_ccg*1000,ccg(:,2,1)./length(SimValues.EcellIDX),'b','linewidth',1)
+    hold on
+    plot(t_ccg*1000,ccg(:,2,2)./length(SimValues.IcellIDX),'r','linewidth',1)
+    legend('Excitatory','Inhibitory')
+    xlabel('t lag from I spike (ms)');ylabel('Rate')
 
-%%
+subplot(2,2,4)
 
-clear all
-
-%% Example Neuron Properties
-
-load('largePopWeight10.mat');
-
-clear PopParams
-
-%Input
-PopParams.I_e  = 250;       %External input
-PopParams.sigma = 50;        %niose magnitude: variance
-PopParams.theta = 0.1;        %noise time scale (1/ms)
-
-% One neuron
-PopParams.EPopNum = 2000;
-PopParams.IPopNum = 500;
-
-%Neuron properties
-PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
-PopParams.g_L     = [182/18 119/8];     %leak conductance (nS)
-PopParams.C       = [182 119];    %capacitance (pF)
-PopParams.V_th    = [-45 -47];    %spike threshold (mV)
-PopParams.V_reset = [-55 -55];    %reset potential (mV)
-PopParams.t_ref   = 0.5;    %refractory period (ms)
-
-%Synaptic Properties
-PopParams.E_e     = 0;      %rev potential: E (mV)
-PopParams.E_i     = -80;    %rev potential: I (mV)
-PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
-
-%Adaptation Properties (No adaptation)
-PopParams.E_w     = -70;    %rev potential: adaptation (mV)
-PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
-PopParams.b       = 0;    %adaptation activation rate (1/ms)
-PopParams.delta_T = 0;     %subthreshold adaptation steepness
-PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
-PopParams.gwnorm  = 0;       %magnitude of adaptation
-
-%Network Properties
-PopParams.Wee   = 10;        %E->E weight (nS)
-PopParams.Wii   = 10;        %I->I weight
-PopParams.Wie   = 10;        %E->I weight
-PopParams.Wei   = 10;        %I->E weight
-PopParams.Kee   = 250;        %Expected E->E In Degree
-PopParams.Kii   = 250;        %Expected I->I In Degree
-PopParams.Kie   = 250;        %Expected E->I In Degree
-PopParams.Kei   = 250;        %Expected I->E In Degree
-
-PopParams.W = SimValues.WeightMat(:,:,4);
-
-TimeParams.dt      = 0.05;
-
-close all
-
-%PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the simulation
-
-%%
-
-TimeParams.SimTime = 10000;
-
-%%
-
-PopParams.LearningRate = 0;
-PopParams.TargetRate = 2; %Target E rate 1Hz
-PopParams.tauSTDP = 20;
-
-%%
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',true,'save_weights',1e4);
-
-save('/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/05-30-2018/trainedsim10','-v7.3')
-
-
-%%
-
-%check the spiking statistics (of the trained network)
-timewin = [9800 10000];
-GetSpikeStats( SimValues,PopParams,timewin )
+    plot(currx.tlags,currx.meanE,'b','linewidth',1)
+    hold on
+    plot(condx.tlags,condx.meanE,'b--','linewidth',1)
+    plot(currx.tlags,currx.meanI,'r','linewidth',1)
+    plot(condx.tlags,condx.meanI,'r--','linewidth',1)
+    plot([0 0],[-1 1],'k:')
+    plot(t_lags([1 end]),[0 0],'k')
+    legend('Curr.->E','Curr.->I','Cond.->E','Cond.->I')
+    xlabel('t lag');ylabel('Mean Input Correlation')

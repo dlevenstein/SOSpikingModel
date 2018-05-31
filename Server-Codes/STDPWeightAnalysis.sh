@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --array=1-4
+#SBATCH --array=1-6
 #SBATCH --cpus-per-task=10
-#SBATCH --time=48:00:00
-#SBATCH --mem=150GB
-#SBATCH --job-name=BigSim
+#SBATCH --time=8:00:00
+#SBATCH --mem=50GB
+#SBATCH --job-name=WeightAnalysis
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
-#SBATCH --output=BigSim_%j.out
+#SBATCH --output=WeightAnalysis_%j.out
 
 n=${SLURM_ARRAY_TASK_ID}
 

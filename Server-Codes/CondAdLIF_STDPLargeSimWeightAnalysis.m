@@ -77,6 +77,8 @@ PreTainPopParams = PopParamsAnalysis;
 PostTrainPopParams = PopParamsAnalysis;
 ScrambledPopParams = PopParamsAnalysis;
 MeanPopParams = PopParamsAnalysis;
+PopParamsTrainingPreWeight = PopParamsAnalysis;
+PopParamsTrainingPostWeight = PopParamsAnalysis;
 
 %% Trained Simulation 1e-1
 
@@ -155,5 +157,31 @@ MeanPopParams.W(SimValues.EcellIDX,SimValues.IcellIDX) = EImeanMatrix;
 MeanSimValuesPostTrain = AdLIFfunction_STDP(MeanPopParams,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
 
 save('/scratch/jmg1030/WeightAnalysis/Weight_Mean','-v7.3')
+
+end
+
+%% Training at Pre
+
+if ww == 5
+    
+PopParamsTrainingPreWeight.LearningRate = 1e-2;
+
+SimValuesPostTrain = AdLIFfunction_STDP(PopParamsTrainingPreWeight,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+
+save('/scratch/jmg1030/WeightAnalysis/TrainingWeight_Post','-v7.3')
+
+end
+
+%% Training at Post
+
+if ww == 6
+    
+PopParamsTrainingPostWeight.LearningRate = 1e-2;
+    
+PopParamsTrainingPostWeight.W = SimValues.WeightMat(:,:,4);
+
+SimValuesPostTrain = AdLIFfunction_STDP(PopParamsTrainingPostWeight,TimeParamsAnalysis,'cellout',true,'showprogress',true,'showfig',true);
+
+save('/scratch/jmg1030/WeightAnalysis/TrainingWeight_Post','-v7.3')
 
 end
