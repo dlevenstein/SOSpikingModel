@@ -331,6 +331,7 @@ savecounter = 1;
 weightcounter = 1;
 timecounter = -onsettime-dt;
 spikecounter = 0;
+tic
 for tt=1:SimTimeLength
     %% Time Counter
     if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
@@ -393,10 +394,12 @@ for tt=1:SimTimeLength
         
         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
         %Presynaptic I Cells
-        PreIspikes = intersect(spikeneurons,Icells);
+        %PreIspikes = intersect(spikeneurons,Icells);
+        PreIspikes = spikeneurons(spikeneurons > EPopNum);
         EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
         %Postsynaptic E cells
-        PostEspikes = intersect(spikeneurons,Ecells);
+        %PostEspikes = intersect(spikeneurons,Ecells);
+        PostEspikes = spikeneurons(spikeneurons <= EPopNum);
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
@@ -451,6 +454,7 @@ for tt=1:SimTimeLength
             
     %%Idea: add a catch for silent network or excessive firing network?
 end
+toc
 
 %%
 %Catch for no spiking in simulation error

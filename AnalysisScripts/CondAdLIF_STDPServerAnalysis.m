@@ -6,7 +6,7 @@ repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel/';
 %repopath = '/home/jmg1030/SOSpikingModel';
 
 buzpath = '/Users/jonathangornet/Documents/GitHub/buzcode/';
-datafolder = 'Data/Balance/05-5-2018/';
+datafolder = '/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/05-5-2018/';
 
 figfolder = '~/Desktop/';
 
