@@ -77,7 +77,9 @@ SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress
 save('/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/05-30-2018/trainedsim3','-v7.3')
 
 %%
+
 clear all
+
 %% Example Neuron Properties
 
 load('largePopWeight10.mat');
@@ -146,3 +148,10 @@ PopParams.tauSTDP = 20;
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',true,'save_weights',1e4);
 
 save('/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/05-30-2018/trainedsim10','-v7.3')
+
+
+%%
+
+%check the spiking statistics (of the trained network)
+timewin = [9800 10000];
+GetSpikeStats( SimValues,PopParams,timewin )
