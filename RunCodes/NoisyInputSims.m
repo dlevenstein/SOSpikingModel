@@ -1,15 +1,18 @@
-function [ spikestats ] = NoisyInputSims( cellparams,synparams,rates,varargin )
+function [ spikestats,isifig ] = NoisyInputSims( cellparams,synparams,rates,varargin )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 %
 %%
 p = inputParser;
 addParameter(p,'showfig',true,@islogical)
+addParameter(p,'figfolder',false)
+addParameter(p,'ntrials',1000,@isnumeric)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
+figfolder = p.Results.figfolder;
+ntrials = p.Results.ntrials; %number of "neurons" or trials
 
 %%
-ntrials = 500; %number of "neurons" or trials
 
 onsettransient = 0.1; %for conductance
 
@@ -56,17 +59,23 @@ E_L = cellparams.E_L;
 E_h = cellparams.E_h;
 
 %Calculate poisson spike times
-T = 5;% simulation time, s
-dt = T./max([(R_e.*K_e),(R_i.*K_i)])./10;
+T = 25;% max simulation time, s
+%dt = T./max([(R_e.*K_e),(R_i.*K_i)])./20;
+dt = 0.0005;
 
-RK_e = repmat(R_e.*K_e,ntrials,1);
-RK_i = repmat(R_i.*K_i,ntrials,1);
-
+%RK_e = repmat(R_e.*K_e,ntrials,1);
+%RK_i = repmat(R_i.*K_i,ntrials,1);
+RK_e = R_e.*K_e;
+RK_i = R_i.*K_i;
 %% Simulate
 TimeStamps = [-onsettransient:dt:T]';
 
-[ s_e ] = PoissonRateSpikeBins(RK_e,dt,length(TimeStamps));
-[ s_i ] = PoissonRateSpikeBins(RK_i,dt,length(TimeStamps));
+%[ s_e ] = PoissonRateSpikeBins(RK_e,dt,length(TimeStamps));
+%[ s_i ] = PoissonRateSpikeBins(RK_i,dt,length(TimeStamps));
+lambda_e = RK_e.*dt;
+lambda_i = RK_i.*dt;
+s_e = poissrnd(lambda_e,length(TimeStamps),ntrials);
+s_i = poissrnd(lambda_i,length(TimeStamps),ntrials);
 
 %Initialize conductance, voltage matrices
 g_e = nan(length(TimeStamps),ntrials);
@@ -104,7 +113,8 @@ for tt = 2:length(TimeStamps)
     v(tt,spikeneurons) = nan;
     ISIs(spikeneurons) = TimeStamps(tt);
     
-    if all(isnan(v(tt,:))) && TimeStamps(tt)>0
+    if (all(isnan(v(tt,:))) | all(v(tt,:)<(v_r))) && TimeStamps(tt)>0
+        %Can put a check - if no spikes by certain time?
        break
     end
     
@@ -128,11 +138,14 @@ spikestats.ISIs = ISIs;
 spikestats.rate = 1./nanmean(ISIs);
 spikestats.ISI_CV = nanstd(ISIs)./nanmean(ISIs);
 %%
+timewin = TimeStamps([1 end]);
+%timewin = [0 3];
 if SHOWFIG
-    figure
+    isifig = figure;
     subplot(2,1,1)
     plot(TimeStamps,v,'color',0.5.*[1 1 1])
     hold on
+    plot(TimeStamps,v(:,1),'color',0.2.*[1 1 1])
     plot(TimeStamps,meanV,'k')
     plot(TimeStamps,meanV+stdV,'k--')
     plot(TimeStamps,meanV-stdV,'k--')
@@ -143,18 +156,25 @@ if SHOWFIG
     box off
     xlabel('t (s)')
     ylabel('V')
+    xlim(timewin)
 
     subplot(4,1,3)
-    plot(TimeStamps,g_e,'g')
+    plot(TimeStamps,g_e(:,1),'g')
     xlabel('t (s)')
     ylabel('g_e')
     box off
+    xlim(timewin)
 
     subplot(4,1,4)
-    plot(TimeStamps,g_i,'r')
+    plot(TimeStamps,g_i(:,1),'r')
     xlabel('t (s)')
     ylabel('g_i')
     box off
+    xlim(timewin)
+    
+    if figfolder
+        NiceSave('SimISI',figfolder,'CondLIF')
+    end
 end
 
 end
