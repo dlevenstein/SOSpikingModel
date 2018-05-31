@@ -158,8 +158,8 @@ isconnected = (EE_mat+II_mat+EI_mat+IE_mat)>0;
 %Simulation Parameters
 %LIF Parameters
 E_L         = PopParams.E_L;      %Reversal potential (mV)
-g_L         = PopParams.g_L;     %conductance (units?)
-C           = PopParams.C;       %capacitance (nF)
+g_L         = PopParams.g_L;     %conductance (nS)
+C           = PopParams.C;       %capacitance (pF)
 I_e         = PopParams.I_e;      %current (nA)
 V_th        = PopParams.V_th;    %spike threshhold (mV)
 V_reset     = PopParams.V_reset; %reset value (mV)
