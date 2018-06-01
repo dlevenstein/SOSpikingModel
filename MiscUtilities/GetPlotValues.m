@@ -203,9 +203,9 @@ end
 
 %% Network - in degree, eigenvalues
 
-indegree.E = sum(SimValues.WeightMat(:,SimValues.EcellIDX)~=0,2);
-indegree.I = sum(SimValues.WeightMat(:,SimValues.IcellIDX)~=0,2);
-indegree.EIratio =     indegree.E./indegree.I;
+% indegree.E = sum(SimValues.WeightMat(:,SimValues.EcellIDX)~=0,2);
+% indegree.I = sum(SimValues.WeightMat(:,SimValues.IcellIDX)~=0,2);
+% indegree.EIratio =     indegree.E./indegree.I;
 
 
 %% Calculate pop Synch/Rate distribution, Pop Autocorrelation
