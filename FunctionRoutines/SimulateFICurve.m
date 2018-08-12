@@ -84,7 +84,8 @@ if ischar(SHOWFIG)
 end
 
 if RAMP
-    error('''bistableramp'' option is not yet functional... sorry :''(')
+    timeparms.onsettransient = 1000 + timeparms.onsettransient; %Onset transient to ignore
+    timeparms.simtime = 1000 + timeparms.simtime;
 end
 %% Set the parameters
 onsettransient = timeparms.onsettransient; %Onset transient to ignore
@@ -97,6 +98,10 @@ parfor ii = 1:numI
     ii
     PopParms = PopParams_in;
     PopParms.I_e     = Ivals(ii);
+    if RAMP 
+        PopParms.I_e = @(t) (500 - Ivals(ii)).*heaviside(750 - t)+Ivals(ii);
+    end
+        
     [SimValues(ii)] = simfunction(PopParms,TimeParams,...
         'showfig',false,'save_dt',0.5,'onsettime',onsettransient,...
         'cellout',true,'showprogress',false);
