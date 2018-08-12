@@ -1,13 +1,14 @@
 function CondAdLIF_STDPWeightServer(w)
 
-Weights = [1,3,10];
+Weights = [0.1, 0.3, 1, 3, 10];
+WeightNames = ["01","03","1","3","10"];
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
 %repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
-repopath = '/home/jmg1030/SOSpikingModel';
+repopath = '/scratch/jmg1030/LogWeight/SOSpikingModel';
 addpath(genpath(repopath))
 
 SAVESIM = true;
@@ -63,7 +64,7 @@ close all
 
 %%
 
-TimeParams.SimTime = 200000;
+TimeParams.SimTime = 5e5+1e4;
 
 %%
 
@@ -73,11 +74,11 @@ PopParams.tauSTDP = 20;
 
 %%
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',1e4,'save_dt',500000,...
-    'recordInterval',[0:1e5:200000;(0:1e5:200000) + 1e4]);
+    'save_weights',5e5,'save_dt',5e5,...
+    'recordInterval',[0:5e5:5e5;(0:5e5:5e5) + 1e4]);
 
 if SAVESIM==true
-    save(['/scratch/jmg1030/largePopWeight' num2str(Weights(w))],'-v7.3')
+    save(['/scratch/jmg1030/LogWeight/largePopWeight' char(WeightNames(w))],'-v7.3')
 end
 
 end

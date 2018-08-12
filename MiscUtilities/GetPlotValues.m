@@ -1,8 +1,6 @@
-function [ exNeu,t_ccg,ccg,currx,condx,t_lags ] = GetPlotValues( SimValues,PopParams,timewin )
+function [ poprate, ISIdist, vm, exNeu,t_ccg,ccg,currx,condx,t_lags ] = GetPlotValues( SimValues,PopParams )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
-%% DEV
-%timewin = [39000 40000];
 %%
 %% Calcualte each cell's spike rate and rate sortings
 cellrates = cellfun(@length,SimValues.spikesbycell)./(SimValues.t(end)./1000);

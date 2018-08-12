@@ -1,11 +1,14 @@
+function CondAdLIF_STDPLogWeight(ss)
+
+Svals = [0.01,0.1,0.5,1];
+Snames = ["001","01","05","1"];
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
 repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
-%repopath = '/home/jmg1030/SOSpikingModel';
-%repopath = 'C:\Users\jgorn\OneDrive\Documents\GitHub\SOSpikingModel';
+%repopath = '/scratch/jmg1030/LogWeight/SOSpikingModel';
 addpath(genpath(repopath))
 
 SAVESIM = true;
@@ -19,8 +22,8 @@ PopParams.sigma = 50;        %niose magnitude: variance
 PopParams.theta = 0.1;        %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 1000;
-PopParams.IPopNum = 250;
+PopParams.EPopNum = 2000;
+PopParams.IPopNum = 500;
 
 %Neuron properties
 PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
@@ -48,20 +51,58 @@ PopParams.Wee   = 3;        %E->E weight (nS)
 PopParams.Wii   = 3;        %I->I weight
 PopParams.Wie   = 3;        %E->I weight
 PopParams.Wei   = 3;        %I->E weight
-PopParams.Kee   = 100;        %Expected E->E In Degree
-PopParams.Kii   = 100;        %Expected I->I In Degree
-PopParams.Kie   = 100;        %Expected E->I In Degree
-PopParams.Kei   = 100;        %Expected I->E In Degree
+PopParams.Kee   = 250;        %Expected E->E In Degree
+PopParams.Kii   = 250;        %Expected I->I In Degree
+PopParams.Kie   = 250;        %Expected E->I In Degree
+PopParams.Kei   = 250;        %Expected I->E In Degree
 
 TimeParams.dt      = 0.05;
 
-close all
+%%
 
-%PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the simulation
+m = 1;
+s = Svals(ss);
+
+mu = log((m^2)/sqrt(s+m^2));
+sigma = sqrt(log((s/m^2)+1));
 
 %%
 
-TimeParams.SimTime = 10000;
+EPopNum = PopParams.EPopNum;
+IPopNum = PopParams.IPopNum;
+PopNum = EPopNum + IPopNum;
+
+EcellidX = 1:EPopNum;
+IcellidX = EPopNum+1:PopNum;
+
+W = zeros(PopNum,PopNum);
+
+Pee = PopParams.Kee/(EPopNum-1);
+Pii = PopParams.Kii/(IPopNum-1);
+Pie = PopParams.Kie/EPopNum;
+Pei = PopParams.Kei/IPopNum;
+
+W(EcellidX,EcellidX) = rand(EPopNum,EPopNum) <= Pee;
+W(EcellidX,EcellidX) = PopParams.Wee.*W(EcellidX,EcellidX);
+
+W(IcellidX,IcellidX) = rand(IPopNum,IPopNum) <= Pii;
+W(IcellidX,IcellidX) = PopParams.Wii.*W(IcellidX,IcellidX);
+
+W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
+W(IcellidX,EcellidX) = PopParams.Wie.*W(IcellidX,EcellidX);
+
+W(EcellidX,IcellidX) = rand(EPopNum,IPopNum) <= Pei;
+W(EcellidX,IcellidX) = PopParams.Wei.*W(EcellidX,IcellidX);
+
+W(EcellidX,EcellidX) = lognrnd(mu,sigma,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
+
+W(diag(diag(true(size(W)))))=0;
+
+PopParams.W = W;
+
+%%
+
+TimeParams.SimTime = 5e5+1e4;
 
 %%
 
@@ -70,6 +111,12 @@ PopParams.TargetRate = 2; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%
-tic
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',true);
-toc
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
+    'save_weights',5e5,'save_dt',5e5,...
+    'recordInterval',[0:5e5:5e5;(0:5e5:5e5) + 1e4]);
+
+if SAVESIM==true
+    save(['/scratch/jmg1030/LogWeight/logWeight_s_' char(Snames(ss))],'-v7.3')
+end
+
+end
