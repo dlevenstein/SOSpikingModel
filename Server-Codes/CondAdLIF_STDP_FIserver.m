@@ -28,14 +28,14 @@ numI = 36;
     
 [ Ivals,rate,voltagemean,SimValues ] = SimulateFICurve(simfunction,PopParamsAnalysis,Irange,numI,'showfig',false,'timeparms',timeparms);
 
-save(['/scratch/jmg1030/FIcurve/data/UP_Rate_s_' char(Snames(ll)) '.mat'],'-struct','rate')
-save(['/scratch/jmg1030/FIcurve/data/UP_Voltagemean_s_' char(Snames(ll)) '.mat'],'-struct','voltagemean')
-save(['/scratch/jmg1030/FIcurve/data/UP_SimValues_s_' char(Snames(ll)) '.mat'],'-struct','SimValues')
+save(['/scratch/jmg1030/FIcurve/data/UP_Rate_s_' char(Snames(ll)) '.mat'],'-struct','rate','-v7.3')
+save(['/scratch/jmg1030/FIcurve/data/UP_Voltagemean_s_' char(Snames(ll)) '.mat'],'-struct','voltagemean','-v7.3')
+save(['/scratch/jmg1030/FIcurve/data/UP_SimValues_s_' char(Snames(ll)) '.mat'],'SimValues','-v7.3')
 
 [ Ivals,rate,voltagemean,SimValues ] = SimulateFICurve(simfunction,PopParamsAnalysis,Irange,numI,'showfig',false,'timeparms',timeparms,'bistableramp',true);
 
-save(['/scratch/jmg1030/FIcurve/data/DOWN_Rate_s_' char(Snames(ll)) '.mat'],'-struct','rate')
-save(['/scratch/jmg1030/FIcurve/data/DOWN_Voltagemean_s_' char(Snames(ll)) '.mat'],'-struct','voltagemean')
-save(['/scratch/jmg1030/FIcurve/data/DOWN_SimValues_s_' char(Snames(ll)) '.mat'],'-struct','SimValues')
+save(['/scratch/jmg1030/FIcurve/data/DOWN_Rate_s_' char(Snames(ll)) '.mat'],'-struct','rate','-v7.3')
+save(['/scratch/jmg1030/FIcurve/data/DOWN_Voltagemean_s_' char(Snames(ll)) '.mat'],'-struct','voltagemean','-v7.3')
+save(['/scratch/jmg1030/FIcurve/data/DOWN_SimValues_s_' char(Snames(ll)) '.mat'],'SimValues','-v7.3')
 
 end
