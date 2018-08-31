@@ -9,13 +9,13 @@ figfolder = [repopath,'/Figures/EIBalance'];
 
 %% Define the Population Parameters to feed the FI Cuve function
 
-%Input Noise
-PopParams.sigma = 0;        %niose magnitude: variance
-PopParams.theta = 1/10;     %noise time scale (1/ms)
+PopParams.I_e  = [0 0];       %External input
+PopParams.sigma = [0 0];        %niose magnitude: variance
+PopParams.theta = 0.1;        %noise time scale (1/ms)
 
 % One neuron
-PopParams.EPopNum = 1;
-PopParams.IPopNum = 1;
+PopParams.EPopNum = 100;
+PopParams.IPopNum = 100;
 
 %Neuron properties
 PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
@@ -25,13 +25,12 @@ PopParams.V_th    = [-45 -47];    %spike threshold (mV)
 PopParams.V_reset = [-55 -55];    %reset potential (mV)
 PopParams.t_ref   = 0.5;    %refractory period (ms)
 
-%Synaptic Properties 
+%Synaptic Properties
 PopParams.E_e     = 0;      %rev potential: E (mV)
-PopParams.E_i     = -70;    %rev potential: I (mV)
-PopParams.b_s     = [0.5 0.5];      %synaptic decay timescale (1/ms)
-PopParams.a       = 0.3;    %synaptic activation rate (1/ms)
+PopParams.E_i     = -80;    %rev potential: I (mV)
+PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
 
-%Adaptation Properties
+%Adaptation Properties (No adaptation)
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
 PopParams.b       = 0;    %adaptation activation rate (1/ms)
@@ -40,19 +39,20 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-K = 150;
-PopParams.Kee   = K;        %Expected E->E In Degree
-PopParams.Kii   = K;        %Expected I->I In Degree
-PopParams.Kie   = K;        %Expected E->I In Degree
-PopParams.Kei   = K;        %Expected I->E In Degree
+PopParams.Wee   = 0;        %E->E weight (nS)
+PopParams.Wii   = 0;        %I->I weight
+PopParams.Wie   = 0;        %E->I weight
+PopParams.Wei   = 0;        %I->E weight
+PopParams.Kee   = 250;        %Expected E->E In Degree
+PopParams.Kii   = 250;        %Expected I->I In Degree
+PopParams.Kie   = 250;        %Expected E->I In Degree
+PopParams.Kei   = 250;        %Expected I->E In Degree
 
-PopParams.Wee   = 0;        
-PopParams.Wii   = 0;
-PopParams.Wie   = 0;
-PopParams.Wei   = 0;
+PopParams.LearningRate = 0;
+PopParams.TargetRate = 2; %Target E rate 1Hz
+PopParams.tauSTDP = 20;
 
-%PopParams.p0spike = 0;
-PopParams.V0    = PopParams.V_reset(1);
+PopParams.V0 = PopParams.V_reset(1);
 
 %%
 %--------------------------------------------------------------------------
@@ -86,8 +86,8 @@ b           = PopParams.b;       %Spike Adaptation (nS)
 E_e         = PopParams.E_e;     %Excitatory reversal potential (mV)
 E_i         = PopParams.E_i;     %Inhibitory reversal potential (mV)
 
-b_s         = PopParams.b_s;     %Synaptic decay (1/ms)
-a           = PopParams.a;
+% b_s         = PopParams.b_s;     %Synaptic decay (1/ms)
+% a           = PopParams.a;
 
 %%
 
@@ -107,7 +107,7 @@ ISpikeTime = -(C(2)./g_L(2)).*log((E_L(2) + I_e./g_L(2) - V_th(2))./(E_L(2) + I_
 %%
 TimeParams.dt      = dt;
 TimeParams.SimTime = 100;
-[SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
+[SimValues] = AdLIFfunction_STDP(PopParams,TimeParams,...
     'showprogress',false,'onsettime',0,'cellout',false,'showfig',false);
 
 figure
@@ -123,7 +123,7 @@ xlabel('Time (ms)');ylabel('Voltage (mV)');title('Voltage at I: 210 pA')
 TimeParams.dt      = dt;
 TimeParams.SimTime = tEND;
 
-Irange = 200:10:450;
+Irange = 0:10:450;
 
 ESimTimes = zeros(1,length(Irange));
 ISimTimes = zeros(1,length(Irange));
@@ -147,7 +147,7 @@ ESpikeTime = -(C(1)./g_L(1)).*log((E_L(1) + I_e./g_L(1) - V_th(1))./(E_L(1) + I_
 
 Etimes(I) = ESpikeTime;
 
-[SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
+[SimValues] = AdLIFfunction_STDP(PopParams,TimeParams,...
     'showprogress',false,'onsettime',0,'cellout',false,'showfig',false);
 
 ESimTimes(I) = SimValues.spikes(1);
@@ -169,7 +169,7 @@ ISpikeTime = -(C(2)./g_L(2)).*log((E_L(2) + I_e./g_L(2) - V_th(2))./(E_L(2) + I_
 
 Itimes(I) = real(ISpikeTime);
 
-[SimValues] = EMAdLIFfunction(PopParams,TimeParams,...
+[SimValues] = AdLIFfunction_STDP(PopParams,TimeParams,...
     'showprogress',false,'onsettime',0,'cellout',false,'showfig',false);
 
 ISimTimes(I) = SimValues.spikes(1);
