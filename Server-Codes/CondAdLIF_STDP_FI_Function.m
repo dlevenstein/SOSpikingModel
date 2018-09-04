@@ -1,4 +1,4 @@
-function [] = CondAdLIF_STDP_FI_Function(index,L)
+function [] = CondAdLIF_STDP_FI_Function(index)
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
@@ -14,17 +14,18 @@ Lnames = ["001","01","05","1"];
 %%
 numI = 20;
 numS = 200;
+numL = 4;
 
 Ivals = linspace(0,400,numI);
 
-ii = mod(index,numI);
-ss = ceil(index,numI);
+ss = mod(index,numS);
+LL = ceil(index,numS);
 
-if ii == 0
-    ii = numI;
+if ss == 0
+    ss = numS;
 end
 
-load(['/scratch/jmg1030/FIcurve/data/' char(logNames(L))]);
+load(['/scratch/jmg1030/FIcurve/data/' char(logNames(LL))]);
 
 TimeParams.SimTime = 2500;
 TimeParams.dt = 0.05;
@@ -34,12 +35,21 @@ PopParamsAnalysis.LearningRate = 0;
 PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,2);
 
-PopParams.I_e = @(t) (400 - Ivals(ii)).*heaviside(250 - t)+Ivals(ii);
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_weights',TimeParams.SimTime);
+clear SimValues
 
-spikes = SimValues.spikes;
+parfor ii = 1:numI
+    ii
+    PopParams.I_e = @(t) (400 - Ivals(ii)).*heaviside(250 - t)+Ivals(ii);
+    [SimValues(ii)] = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_weights',TimeParams.SimTime);
+end
 
-save(['/scratch/jmg1030/newFI/data/LogWeight_Simvalues_' char(Lnames(L)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'-struct','SimValues','-v7.3');
-save(['/scratch/jmg1030/newFI/data/LogWeight_Spikes_' char(Lnames(L)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'spikes','-v7.3');
+for ii = 1:numI
+    
+spikes = SimValues(ii).spikes;
+save(['/scratch/jmg1030/newFI/data/LogWeight_Spikes_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'spikes','-v7.3');
+
+end
+
+save(['/scratch/jmg1030/newFI/data/LogWeight_Simvalues_' char(Lnames(LL)) '_sim_' char(num2str(ss)) '.mat'],'SimValues','-v7.3');
 
 end
