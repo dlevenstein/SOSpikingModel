@@ -19,7 +19,7 @@ numL = 4;
 Ivals = linspace(0,400,numI);
 
 ss = mod(index,numS);
-LL = ceil(index,numS);
+LL = ceil(index/numS);
 
 if ss == 0
     ss = numS;
@@ -39,8 +39,9 @@ clear SimValues
 
 parfor ii = 1:numI
     ii
-    PopParams.I_e = @(t) (400 - Ivals(ii)).*heaviside(250 - t)+Ivals(ii);
-    [SimValues(ii)] = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_weights',TimeParams.SimTime);
+    PopParms = PopParamsAnalysis;
+    PopParms.I_e = @(t) (400 - Ivals(ii)).*heaviside(250 - t)+Ivals(ii);
+    [SimValues(ii)] = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_weights',TimeParams.SimTime);
 end
 
 for ii = 1:numI
