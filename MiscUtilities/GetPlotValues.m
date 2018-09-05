@@ -1,4 +1,4 @@
-function [ poprate, ISIdist, vm, exNeu,t_ccg,ccg,currx,condx,t_lags ] = GetPlotValues( SimValues,PopParams )
+function [ sortrate, poprate, ISIdist, vm, exNeu,t_ccg,ccg,currx,condx,t_lags ] = GetPlotValues( SimValues,PopParams )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 %%
