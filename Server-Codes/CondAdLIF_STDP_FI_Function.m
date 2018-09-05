@@ -18,12 +18,14 @@ numL = 4;
 
 Ivals = linspace(0,400,numI);
 
-ss = mod(index,numS);
+ss = mod(index,numS)
 LL = ceil(index/numS);
 
 if ss == 0
-    ss = numS;
+    ss = numS
 end
+
+disp(['ss: ' char(num2str(ss))]);
 
 load(['/scratch/jmg1030/FIcurve/data/' char(logNames(LL))]);
 
