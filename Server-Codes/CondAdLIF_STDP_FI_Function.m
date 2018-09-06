@@ -18,18 +18,18 @@ numL = 4;
 
 Ivals = linspace(0,400,numI);
 
-ss = mod(index,numS)
+ss = mod(index,numS);
 LL = ceil(index/numS);
 
 if ss == 0
-    ss = numS
+    ss = numS;
 end
 
 disp(['ss: ' char(num2str(ss))]);
 
 load(['/scratch/jmg1030/FIcurve/data/' char(logNames(LL))]);
 
-TimeParams.SimTime = 2500
+TimeParams.SimTime = 2500;
 TimeParams.dt = 0.05;
 
 PopParamsAnalysis = PopParams;
@@ -39,15 +39,20 @@ PopParamsAnalysis.W = SimValues.WeightMat(:,:,2);
 
 clear SimValues
 
-for ii = 1:numI
+parfor ii = 1:numI
     
     ii
+    
     PopParms = PopParamsAnalysis;
     PopParms.I_e = @(t) (400 - Ivals(ii)).*heaviside(250 - t)+Ivals(ii);
-    SimValuesIndex = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_weights',TimeParams.SimTime);
+    SimValuesArray = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_weights',TimeParams.SimTime);
     
-    spikes         = SimValuesIndex.spikes;
-    SimValuesIndex = SimValuesIndex;
+end
+
+for ii = 1:numI
+    
+    spikes         = SimValuesIndex(ii).spikes;
+    SimValuesIndex = SimValuesIndex(ii);
     
     save(['/scratch/jmg1030/newFI/data/LogWeight_Spikes_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'spikes','-v7.3');
     save(['/scratch/jmg1030/newFI/data/LogWeight_Simvalues_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'-struct','SimValuesIndex','-v7.3');
