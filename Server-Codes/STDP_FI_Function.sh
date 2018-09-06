@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --array=1-800
-#SBATCH --cpus-per-task=2
+#SBATCH --cpus-per-task=20
 #SBATCH --time=12:00:00
-#SBATCH --mem=20GB
+#SBATCH --mem=62GB
 #SBATCH --job-name=FI_Function_LogWeight
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
