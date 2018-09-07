@@ -49,9 +49,17 @@ end
 
 for ii = 1:numI
     
+    ss = mod(index,numS);
+    LL = ceil(index/numS);
+
+    if ss == 0
+        ss = numS;
+    end
+
     spikes         = SimValuesArray(ii).spikes;
     SimValuesIndex = SimValuesArray(ii);
     
+    disp(['index: ' char(num2str(index))]);
     disp(['ss: ' char(num2str(ss))]);
     disp(['ii: ' char(num2str(ii))]);
     disp(['LL: ' char(num2str(LL))]);
