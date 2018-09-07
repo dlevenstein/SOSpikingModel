@@ -25,8 +25,6 @@ if ss == 0
     ss = numS;
 end
 
-disp(['ss: ' char(num2str(ss))]);
-
 load(['/scratch/jmg1030/FIcurve/data/' char(logNames(LL))]);
 
 TimeParams.SimTime = 2500;
@@ -53,6 +51,13 @@ for ii = 1:numI
     
     spikes         = SimValuesArray(ii).spikes;
     SimValuesIndex = SimValuesArray(ii);
+    
+    disp(['ss: ' char(num2str(ss))]);
+    disp(['ii: ' char(num2str(ii))]);
+    disp(['LL: ' char(num2str(LL))]);
+    
+    disp(['/scratch/jmg1030/newFI/data/LogWeight_Spikes_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat']);
+    disp(['/scratch/jmg1030/newFI/data/LogWeight_Simvalues_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat']);
     
     save(['/scratch/jmg1030/newFI/data/LogWeight_Spikes_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'spikes','-v7.3');
     save(['/scratch/jmg1030/newFI/data/LogWeight_Simvalues_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'-struct','SimValuesIndex','-v7.3');
