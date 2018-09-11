@@ -8,13 +8,15 @@ repopath = '/scratch/jmg1030/newFI/SOSpikingModel';
 addpath(genpath(repopath))
 
 %%
-logNames = ["logWeight_s_001.mat","logWeight_s_01.mat","logWeight_s_05.mat","logWeight_s_1.mat"];
-Lnames = ["001","01","05","1"];
+%logNames = ["logWeight_s_001.mat","logWeight_s_01.mat","logWeight_s_05.mat","logWeight_s_1.mat"];
+meanNames = ["largePopWeight01.mat","largePopWeight03.mat","largePopWeight1.mat","largePopWeight3.mat","largePopWeight10.mat"];
+%Lnames = ["001","01","05","1"];
+Mnames = ["01","03","1","3","10"];
 
 %%
 numI = 20;
-numS = 200;
-numL = 4;
+numS = 100;
+numL = length(meanNames);
 
 Ivals = linspace(0,400,numI);
 
@@ -25,7 +27,12 @@ if ss == 0
     ss = numS;
 end
 
-load(['/scratch/jmg1030/FIcurve/data/' char(logNames(LL))]);
+disp(['index: ' char(num2str(index))]);
+disp(['ss: ' char(num2str(ss))]);
+disp(['ii: ' char(num2str(ii))]);
+disp(['LL: ' char(num2str(LL))]);
+
+load(['/scratch/jmg1030/FIcurve/data/' char(meanNames(LL))]);
 
 TimeParams.SimTime = 2500;
 TimeParams.dt = 0.05;
@@ -64,12 +71,12 @@ for ii = 1:numI
     disp(['ii: ' char(num2str(ii))]);
     disp(['LL: ' char(num2str(LL))]);
     
-    disp(['/scratch/jmg1030/newFI/data/LogWeight_Spikes_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat']);
-    disp(['/scratch/jmg1030/newFI/data/LogWeight_Simvalues_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat']);
+    disp(['/scratch/jmg1030/meanFI/data/MeanWeight_Spikes_' char(Mnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat']);
+    disp(['/scratch/jmg1030/meanFI/data/MeanWeight_Simvalues_' char(Mnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat']);
     
-    save(['/scratch/jmg1030/newFI/data/LogWeight_Spikes_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'spikes','-v7.3');
-    save(['/scratch/jmg1030/newFI/data/LogWeight_Simvalues_' char(Lnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'-struct','SimValuesIndex','-v7.3');
-
+    save(['/scratch/jmg1030/meanFI/data/MeanWeight_Spikes_' char(Mnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'spikes','-v7.3');
+    save(['/scratch/jmg1030/meanFI/data/MeanWeight_Simvalues_' char(Mnames(LL)) '_ii_' char(num2str(ii)) '_sim_' char(num2str(ss)) '.mat'],'-struct','SimValuesIndex','-v7.3');
+    
 end
 
 end

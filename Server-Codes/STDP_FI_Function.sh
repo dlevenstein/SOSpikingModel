@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --array=1-800
+#SBATCH --array=1-500
 #SBATCH --cpus-per-task=20
 #SBATCH --time=12:00:00
 #SBATCH --mem=62GB
-#SBATCH --job-name=FI_Function_LogWeight
+#SBATCH --job-name=FI_Function_MeanWeight
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
-#SBATCH --output=FI_Function_LogWeight_%j.out
+#SBATCH --output=FI_Function_MeanWeight_%j.out
 
 n=${SLURM_ARRAY_TASK_ID}
 
