@@ -3,7 +3,7 @@ function [] = CondAdLIF_STDP_FI_Function(index)
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-repopath = '/scratch/jmg1030/newFI/SOSpikingModel';
+repopath = '/scratch/jmg1030/meanFI/SOSpikingModel';
 
 addpath(genpath(repopath))
 
