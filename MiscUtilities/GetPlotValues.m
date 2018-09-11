@@ -22,7 +22,7 @@ poprate.I = sum(spikemat(:,SimValues.IcellIDX),2)./(winsize./1000)./length(SimVa
 %% Spike statistics
 
 %ISI distirbutions
-ISIdist.bins = linspace(0,3.5,50);
+ISIdist.bins = linspace(0,3.5,25);
 ISIs = cellfun(@diff,SimValues.spikesbycell,'uniformoutput',false);
 ISIdist.E = hist(log10(cat(1,ISIs{SimValues.EcellIDX})),ISIdist.bins);
 ISIdist.E = ISIdist.E./sum(ISIdist.E);
