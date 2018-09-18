@@ -40,6 +40,6 @@ dataname = ['logSigmaWeight_' char(weightNames(LL)) '_sim_' char(num2str(ss))];
 
 disp([datafolder dataname]);
 
-SimulateFICurveServer(PopParamsAnalysis,[0 400],21,datafolder,dataname,up,false);
+SimulateFICurveServer(PopParamsAnalysis,[0 400],21,datafolder,dataname,'up',false);
 
 end
