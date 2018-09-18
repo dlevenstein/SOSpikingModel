@@ -55,8 +55,8 @@ for ii = 1:numI
     disp([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat']);
     disp([datafolder dataname '_ii_' char(num2str(ii)) '_SimValues.mat']);
     
-    save([datafolder dataname '_spikes.mat'],'spikes','-v7.3');
-    save([datafolder dataname '_SimValues.mat'],'-struct','SimValues','-v7.3');
+    save([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat'],'spikes','-v7.3');
+    save([datafolder dataname '_ii_' char(num2str(ii)) '_SimValues.mat'],'-struct','SimValues','-v7.3');
     
     if UP == false
         lastSpikeTimes(ii) = SimValuesArray(ii).spikes(end,1) - 1e3;
