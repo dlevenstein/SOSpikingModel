@@ -16,16 +16,16 @@ numI = 20;
 numS = 100;
 numL = length(names);
 
-ss = mod(index,numS);
+simnum = mod(index,numS);
 LL = ceil(index/numS);
 
-if ss == 0
-    ss = numS;
+if simnum == 0
+    simnum = numS;
 end
 
 disp(['index: ' char(num2str(index))]);
 
-disp(['Sim Number: ' char(num2str(ss))]);
+disp(['Sim Number: ' char(num2str(simnum))]);
 disp(['File Name: ' char(names(LL))]);
 
 load(['/scratch/jmg1030/FIcurve/data/trainedWeights/' char(names(LL))]);
@@ -36,7 +36,7 @@ PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,2);
 
 datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/';
-dataname = ['singleWeight_' char(weightNames(LL)) '_sim_' char(num2str(ss))];
+dataname = ['singleWeight_' char(weightNames(LL)) '_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
 
