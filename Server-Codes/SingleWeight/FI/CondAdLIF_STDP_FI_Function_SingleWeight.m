@@ -3,7 +3,7 @@ function [] = CondAdLIF_STDP_FI_Function_SingleWeight(index)
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-repopath = '/scratch/jmg1030/SingleWeight/SOSpikingModel';
+repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 
 addpath(genpath(repopath))
 
