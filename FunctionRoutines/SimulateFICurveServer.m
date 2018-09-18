@@ -5,11 +5,11 @@ defaulttimeparms.simtime = 2000; %ms, time to simulate each "trial"
 defaulttimeparms.onsettransient = 0; %ms, onsiet transient time to ignore
 
 p = inputParser;
-addParameter(p,'ramp','UP',@ischar)
+addParameter(p,'up',true,@islogical)
 addParameter(p,'timeparms',defaulttimeparms,@isstruct)
 parse(p,varargin{:})
 
-RAMP = p.Results.ramp;
+UP = p.Results.up;
 timeparms = p.Results.timeparms;
 
 Ivals = linspace(Irange(1),Irange(2),numI);
@@ -19,7 +19,7 @@ timeparms.simtime = timeparms.simtime;
 
 TimeParams.dt      = 0.05;
 
-if RAMP == 'UP'
+if UP
 TimeParams.SimTime = timeparms.simtime;
 else
 TimeParams.SimTime = timeparms.simtime+1e3;
@@ -33,11 +33,11 @@ parfor ii = 1:numI
     
     PopParamsAnalysis = PopParams_in;
     
-    if RAMP == 'UP'
+    if UP
     PopParamsAnalysis.I_e = Ivals(ii);
     end
     
-    if RAMP == 'DOWN'
+    if UP == false
     PopParamsAnalysis.I_e = @(t) (Ivals(numI) - Ivals(ii)).*heaviside(1000 - t)+Ivals(ii);
     end
     
@@ -58,13 +58,13 @@ for ii = 1:numI
     save([datafolder dataname '_spikes.mat'],'spikes','-v7.3');
     save([datafolder dataname '_SimValues.mat'],'-struct','SimValues','-v7.3');
     
-    if RAMP == 'DOWN'
+    if UP == false
         lastSpikeTimes(ii) = SimValuesArray(ii).spikes(end,1) - 1e3;
     end
         
 end
 
-if RAMP == 'DOWN'
+if UP == false
     save([datafolder dataname '_lastSpikeTimes.mat'],'lastSpikeTimes','-v7.3'); 
 end
 
