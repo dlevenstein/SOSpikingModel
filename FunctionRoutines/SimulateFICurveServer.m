@@ -1,7 +1,7 @@
 function [] = SimulateFICurveServer(PopParams_in,Irange,numI,datafolder,dataname,varargin)
 
 %% Input options
-defaulttimeparms.simtime = 3000; %ms, time to simulate each "trial"
+defaulttimeparms.simtime = 2000; %ms, time to simulate each "trial"
 defaulttimeparms.onsettransient = 0; %ms, onsiet transient time to ignore
 
 p = inputParser;
@@ -15,9 +15,7 @@ timeparms = p.Results.timeparms;
 Ivals = linspace(Irange(1),Irange(2),numI);
 
 timeparms.onsettransient = 0; %Onset transient to ignore
-timeparms.simtime = 1000 + timeparms.simtime;
-
-onsettransient = timeparms.onsettransient; %Onset transient to ignore
+timeparms.simtime = timeparms.simtime;
 
 TimeParams.dt      = 0.05;
 

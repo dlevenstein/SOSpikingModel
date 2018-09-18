@@ -28,18 +28,18 @@ disp(['index: ' char(num2str(index))]);
 disp(['Sim Number: ' char(num2str(ss))]);
 disp(['File Name: ' char(names(LL))]);
 
-load(['/scratch/jmg1030/LogWeightSigma/data/' char(names(LL))]);
+load(['/scratch/jmg1030/FIcurve/data/trainedWeights/' char(names(LL))]);
 
 PopParamsAnalysis = PopParams;
 PopParamsAnalysis.LearningRate = 0;
 PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,2);
 
-datafolder = '/scratch/jmg1030/LogWeightSigma/data/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/';
 dataname = ['logSigmaWeight_' char(weightNames(LL)) '_sim_' char(num2str(ss))];
 
 disp([datafolder dataname]);
 
-SimulateFICurveServer(PopParamsAnalysis,[0 400],21,datafolder,dataname,ramp,'DOWN');
+SimulateFICurveServer(PopParamsAnalysis,[0 400],21,datafolder,dataname,'ramp','DOWN');
 
 end
