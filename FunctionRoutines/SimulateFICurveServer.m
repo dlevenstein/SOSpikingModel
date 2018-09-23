@@ -34,7 +34,7 @@ parfor ii = 1:numI
     rng(ii,'twister');
 
     PopParamsAnalysis = PopParams_in;
-    PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.E_L)-max(PopParamsAnalysis.E_L)).*rand(PopParams.EPopNum + PopParams.IPopNum,1);
+    PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (max(PopParamsAnalysis.E_L)-min(PopParamsAnalysis.E_L)).*rand(PopParams.EPopNum + PopParams.IPopNum,1);
     
     if UP
     PopParamsAnalysis.I_e = Ivals(ii);
