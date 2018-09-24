@@ -31,6 +31,8 @@ parfor ii = 1:numI
     
     ii
     
+    PopParamsAnalysis = PopParams_in;
+     
     if UP
     PopParamsAnalysis.I_e = Ivals(ii);
     end
