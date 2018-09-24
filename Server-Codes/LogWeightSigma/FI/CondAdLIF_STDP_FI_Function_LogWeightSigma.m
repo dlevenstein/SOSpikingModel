@@ -30,10 +30,14 @@ disp(['File Name: ' char(names(LL))]);
 
 load(['/scratch/jmg1030/FIcurve/data/trainedWeights/' char(names(LL))]);
 
+rng(ii,'twister');
+
 PopParamsAnalysis = PopParams;
 PopParamsAnalysis.LearningRate = 0;
 PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,2);
+
+PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (max(PopParamsAnalysis.E_L)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
 datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/';
 dataname = ['logSigmaWeight_' char(weightNames(LL)) '_sim_' char(num2str(simnum))];
