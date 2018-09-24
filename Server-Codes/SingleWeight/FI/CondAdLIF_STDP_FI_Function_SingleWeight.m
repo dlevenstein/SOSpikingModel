@@ -30,7 +30,7 @@ disp(['File Name: ' char(names(LL))]);
 
 load(['/scratch/jmg1030/FIcurve/data/trainedWeights/' char(names(LL))]);
 
-rng(ii,'twister');
+rng(simnum,'twister');
 
 PopParamsAnalysis = PopParams;
 PopParamsAnalysis.LearningRate = 0;
