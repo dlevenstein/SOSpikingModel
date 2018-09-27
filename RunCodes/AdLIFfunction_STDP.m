@@ -174,7 +174,7 @@ theta       = PopParams.theta;   %Strength to mean (time scale of noise, ms^-1)
 E_w         = PopParams.E_w;     %Adaptation reversal potential, (mV)
 b_w         = PopParams.b_w;     %Adaptation decay (1/ms)
 
-delta_T     = PopParams.delta_T; %threshhold softness
+tau_w       = PopParams.tau_w; %threshhold softness
 
 gwnorm      = PopParams.gwnorm;  %Adaptation norm (nS)
 w_r         = PopParams.w_r;     %Adaptation at rest (E_L)
@@ -282,10 +282,10 @@ b_w         = transpose([b_w(1).*ones(1,EPopNum),     b_w(2).*ones(1,IPopNum)]);
 elseif length(b_w)==1
 b_w         = transpose([b_w.*ones(1,EPopNum),     b_w.*ones(1,IPopNum)]);  
 end
-if length(delta_T) == 2 
-delta_T     = transpose([delta_T(1).*ones(1,EPopNum), delta_T(2).*ones(1,IPopNum)]);
-elseif length(delta_T) == 1
-delta_T     = transpose([delta_T(1).*ones(1,EPopNum), 0.*ones(1,IPopNum)]);
+if length(tau_w) == 2 
+tau_w     = transpose([tau_w(1).*ones(1,EPopNum), tau_w(2).*ones(1,IPopNum)]);
+elseif length(tau_w) == 1
+tau_w     = transpose([tau_w(1).*ones(1,EPopNum), 0.*ones(1,IPopNum)]);
 end
 if length(gwnorm) == 2 
 gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)]);
@@ -305,7 +305,7 @@ tau_s         = transpose([tau_s(1).*ones(1,EPopNum),     tau_s(2).*ones(1,IPopN
 end
 
 %% if no spike adaptation, set to steady state????? or set to alpha(v_th)
-b(b==0) = w_r(b==0).*b_w(b==0)./(1 - w_r(b==0)).*exp((V_reset(b==0)-E_L(b==0)).*delta_T(b==0));
+b(b==0) = w_r(b==0).*b_w(b==0)./(1 - w_r(b==0)).*exp((V_reset(b==0)-E_L(b==0)).*tau_w(b==0));
 
 %% If no noise
 if sigma==0
@@ -352,11 +352,11 @@ for tt=1:SimTimeLength
              + I_e(timecounter) + X_t)./C;           %External input
     
     %s - Synaptic Output 
-    dsdt =  - s./tau_s;
+    dsdt = - s./tau_s;
     %w - Adaptation Variable
-    dwdt = a_w.*(1-w) - b_w.*w;
+    dwdt = (- w + b_w.*(V-E_w) + a_w)./tau_w;
     %x - Synaptic Trace for STDP
-    dxdt =  - x./tauSTDP;
+    dxdt = - x./tauSTDP;
     
     X_t = X_t + dX;
     V   = V + dVdt.*dt;
@@ -365,11 +365,9 @@ for tt=1:SimTimeLength
     x   = x + dxdt.*dt;
 
     timecounter = round(timecounter+dt,4);  %Round to deal with computational error
+        
+    a_w          = zeros(PopNum,1);
     
-    %a_w - Adaptation activation rate for the next time step (unless spike)
-    a_w = w_r.*b_w./(1 - w_r).*exp((V-E_L).*delta_T);
-
-
     %% Spiking
     if any(V > V_th)
         %Find neurons that crossed threshold and record the spiketimes 
@@ -386,6 +384,8 @@ for tt=1:SimTimeLength
         
         %Jump the conductance
         s(spikeneurons) = s(spikeneurons) + 1;
+        %Jump the Adaptation
+        a_w(spikeneurons) = b(spikeneurons);  
         %Set spiking neurons refractory period 
         t_r(spikeneurons) = t_ref(spikeneurons);
         
@@ -413,7 +413,6 @@ for tt=1:SimTimeLength
         
         %Hold voltage, synaptic/adaptation rates at spike levels
         V(refractoryneurons) = V_reset(refractoryneurons);
-        a_w(refractoryneurons) = b(refractoryneurons);  
         %Count down the refractory period
         t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
     end
