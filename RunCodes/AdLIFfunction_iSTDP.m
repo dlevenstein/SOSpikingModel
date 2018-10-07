@@ -383,18 +383,23 @@ for tt=1:SimTimeLength
         %Jump the synaptic trace
         x(spikeneurons) = x(spikeneurons) + 1;
         
-        %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
+        %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E and I->I
         %Presynaptic I Cells
         %PreIspikes = intersect(spikeneurons,Icells);
         PreIspikes = spikeneurons(spikeneurons > EPopNum);
         EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
+        II_mat(IcellIDX,PreIspikes) = II_mat(IcellIDX,PreIspikes) + LearningRate.*(x(IcellIDX)-alpha);
         %Postsynaptic E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
         PostEspikes = spikeneurons(spikeneurons <= EPopNum);
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
+        II_mat(PreIspikes,IcellIDX)  = II_mat(PreIspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
+        
+        II_mat = II_mat.*isconnected; %Keep only connected pairs
+        II_mat(II_mat<=0) = 0; %Get rid of any negative synapses...
         
     end
 
@@ -437,7 +442,7 @@ for tt=1:SimTimeLength
     if mod(timecounter,save_weights)==0 && timecounter>=0 
         if recordVALs(tt)
         SimValues.t_weight(weightcounter)            = timecounter;
-        SimValues.WeightMat(:,:,weightcounter)     = EE_mat+II_mat+EI_mat+IE_mat;
+        SimValues.WeightMat(:,:,weightcounter)       = EE_mat+II_mat+EI_mat+IE_mat;
     	weightcounter = weightcounter+1;
         end
     end

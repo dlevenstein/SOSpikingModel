@@ -1,19 +1,55 @@
 vals = [0.01,0.1,1];
 weightNames = ["001","01","1"];
 
-for ii = 3
-B = 100;
+% vals = [0.1,1,10];
+% weightNames = ["01","1","10"];
 
-bins = linspace(0,25,B);
-wE = zeros(2500,2500);
-wI = zeros(2500,2500);
-wEDist = zeros(2500,B);
-wIDist = zeros(2500,B);
+for ii = 1:length(weightNames)
+    
+    SimValuesArray(ii) = load(['Asynchrony_Test_s_' char(weightNames(ii))]);
+%     SimValuesArray(ii) = load(['Weights_Asynchrony_Test_s_' char(weightNames(ii))]);
+    
+end
+
+%%
+for ii = 1
+    
+U = 1;
+    
+cellrates = cellfun(@length,SimValuesArray(ii).spikesbycell)./(SimValuesArray(ii).t(end)./1000);
+
+SortedRate = zeros(1,2500);
+
+ratesort = zeros(2,2500);
+
+ratesort(1,:) = cellrates;
+ratesort(2,:) = 1:2500;
 
 for jj = 1:2500
     
-    wiE(jj,1:2000) = reshape(SimValuesArray(ii).WeightMat(jj,1:2000,2),[1,2000]);
-    wiI(jj,1:500) = reshape(SimValuesArray(ii).WeightMat(jj,2001:2500,2),[1,500]);
+    id = find(ratesort(1,:) == max(ratesort(1,:)));
+    SortedRate(1,jj) = ratesort(2,max(id));
+    ratesort(1,max(id)) = nan;
+    ratesort(2,max(id)) = nan;
+    
+end
+
+
+SortedRate = SortedRate(SortedRate < 2001);
+    
+
+B = 100;
+
+bins = linspace(0,U,B);
+wE = zeros(2000,2000);
+wI = zeros(2000,2000);
+wEDist = zeros(2000,B);
+wIDist = zeros(2000,B);
+
+for jj = 1:2000
+    
+    wiE(jj,1:2000) = reshape(SimValuesArray(ii).WeightMat(SortedRate(jj),1:2000,2),[1,2000]);
+    wiI(jj,1:500) = reshape(SimValuesArray(ii).WeightMat(SortedRate(jj),2001:2500,2),[1,500]);
     
     idE = find(wiE(jj,:) == 0);
     wiE(jj,idE) = nan;
@@ -43,18 +79,18 @@ EIDist = hist(wEI,bins);
 
 figure
 
+%     subplot(2,2,1)
+%         A = repmat(1,size(wEDist));
+%         A(wEDist == 0) = 0;
+%         imagesc(bins,1:2000,wEDist)
+%         alpha(A);colorbar
+%         set(gca,'ydir','normal')
+%         xlabel('Weight (nS)');ylabel('Neuron ID');title(['E->Neuron i, \sigma: ' num2str(vals(ii))])
+%         
     subplot(2,2,1)
-        A = repmat(1,size(wEDist));
-        A(wEDist == 0) = 0;
-        imagesc(bins,1:2500,wEDist)
-        alpha(A);colorbar
-        set(gca,'ydir','normal')
-        xlabel('Weight (nS)');ylabel('Neuron ID');title(['E->Neuron i, \sigma: ' num2str(vals(ii))])
-        
-    subplot(2,2,2)
         A = repmat(1,size(wIDist));
         A(wIDist == 0) = 0;
-        imagesc(bins,1:2500,wIDist)
+        imagesc(bins,1:2000,wIDist)
         alpha(A);colorbar
         set(gca,'ydir','normal')
         xlabel('Weight (nS)');ylabel('Neuron ID');title(['I->Neuron i, \sigma: ' num2str(vals(ii))])
@@ -64,13 +100,157 @@ figure
         xlabel('In Degree (E)');ylabel('In Degree (I)')
         title('Network and Cell Rate (color)')
     subplot(2,2,4)
-        plot(bins, EEDist./sum(EEDist), 'b','linewidth',2)
+        %plot(bins, EEDist./sum(EEDist), 'b','linewidth',2)
+        plot([vals(ii) vals(ii)], [0 max(EIDist./sum(EIDist)) + 0.01], 'b','linewidth',2)
         hold on
         plot(bins, EIDist./sum(EIDist), 'r','linewidth',2)
         xlabel('Weight (pS)');ylabel('Probability');title('Distribution of Population Weights')
         legend('EE Weight','EI Weight')
-        xlim([0 15]);ylim([0 max(EIDist./sum(EIDist)) + 0.01])
+        xlim([0 U]);ylim([0 max(EIDist./sum(EIDist)) + 0.01])
         
-NiceSave(['K_Weight_Distribution_LogWeight_w_' char(weightNames(ii))],'~/Desktop',[]);
+% NiceSave(['K_Weight_Distribution_LogWeight_w_' char(weightNames(ii))],'~/Desktop',[]);
+% NiceSave(['K_Weight_Distribution_Uniform_w_' char(weightNames(ii))],'~/Desktop',[]);
 
+end
+
+%%
+for ii = 1:length(weightNames)
+    
+    wEE = reshape(SimValuesArray(ii).WeightMat(1:2000,1:2000,2),[1,2000.^2]);
+    wEI = reshape(SimValuesArray(ii).WeightMat(1:2000,2001:2500,2),[1,2000*500]);
+
+    id = find(wEE == 0);
+    wEE(id) = nan;
+    id = find(wEI == 0);
+    wEI(id) = nan;
+    
+    nanmean(wEI)
+    
+end
+    
+    
+%%
+UniformName     = ["01","03","1","3","10"];
+LogSigmaName    = ["001","01","1"];
+LogMuName       = ["01","03","1"];
+
+KuniformE    = zeros(2500,length(UniformName));
+KLogSigmaE   = zeros(2500,length(LogSigmaName));
+KLogMuE      = zeros(2500,length(LogMuName));
+
+KuniformI    = zeros(2500,length(UniformName));
+KLogSigmaI   = zeros(2500,length(LogSigmaName));
+KLogMuI      = zeros(2500,length(LogMuName));
+
+Kuniform    = zeros(2500,length(UniformName));
+KLogSigma   = zeros(2500,length(LogSigmaName));
+KLogMu      = zeros(2500,length(LogMuName));
+
+rateuniform     = zeros(2500,length(UniformName));
+rateLogSigma    = zeros(2500,length(LogSigmaName));
+rateLogMu       = zeros(2500,length(LogMuName));
+
+%%
+for ii = 1:length(UniformName)
+    
+    load(['largePopWeight' char(UniformName(ii)) '.mat']);
+   
+    for jj = 1:2500
+        
+        KuniformE(jj,ii) = sum(SimValues.WeightMat(jj,1:2000,2));
+        KuniformI(jj,ii) = sum(SimValues.WeightMat(jj,2001:2500,2));
+        Kuniform(jj,ii)  = KuniformE(jj,ii)/KuniformI(jj,ii);
+        
+        spikes = SimValues.spikesbycell{jj};
+        
+        rateuniform(jj,ii) = mean(1./(diff(spikes(spikes > 5e5))));
+        
+    end
+    
+end
+
+%%
+for p = 1:5
+figure
+subplot(2,1,1)
+plot(KuniformE(1:2000,p),KuniformI(1:2000,p),'.b')
+hold on
+plot(KuniformE(2001:2500,p),KuniformI(2001:2500,p),'.r')
+xlabel('k_{i,E}');ylabel('k_{i,I}');legend('E','I');title(['Indegree Sum, Uniform w: ' char(UniformName(p))]);
+subplot(2,1,2)
+plot(Kuniform(1:2000,p),rateuniform(1:2000,p),'.b')
+hold on
+plot(Kuniform(2001:2500,p),rateuniform(2001:2500,p),'.r')
+xlabel('<K>');ylabel('Rate (1/ms)');legend('E','I')
+NiceSave(['Kweight_Uniform_w_' char(UniformName(p))],'~/Desktop/TrainedWeights/figures/',[])
+end
+
+%%
+for ii = 1:length(LogSigmaName)
+    
+    load(['logWeight_s_' char(LogSigmaName(ii)) '.mat']);
+   
+    for jj = 1:2500
+        
+        KLogSigmaE(jj,ii) = sum(SimValues.WeightMat(jj,1:2000,2));
+        KLogSigmaI(jj,ii) = sum(SimValues.WeightMat(jj,2001:2500,2));
+        KLogSigma(jj,ii)  = KLogSigmaE(jj,ii)/KLogSigmaI(jj,ii);
+        
+        spikes = SimValues.spikesbycell{jj};
+        
+        rateLogSigma(jj,ii) = mean(1./(diff(spikes(spikes > 5e5))));
+        
+    end
+    
+end
+
+%%
+for p = 1:3
+figure
+subplot(2,1,1)
+plot(KLogSigmaE(1:2000,p),KLogSigmaI(1:2000,p),'.b')
+hold on
+plot(KLogSigmaE(2001:2500,p),KLogSigmaI(2001:2500,p),'.r')
+xlabel('k_{i,E}');ylabel('k_{i,I}');legend('E','I');title(['Indegree Sum, LogWeight Sigma: ' char(LogSigmaName(p))]);
+subplot(2,1,2)
+plot(KLogSigma(1:2000,p),rateLogSigma(1:2000,p),'.b')
+hold on
+plot(KLogSigma(2001:2500,p),rateLogSigma(2001:2500,p),'.r')
+xlabel('<K>');ylabel('Rate (1/ms)');legend('E','I')
+NiceSave(['Kweight_LogSigma_s_' char(LogSigmaName(p))],'~/Desktop/TrainedWeights/figures/',[])
+end
+
+%%
+for ii = 1:length(LogMuName)
+    
+    load(['logWeight_m_' char(LogMuName(ii)) '.mat']);
+   
+    for jj = 1:2500
+        
+        KLogMuE(jj,ii) = sum(SimValues.WeightMat(jj,1:2000,2));
+        KLogMuI(jj,ii) = sum(SimValues.WeightMat(jj,2001:2500,2));
+        KLogMu(jj,ii)  = KLogMuE(jj,ii)/KLogMuI(jj,ii);
+        
+        spikes = SimValues.spikesbycell{jj};
+        
+        rateLogMu(jj,ii) = mean(1./(diff(spikes(spikes > 5e5))));
+        
+    end
+    
+end
+
+%%
+for p = 1:3
+figure
+subplot(2,1,1)
+plot(KLogMuE(1:2000,p),KLogMuI(1:2000,p),'.b')
+hold on
+plot(KLogMuE(2001:2500,p),KLogMuI(2001:2500,p),'.r')
+xlabel('k_{i,E}');ylabel('k_{i,I}');legend('E','I');title(['Indegree Sum, LogWeight Mu: ' char(LogMuName(p))]);
+subplot(2,1,2)
+plot(KLogMu(1:2000,p),rateLogMu(1:2000,p),'.b')
+hold on
+plot(KLogMu(2001:2500,p),rateLogMu(2001:2500,p),'.r')
+xlabel('<K>');ylabel('Rate (1/ms)');legend('E','I')
+NiceSave(['Kweight_LogMu_m_' char(LogMuName(p))],'~/Desktop/TrainedWeights/figures/',[])
 end

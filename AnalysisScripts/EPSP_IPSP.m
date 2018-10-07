@@ -84,6 +84,7 @@ xlabel('Weight (nS)');ylabel('Voltage mV');title('EPSP')
 subplot(2,1,2)
 plot(1:N,vImin,'.r')
 xlabel('Weight (nS)');ylabel('Voltage mV');title('IPSP')
+NiceSave('EPSP_IPSP','~/Desktop',[])
 
 %%
 Ve  = zeros(N,N,T);
