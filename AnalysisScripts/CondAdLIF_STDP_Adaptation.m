@@ -62,7 +62,7 @@ PopParams.tauSTDP = 20;
 a = 0:0.001:0.08;
 b = 0:1:100;
 
-Ivals = 0:10:500;
+Ivals = 0:10:1000;
 
 ISI_a = zeros(length(a),length(Ivals));
 ISI_b = zeros(length(b),length(Ivals));
@@ -133,3 +133,32 @@ end
 
 end
 end
+
+%%
+
+for aa = 1:length(a)
+    
+figure
+plot(ISI_a(aa,:),w_a(aa,:),'.k')
+xlabel('1/ISI');ylabel('Adaptation');title(['Subthreshold Adaptation a: ' num2str(a(aa))])
+
+NiceSave(['Subthreshold_Based_Adaptation_a_' num2str(a(aa))],'~/Desktop/TrainedWeights/figures/',[])
+
+close all
+
+end
+
+%%
+
+for bb = 1:length(b)
+    
+figure
+plot(ISI_b(bb,:),w_b(bb,:),'.k')
+xlabel('1/ISI');ylabel('Adaptation');title(['Spike-Based Adaptation b: ' num2str(b(bb))])
+
+NiceSave(['Spike_Based_Adaptation_b_' num2str(b(bb))],'~/Desktop/TrainedWeights/figures/',[])
+
+close all
+
+end
+

@@ -1,6 +1,6 @@
-function spikesbycell = spikeSorter(spikes)
+function spikesbycell = spikeSorter(spikes,cellStart,cellEnd)
 
-cellID = min(spikes(:,2)):max(spikes(:,2));
+cellID = cellStart:cellEnd;
 
 for cc = cellID
     

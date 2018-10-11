@@ -1,20 +1,24 @@
-vals = [0.01,0.1,1];
-weightNames = ["001","01","1"];
+% vals = [0.01,0.1,1];
+% weightNames = ["001","01","1"];
 
 % vals = [0.1,1,10];
 % weightNames = ["01","1","10"];
 
+vals = [0.1,0.3,1];
+weightNames = ["01","03","1"];
+
 for ii = 1:length(weightNames)
     
-    SimValuesArray(ii) = load(['Asynchrony_Test_s_' char(weightNames(ii))]);
-%     SimValuesArray(ii) = load(['Weights_Asynchrony_Test_s_' char(weightNames(ii))]);
+%     SimValuesArray(ii) = load(['~/Desktop/TrainedWeights/Asynchrony_Test_s_' char(weightNames(ii))]);
+%     SimValuesArray(ii) = load(['~/Desktop/TrainedWeights/Weights_Asynchrony_Test_s_' char(weightNames(ii))]);
+    load(['~/Desktop/TrainedWeights/logWeight_m_' char(weightNames(ii))]);
     
 end
 
 %%
-for ii = 1
+for ii = 2
     
-U = 1;
+U = 20;
     
 cellrates = cellfun(@length,SimValuesArray(ii).spikesbycell)./(SimValuesArray(ii).t(end)./1000);
 
@@ -34,10 +38,8 @@ for jj = 1:2500
     
 end
 
-
 SortedRate = SortedRate(SortedRate < 2001);
     
-
 B = 100;
 
 bins = linspace(0,U,B);
@@ -109,7 +111,7 @@ figure
         xlim([0 U]);ylim([0 max(EIDist./sum(EIDist)) + 0.01])
         
 % NiceSave(['K_Weight_Distribution_LogWeight_w_' char(weightNames(ii))],'~/Desktop',[]);
-% NiceSave(['K_Weight_Distribution_Uniform_w_' char(weightNames(ii))],'~/Desktop',[]);
+%NiceSave(['K_Weight_Distribution_Uniform_w_' char(weightNames(ii))],'~/Desktop',[]);
 
 end
 
@@ -153,7 +155,7 @@ rateLogMu       = zeros(2500,length(LogMuName));
 %%
 for ii = 1:length(UniformName)
     
-    load(['largePopWeight' char(UniformName(ii)) '.mat']);
+    load(['~/Desktop/TrainedWeights/largePopWeight' char(UniformName(ii)) '.mat']);
    
     for jj = 1:2500
         
@@ -163,7 +165,7 @@ for ii = 1:length(UniformName)
         
         spikes = SimValues.spikesbycell{jj};
         
-        rateuniform(jj,ii) = mean(1./(diff(spikes(spikes > 5e5))));
+        rateuniform(jj,ii) = 1./mean((diff(spikes(spikes > 5e5))));
         
     end
     
@@ -172,23 +174,31 @@ end
 %%
 for p = 1:5
 figure
-subplot(2,1,1)
-plot(KuniformE(1:2000,p),KuniformI(1:2000,p),'.b')
-hold on
-plot(KuniformE(2001:2500,p),KuniformI(2001:2500,p),'.r')
-xlabel('k_{i,E}');ylabel('k_{i,I}');legend('E','I');title(['Indegree Sum, Uniform w: ' char(UniformName(p))]);
-subplot(2,1,2)
-plot(Kuniform(1:2000,p),rateuniform(1:2000,p),'.b')
-hold on
-plot(Kuniform(2001:2500,p),rateuniform(2001:2500,p),'.r')
-xlabel('<K>');ylabel('Rate (1/ms)');legend('E','I')
-NiceSave(['Kweight_Uniform_w_' char(UniformName(p))],'~/Desktop/TrainedWeights/figures/',[])
+subplot(2,2,1)
+plot(KuniformE(1:2000,p),KuniformI(1:2000,p),'.b','markersize',1)
+xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Indegree Sum into E cells, Uniform w: ' char(UniformName(p))]);
+xlim([0 max(KuniformE(1:2000,p))]);ylim([0 max(KuniformI(1:2000,p))])
+subplot(2,2,2)
+plot(KuniformE(2001:2500,p),KuniformI(2001:2500,p),'.r','markersize',1)
+xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Indegree Sum into I cells, Uniform w: ' char(UniformName(p))]);
+xlim([0 max(KuniformE(1:2000,p))]);ylim([0 max(KuniformI(1:2000,p))])
+subplot(2,2,3)
+plot(Kuniform(1:2000,p),rateuniform(1:2000,p),'.b','markersize',1)
+xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into E cells']);
+xlim([0 max(Kuniform(2001:2500,p))]);ylim([0 max(rateuniform(2001:2500,p))])
+subplot(2,2,4)
+plot(Kuniform(2001:2500,p),rateuniform(2001:2500,p),'.r','markersize',1)
+xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into I cells']);
+xlim([0 max(Kuniform(2001:2500,p))]);ylim([0 max(rateuniform(2001:2500,p))])
+
+NiceSave(['Kweight_Uniform_w_' char(UniformName(p))],'~/Desktop',[])
+
 end
 
 %%
 for ii = 1:length(LogSigmaName)
     
-    load(['logWeight_s_' char(LogSigmaName(ii)) '.mat']);
+    load(['~/Desktop/TrainedWeights/logWeight_s_' char(LogSigmaName(ii)) '.mat']);
    
     for jj = 1:2500
         
@@ -198,7 +208,7 @@ for ii = 1:length(LogSigmaName)
         
         spikes = SimValues.spikesbycell{jj};
         
-        rateLogSigma(jj,ii) = mean(1./(diff(spikes(spikes > 5e5))));
+        rateLogSigma(jj,ii) = 1./mean(diff(spikes(spikes > 5e5)));
         
     end
     
@@ -207,23 +217,31 @@ end
 %%
 for p = 1:3
 figure
-subplot(2,1,1)
-plot(KLogSigmaE(1:2000,p),KLogSigmaI(1:2000,p),'.b')
-hold on
-plot(KLogSigmaE(2001:2500,p),KLogSigmaI(2001:2500,p),'.r')
-xlabel('k_{i,E}');ylabel('k_{i,I}');legend('E','I');title(['Indegree Sum, LogWeight Sigma: ' char(LogSigmaName(p))]);
-subplot(2,1,2)
-plot(KLogSigma(1:2000,p),rateLogSigma(1:2000,p),'.b')
-hold on
-plot(KLogSigma(2001:2500,p),rateLogSigma(2001:2500,p),'.r')
-xlabel('<K>');ylabel('Rate (1/ms)');legend('E','I')
-NiceSave(['Kweight_LogSigma_s_' char(LogSigmaName(p))],'~/Desktop/TrainedWeights/figures/',[])
+subplot(2,2,1)
+plot(KLogSigmaE(1:2000,p),KLogSigmaI(1:2000,p),'.b','markersize',1)
+xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Sum -> E cells, LogWeight Sigma: ' char(LogSigmaName(p))]);
+xlim([0 max(KLogSigmaE(1:2000,p))]);ylim([0 max(KLogSigmaI(1:2000,p))])
+subplot(2,2,2)
+plot(KLogSigmaE(2001:2500,p),KLogSigmaI(2001:2500,p),'.r','markersize',1)
+xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Sum -> I cells, LogWeight Sigma: ' char(LogSigmaName(p))]);
+xlim([0 max(KLogSigmaE(1:2000,p))]);ylim([0 max(KLogSigmaI(1:2000,p))])
+subplot(2,2,3)
+plot(KLogSigma(1:2000,p),rateLogSigma(1:2000,p),'.b','markersize',1)
+xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into E cells']);
+xlim([0 max(KLogSigma(2001:2500,p))]);ylim([0 max(rateLogSigma(2001:2500,p))])
+subplot(2,2,4)
+plot(KLogSigma(2001:2500,p),rateLogSigma(2001:2500,p),'.r','markersize',1)
+xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into I cells']);
+xlim([0 max(KLogSigma(2001:2500,p))]);ylim([0 max(rateLogSigma(2001:2500,p))])
+
+NiceSave(['Kweight_LogSigma_s_' char(LogSigmaName(p))],'~/Desktop',[])
+
 end
 
 %%
 for ii = 1:length(LogMuName)
     
-    load(['logWeight_m_' char(LogMuName(ii)) '.mat']);
+    load(['~/Desktop/TrainedWeights/logWeight_m_' char(LogMuName(ii)) '.mat']);
    
     for jj = 1:2500
         
@@ -233,7 +251,7 @@ for ii = 1:length(LogMuName)
         
         spikes = SimValues.spikesbycell{jj};
         
-        rateLogMu(jj,ii) = mean(1./(diff(spikes(spikes > 5e5))));
+        rateLogMu(jj,ii) = 1./mean(diff(spikes(spikes > 5e5)));
         
     end
     
@@ -242,15 +260,23 @@ end
 %%
 for p = 1:3
 figure
-subplot(2,1,1)
-plot(KLogMuE(1:2000,p),KLogMuI(1:2000,p),'.b')
-hold on
-plot(KLogMuE(2001:2500,p),KLogMuI(2001:2500,p),'.r')
-xlabel('k_{i,E}');ylabel('k_{i,I}');legend('E','I');title(['Indegree Sum, LogWeight Mu: ' char(LogMuName(p))]);
-subplot(2,1,2)
-plot(KLogMu(1:2000,p),rateLogMu(1:2000,p),'.b')
-hold on
-plot(KLogMu(2001:2500,p),rateLogMu(2001:2500,p),'.r')
-xlabel('<K>');ylabel('Rate (1/ms)');legend('E','I')
-NiceSave(['Kweight_LogMu_m_' char(LogMuName(p))],'~/Desktop/TrainedWeights/figures/',[])
+subplot(2,2,1)
+plot(KLogMuE(1:2000,p),KLogMuI(1:2000,p),'.b','markersize',1)
+xlim([0 max(KLogMuE(1:2000,p))]);ylim([0 max(KLogMuI(1:2000,p))])
+xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Indegree Sum into E, LogWeight Mu: ' char(LogMuName(p))]);
+subplot(2,2,2)
+plot(KLogMuE(2001:2500,p),KLogMuI(2001:2500,p),'.r','markersize',1)
+xlim([0 max(KLogMuE(1:2000,p))]);ylim([0 max(KLogMuI(1:2000,p))])
+xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Indegree Sum into I, LogWeight Mu: ' char(LogMuName(p))]);
+subplot(2,2,3)
+plot(KLogMu(1:2000,p),rateLogMu(1:2000,p),'.b','markersize',1)
+xlim([0 max(KLogMu(2001:2500,p))]);ylim([0 max(rateLogMu(2001:2500,p))])
+xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into E']);
+subplot(2,2,4)
+plot(KLogMu(2001:2500,p),rateLogMu(2001:2500,p),'.r','markersize',1)
+xlim([0 max(KLogMu(2001:2500,p))]);ylim([0 max(rateLogMu(2001:2500,p))])
+xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into I']);
+
+NiceSave(['Kweight_LogMu_m_' char(LogMuName(p))],'~/Desktop',[])
+
 end
