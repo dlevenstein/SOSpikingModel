@@ -31,10 +31,10 @@ gwnorm  = 0;       %magnitude of adaptation
 %% Normalized Paramets
 N     = 30;
 
-v_inf = [-55 -55];            %Input Voltage from Population
+v_inf = [-55 -55];      %Input Voltage from Population
 tau   = C./g_L;         %Cell tau
-w     = transpose(1:N); %Weight of incoming signal
-G     = 3;             %Background tau
+w     = logspace(-1.5,1.5,N)'; %Weight of incoming signal
+G     = 5;              %Background tau
 
 %% Allocated Arrays
 
@@ -63,27 +63,31 @@ end
 figure
 subplot(2,1,1)
 plot(t,vE,'b')
+xlim([0 100])
+xlabel('Time (ms)');ylabel('Voltage (mV)');title('EPSP')
 subplot(2,1,2)
 plot(t,vI,'r')
-
+xlim([0 100])
+xlabel('Time (ms)');ylabel('Voltage (mV)');title('IPSP')
 %%
 vEmax = zeros(N,1);
 vImin = zeros(N,1);
 
 for ii = 1:N
     
-    vEmax(ii) = max(vE(ii,:));
-    vImin(ii) = min(vI(ii,:));
+    vEmax(ii) = max(vE(ii,:)) - v_inf(1);
+    vImin(ii) = min(vI(ii,:)) - v_inf(2 );
         
 end
 
 %%
 figure
 subplot(2,1,1)
-plot(1:N,vEmax,'.b')
-xlabel('Weight (nS)');ylabel('Voltage mV');title('EPSP')
+plot(log10(w),vEmax,'.b')
+xlabel('log10(Weight) (nS)');ylabel('Voltage mV');title('EPSP')
+%LogScale('x',10)
 subplot(2,1,2)
-plot(log10(1:N),vImin,'.r')
-xlabel('Weight (nS)');ylabel('Voltage mV');title('IPSP')
-NiceSave('EPSP_IPSP','~/Desktop',[])
+plot(log10(w),vImin,'.r')
+xlabel('log10(Weight) (nS)');ylabel('Voltage mV');title('IPSP')
+%NiceSave('EPSP_IPSP','~/Desktop',[])
 

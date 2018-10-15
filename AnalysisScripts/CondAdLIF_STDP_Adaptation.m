@@ -71,8 +71,8 @@ w_a = zeros(length(a),length(Ivals));
 w_b = zeros(length(b),length(Ivals));
 
 %%
-for aa = 2:length(a)
-for ii = 1:length(Ivals)
+for aa = 10
+for ii = 26
     
 PopParams.I_e = Ivals(ii);
 PopParams.a = a(aa);
@@ -88,21 +88,22 @@ end
 
 w_a(aa,ii) = mean(SimValues.w(2001:end));
 
-% figure
-% subplot(2,1,1)
-% plot(SimValues.t,SimValues.V)
-% xlabel('Time (ms)');ylabel('Voltage (mV)');title(['Current ' num2str(Ivals(ii))])
-% subplot(2,1,2)
-% plot(SimValues.t,SimValues.w)
-% xlabel('Time (ms)');ylabel('Adaptation (nS)')
+figure
+subplot(2,1,1)
+plot(SimValues.t,SimValues.V)
+xlabel('Time (ms)');ylabel('Voltage (mV)');title(['Current ' num2str(Ivals(ii))])
+xlim([100 200]);
+subplot(2,1,2)
+plot(SimValues.t,SimValues.w)
+xlabel('Time (ms)');ylabel('Adaptation (nS)')
+xlim([100 200]);
 
 end
 end
-
 
 %%
-for bb = 2:length(b)
-for ii = 1:length(Ivals)
+for bb = 70
+for ii = 101
     
 PopParams.I_e = Ivals(ii);
 
@@ -123,13 +124,15 @@ if isnan(w_b(bb,ii))
     w_b(bb,ii) = 0;
 end
 
-% figure
-% subplot(2,1,1)
-% plot(SimValues.t,SimValues.V)
-% xlabel('Time (ms)');ylabel('Voltage (mV)')
-% subplot(2,1,2)
-% plot(SimValues.t,SimValues.w)
-% xlabel('Time (ms)');ylabel('Adaptation (nS)')
+figure
+subplot(2,1,1)
+plot(SimValues.t,SimValues.V)
+xlabel('Time (ms)');ylabel('Voltage (mV)');title(['Current ' num2str(Ivals(ii))])
+xlim([0 1000])
+subplot(2,1,2)
+plot(SimValues.t,SimValues.w)
+xlabel('Time (ms)');ylabel('Adaptation (nS)')
+xlim([0 1000])
 
 end
 end
