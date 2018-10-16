@@ -67,11 +67,11 @@ sigma = sqrt(log((s/m^2)+1));
 
 %%
 
-m = -0.1;
-s = 0.8;
+mTR = -0.1;
+sTR = 0.8;
 
-muTR = log((m^2)/sqrt(s+m^2));
-sigmaTR = sqrt(log((s/m^2)+1));
+muTR = log((mTR^2)/sqrt(sTR+mTR^2));
+sigmaTR = sqrt(log((sTR/mTR^2)+1));
 
 %%
 
