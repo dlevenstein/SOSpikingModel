@@ -280,9 +280,9 @@ if length(E_w) == 2
 E_w         = transpose([E_w(1).*ones(1,EPopNum),     E_w(2).*ones(1,IPopNum)]);
 end
 if length(tau_w) == 2 
-tau_w     = transpose([tau_w(1).*ones(1,EPopNum), tau_w(2).*ones(1,IPopNum)]);
+tau_w       = transpose([tau_w(1).*ones(1,EPopNum), tau_w(2).*ones(1,IPopNum)]);
 elseif length(tau_w) == 1
-tau_w     = transpose([tau_w.*ones(1,EPopNum), tau_w.*ones(1,IPopNum)]);
+tau_w       = transpose([tau_w.*ones(1,EPopNum), tau_w.*ones(1,IPopNum)]);
 end
 if length(gwnorm) == 2 
 gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)]);
