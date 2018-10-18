@@ -83,7 +83,7 @@ Pie = PopParams.Kie/EPopNum;
 Pei = PopParams.Kei/IPopNum;
 
 W(EcellidX,EcellidX) = rand(EPopNum,EPopNum) <= Pee;
-W(EcellidX,EcellidX) = PopParams.Wee.*W(EcellidX,EcellidX);
+W(EcellidX,EcellidX) = W(EcellidX,EcellidX);
 
 W(IcellidX,IcellidX) = rand(IPopNum,IPopNum) <= Pii;
 W(IcellidX,IcellidX) = PopParams.Wii.*W(IcellidX,IcellidX);

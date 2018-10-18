@@ -4,23 +4,39 @@
 % vals = [0.1,1,10];
 % weightNames = ["01","1","10"];
 
-vals = [0.1,0.3,1];
-weightNames = ["01","03","1"];
+vals = [1,0.3,0.1];
+spikeNames = ["1-001","01-002","03-003"];
+weightNames = ["1","01","03"];
 
 for ii = 1:length(weightNames)
     
 %     SimValuesArray(ii) = load(['~/Desktop/TrainedWeights/Asynchrony_Test_s_' char(weightNames(ii))]);
 %     SimValuesArray(ii) = load(['~/Desktop/TrainedWeights/Weights_Asynchrony_Test_s_' char(weightNames(ii))]);
-    load(['~/Desktop/TrainedWeights/logWeight_m_' char(weightNames(ii))]);
+     spikesbycell(ii) = load(['~/Desktop/TrainedWeights/AsynchronyLogMu_m_' char(spikeNames(ii))],'spikesbycell');
+     SimValues(ii) = load(['~/Desktop/TrainedWeights/logWeight_m_' char(weightNames(ii))],'SimValues');
     
 end
 
 %%
-for ii = 2
+for ii = 1:3
     
-U = 20;
+    SimValuesArray(ii).WeightMat = SimValues(ii).WeightMat;
+    SimValuesArray(ii).spikesbycell = SimValues(ii).spikesbycell;
+    %S = load(['~/Desktop/TrainedWeights/AsynchronyLogMu_m_' char(spikeNames(ii))],'spikes');
+    %SimValuesArray(ii).spikes = S.spikes;
+    SimValuesArray(ii).t = SimValues(ii).t;
+    SimValuesArray(ii).EcellIDX = SimValues(ii).EcellIDX;
+    SimValuesArray(ii).IcellIDX = SimValues(ii).IcellIDX;
     
-cellrates = cellfun(@length,SimValuesArray(ii).spikesbycell)./(SimValuesArray(ii).t(end)./1000);
+end
+%%
+for ii = 1:3
+    
+%U = [7,7,17];
+%U = [1,5,20];
+U = [7,3,2];
+    
+cellrates = cellfun(@length,SimValuesArray(ii).spikesbycell)./(SimValuesArray(1).t(end)./1000);
 
 SortedRate = zeros(1,2500);
 
@@ -42,7 +58,7 @@ SortedRate = SortedRate(SortedRate < 2001);
     
 B = 100;
 
-bins = linspace(0,U,B);
+bins = linspace(0,U(ii),B);
 wE = zeros(2000,2000);
 wI = zeros(2000,2000);
 wEDist = zeros(2000,B);
@@ -63,9 +79,9 @@ for jj = 1:2000
     
 end
 
-cellrates = cellfun(@length,SimValuesArray(ii).spikesbycell)./(SimValuesArray(ii).t(end)./1000);
-indegree.E = sum(SimValuesArray(ii).WeightMat(:,SimValuesArray(ii).EcellIDX)~=0,2);
-indegree.I = sum(SimValuesArray(ii).WeightMat(:,SimValuesArray(ii).IcellIDX)~=0,2);
+cellrates = cellfun(@length,SimValuesArray(ii).spikesbycell)./(SimValuesArray(1).t(end)./1000);
+indegree.E = sum(SimValuesArray(ii).WeightMat(:,SimValuesArray(1).EcellIDX)~=0,2);
+indegree.I = sum(SimValuesArray(ii).WeightMat(:,SimValuesArray(1).IcellIDX)~=0,2);
 indegree.EIratio =     indegree.E./indegree.I;
 
 wEE = reshape(SimValuesArray(ii).WeightMat(1:2000,1:2000,2),[1,2000.^2]);
@@ -81,37 +97,49 @@ EIDist = hist(wEI,bins);
 
 figure
 
-%     subplot(2,2,1)
-%         A = repmat(1,size(wEDist));
-%         A(wEDist == 0) = 0;
-%         imagesc(bins,1:2000,wEDist)
-%         alpha(A);colorbar
-%         set(gca,'ydir','normal')
-%         xlabel('Weight (nS)');ylabel('Neuron ID');title(['E->Neuron i, \sigma: ' num2str(vals(ii))])
-%         
     subplot(2,2,1)
+        A = repmat(1,size(wEDist));
+        A(wEDist == 0) = 0;
+        imagesc(bins,1:2000,wEDist)
+        alpha(A);colorbar
+        set(gca,'ydir','normal')
+        xlabel('Weight (nS)');ylabel('Neuron ID');
+        
+        %title(['E->Neuron i, \sigma: ' num2str(vals(ii))])
+        %title(['E->Neuron i, Weight: ' num2str(vals(ii))])
+        title(['E->Neuron i, \mu: ' num2str(vals(ii))])
+        
+    subplot(2,2,2)
         A = repmat(1,size(wIDist));
         A(wIDist == 0) = 0;
         imagesc(bins,1:2000,wIDist)
         alpha(A);colorbar
         set(gca,'ydir','normal')
-        xlabel('Weight (nS)');ylabel('Neuron ID');title(['I->Neuron i, \sigma: ' num2str(vals(ii))])
+        xlabel('Weight (nS)');ylabel('Neuron ID');
+        
+        %title(['I->Neuron i, \sigma: ' num2str(vals(ii))])
+        %title(['I->Neuron i, Weight: ' num2str(vals(ii))])
+        title(['I->Neuron i, \mu: ' num2str(vals(ii))])
+        
     subplot(2,2,3)
-        scatter(indegree.E,indegree.I,2,log10(cellrates))
+        scatter(indegree.E,indegree.I,2,(cellrates))
         hold on
         xlabel('In Degree (E)');ylabel('In Degree (I)')
         title('Network and Cell Rate (color)')
+        colorbar
     subplot(2,2,4)
-        %plot(bins, EEDist./sum(EEDist), 'b','linewidth',2)
-        plot([vals(ii) vals(ii)], [0 max(EIDist./sum(EIDist)) + 0.01], 'b','linewidth',2)
+        plot(bins, EEDist./sum(EEDist), 'b','linewidth',2)
+        %plot([vals(ii) vals(ii)], [0 max(EIDist./sum(EIDist)) + 0.01], 'b','linewidth',2)
         hold on
         plot(bins, EIDist./sum(EIDist), 'r','linewidth',2)
-        xlabel('Weight (pS)');ylabel('Probability');title('Distribution of Population Weights')
+        xlabel('Weight (pS)');ylabel('Probability');
+        title('Distribution of Population Weights')
         legend('EE Weight','EI Weight')
-        xlim([0 U]);ylim([0 max(EIDist./sum(EIDist)) + 0.01])
+        xlim([0 U(ii)]);ylim([0 max(EIDist./sum(EIDist)) + 0.01])
         
-% NiceSave(['K_Weight_Distribution_LogWeight_w_' char(weightNames(ii))],'~/Desktop',[]);
+%NiceSave(['K_Weight_Distribution_LogWeight_w_' char(weightNames(ii))],'~/Desktop',[]);
 %NiceSave(['K_Weight_Distribution_Uniform_w_' char(weightNames(ii))],'~/Desktop',[]);
+%NiceSave(['K_Weight_Distribution_LogWeightMu_w_' char(weightNames(ii))],'~/Desktop',[]);
 
 end
 
@@ -127,6 +155,7 @@ for ii = 1:length(weightNames)
     wEI(id) = nan;
     
     nanmean(wEI)
+    nanmean(wEE)
     
 end
     
@@ -177,19 +206,19 @@ figure
 subplot(2,2,1)
 plot(KuniformE(1:2000,p),KuniformI(1:2000,p),'.b','markersize',1)
 xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Indegree Sum into E cells, Uniform w: ' char(UniformName(p))]);
-xlim([0 max(KuniformE(1:2000,p))]);ylim([0 max(KuniformI(1:2000,p))])
+%xlim([0 max(KuniformE(1:2000,p))]);ylim([0 max(KuniformI(1:2000,p))])
 subplot(2,2,2)
 plot(KuniformE(2001:2500,p),KuniformI(2001:2500,p),'.r','markersize',1)
 xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Indegree Sum into I cells, Uniform w: ' char(UniformName(p))]);
-xlim([0 max(KuniformE(1:2000,p))]);ylim([0 max(KuniformI(1:2000,p))])
+%xlim([0 max(KuniformE(1:2000,p))]);ylim([0 max(KuniformI(1:2000,p))])
 subplot(2,2,3)
 plot(Kuniform(1:2000,p),rateuniform(1:2000,p),'.b','markersize',1)
 xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into E cells']);
-xlim([0 max(Kuniform(2001:2500,p))]);ylim([0 max(rateuniform(2001:2500,p))])
+%xlim([0 max(Kuniform(2001:2500,p))]);ylim([0 max(rateuniform(2001:2500,p))])
 subplot(2,2,4)
 plot(Kuniform(2001:2500,p),rateuniform(2001:2500,p),'.r','markersize',1)
 xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into I cells']);
-xlim([0 max(Kuniform(2001:2500,p))]);ylim([0 max(rateuniform(2001:2500,p))])
+%xlim([0 max(Kuniform(2001:2500,p))]);ylim([0 max(rateuniform(2001:2500,p))])
 
 NiceSave(['Kweight_Uniform_w_' char(UniformName(p))],'~/Desktop',[])
 
@@ -220,19 +249,19 @@ figure
 subplot(2,2,1)
 plot(KLogSigmaE(1:2000,p),KLogSigmaI(1:2000,p),'.b','markersize',1)
 xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Sum -> E cells, LogWeight Sigma: ' char(LogSigmaName(p))]);
-xlim([0 max(KLogSigmaE(1:2000,p))]);ylim([0 max(KLogSigmaI(1:2000,p))])
+%xlim([0 max(KLogSigmaE(1:2000,p))]);ylim([0 max(KLogSigmaI(1:2000,p))])
 subplot(2,2,2)
 plot(KLogSigmaE(2001:2500,p),KLogSigmaI(2001:2500,p),'.r','markersize',1)
 xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Sum -> I cells, LogWeight Sigma: ' char(LogSigmaName(p))]);
-xlim([0 max(KLogSigmaE(1:2000,p))]);ylim([0 max(KLogSigmaI(1:2000,p))])
+%xlim([0 max(KLogSigmaE(1:2000,p))]);ylim([0 max(KLogSigmaI(1:2000,p))])
 subplot(2,2,3)
 plot(KLogSigma(1:2000,p),rateLogSigma(1:2000,p),'.b','markersize',1)
 xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into E cells']);
-xlim([0 max(KLogSigma(2001:2500,p))]);ylim([0 max(rateLogSigma(2001:2500,p))])
+%xlim([0 max(KLogSigma(2001:2500,p))]);ylim([0 max(rateLogSigma(2001:2500,p))])
 subplot(2,2,4)
 plot(KLogSigma(2001:2500,p),rateLogSigma(2001:2500,p),'.r','markersize',1)
 xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into I cells']);
-xlim([0 max(KLogSigma(2001:2500,p))]);ylim([0 max(rateLogSigma(2001:2500,p))])
+%xlim([0 max(KLogSigma(2001:2500,p))]);ylim([0 max(rateLogSigma(2001:2500,p))])
 
 NiceSave(['Kweight_LogSigma_s_' char(LogSigmaName(p))],'~/Desktop',[])
 
@@ -245,15 +274,17 @@ for ii = 1:length(LogMuName)
    
     for jj = 1:2500
         
-        KLogMuE(jj,ii) = sum(SimValues.WeightMat(jj,1:2000,2));
-        KLogMuI(jj,ii) = sum(SimValues.WeightMat(jj,2001:2500,2));
+        KLogMuE(jj,ii) = sum(SimValuesArray(ii).WeightMat(jj,1:2000,2));
+        KLogMuI(jj,ii) = sum(SimValuesArray(ii).WeightMat(jj,2001:2500,2));
         KLogMu(jj,ii)  = KLogMuE(jj,ii)/KLogMuI(jj,ii);
         
-        spikes = SimValues.spikesbycell{jj};
+        spikes = SimValuesArray(ii).spikesbycell{jj};
         
-        rateLogMu(jj,ii) = 1./mean(diff(spikes(spikes > 5e5)));
+        rateLogMu(jj,ii) = 1000./mean(diff(spikes));
         
     end
+    
+    %rateLogMu(:,ii) = cellfun(@length,SimValuesArray(ii).spikesbycell)./(SimValuesArray(1).t(end)./1000);
     
 end
 
@@ -262,21 +293,21 @@ for p = 1:3
 figure
 subplot(2,2,1)
 plot(KLogMuE(1:2000,p),KLogMuI(1:2000,p),'.b','markersize',1)
-xlim([0 max(KLogMuE(1:2000,p))]);ylim([0 max(KLogMuI(1:2000,p))])
+%xlim([0 max(KLogMuE(1:2000,p))]);ylim([0 max(KLogMuI(1:2000,p))])
 xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Indegree Sum into E, LogWeight Mu: ' char(LogMuName(p))]);
 subplot(2,2,2)
 plot(KLogMuE(2001:2500,p),KLogMuI(2001:2500,p),'.r','markersize',1)
-xlim([0 max(KLogMuE(1:2000,p))]);ylim([0 max(KLogMuI(1:2000,p))])
+%xlim([0 max(KLogMuE(1:2000,p))]);ylim([0 max(KLogMuI(1:2000,p))])
 xlabel('k_{i,E}');ylabel('k_{i,I}');title(['Indegree Sum into I, LogWeight Mu: ' char(LogMuName(p))]);
 subplot(2,2,3)
 plot(KLogMu(1:2000,p),rateLogMu(1:2000,p),'.b','markersize',1)
-xlim([0 max(KLogMu(2001:2500,p))]);ylim([0 max(rateLogMu(2001:2500,p))])
+%xlim([0 max(KLogMu(2001:2500,p))]);ylim([0 max(rateLogMu(2001:2500,p))])
 xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into E']);
 subplot(2,2,4)
 plot(KLogMu(2001:2500,p),rateLogMu(2001:2500,p),'.r','markersize',1)
-xlim([0 max(KLogMu(2001:2500,p))]);ylim([0 max(rateLogMu(2001:2500,p))])
+%xlim([0 max(KLogMu(2001:2500,p))]);ylim([0 max(rateLogMu(2001:2500,p))])
 xlabel('<K>');ylabel('Rate (1/ms)');title(['Indegree Sum into I']);
 
-NiceSave(['Kweight_LogMu_m_' char(LogMuName(p))],'~/Desktop',[])
+% NiceSave(['Kweight_LogMu_m_' char(LogMuName(p))],'~/Desktop',[])
 
 end

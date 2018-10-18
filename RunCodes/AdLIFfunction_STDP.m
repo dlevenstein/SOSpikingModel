@@ -66,6 +66,7 @@ addParameter(p,'save_dt',0.5,@isnumeric)
 addParameter(p,'save_weights',10,@isnumeric)
 addParameter(p,'cellout',false,@islogical)
 addParameter(p,'recordInterval',[],@isnumeric)
+addParameter(p,'intersave',[],@ischar)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
@@ -74,6 +75,7 @@ save_dt = p.Results.save_dt;
 save_weights = p.Results.save_weights;
 cellout = p.Results.cellout;
 recordIntervals = p.Results.recordInterval;
+intersave = p.Results.intersave;
 
 recordVALs = createRecorder(recordIntervals,TimeParams);
 
@@ -226,6 +228,7 @@ SimValues.g_e             = nan(PopNum,SaveTimeLength);
 SimValues.g_i             = nan(PopNum,SaveTimeLength);
 SimValues.s               = nan(PopNum,SaveTimeLength);
 SimValues.w               = nan(PopNum,SaveTimeLength);
+SimValues.x               = nan(PopNum,SaveTimeLength);
 SimValues.a_w             = nan(PopNum,SaveTimeLength);
 SimValues.Input           = nan(PopNum,SaveTimeLength);
 SimValues.t_weight        = nan(1,WeightSaveLength);
@@ -279,7 +282,7 @@ end
 if length(tau_w) == 2 
 tau_w     = transpose([tau_w(1).*ones(1,EPopNum), tau_w(2).*ones(1,IPopNum)]);
 elseif length(tau_w) == 1
-tau_w     = transpose([tau_w(1).*ones(1,EPopNum), 0.*ones(1,IPopNum)]);
+tau_w     = transpose([tau_w.*ones(1,EPopNum), tau_w.*ones(1,IPopNum)]);
 end
 if length(gwnorm) == 2 
 gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)]);
@@ -330,6 +333,10 @@ for tt=1:SimTimeLength
     %% Time Counter
     if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
         display([num2str(round(100.*tt./SimTimeLength)),'% Done!']) %clearly, this needs improvement
+        if isempty(intersave) == false
+            trainedWeight = EE_mat+II_mat+EI_mat+IE_mat;
+            save(intersave,'trainedWeight','-v7.3');
+        end
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     
@@ -415,7 +422,13 @@ for tt=1:SimTimeLength
         
     %% Add data to the output variables
     %Question: is accessing structure slower than doubles?
-
+    
+    if any(V == inf)
+        warning('Numerical Error');
+    elseif any(isnan(V))
+        warning('Numerical Error');
+    end
+    
     if mod(timecounter,save_dt)==0 && timecounter>=0
         if recordVALs(tt)
             
@@ -426,6 +439,7 @@ for tt=1:SimTimeLength
          SimValues.g_i(:,savecounter)             = g_i;
          SimValues.s(:,savecounter)               = s;
          SimValues.w(:,savecounter)               = w;
+         SimValues.x(:,savecounter)               = x;
          SimValues.a_w(:,savecounter)             = a_w;
          SimValues.Input(:,savecounter)           = I_e(timecounter) + X_t;
         
@@ -437,7 +451,7 @@ for tt=1:SimTimeLength
     if mod(timecounter,save_weights)==0 && timecounter>=0 
         if recordVALs(tt)
         SimValues.t_weight(weightcounter)            = timecounter;
-        SimValues.WeightMat(:,:,weightcounter)     = EE_mat+II_mat+EI_mat+IE_mat;
+        SimValues.WeightMat(:,:,weightcounter)       = EE_mat+II_mat+EI_mat+IE_mat;
     	weightcounter = weightcounter+1;
         end
     end

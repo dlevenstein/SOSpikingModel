@@ -60,7 +60,7 @@ TimeParams.dt      = 0.05;
 %%
 
 m = 3;
-s = vals(m);
+s = vals(mm);
 
 mu = log((m^2)/sqrt(s+m^2));
 sigma = sqrt(log((s/m^2)+1));
@@ -90,7 +90,7 @@ Pie = PopParams.Kie/EPopNum;
 Pei = PopParams.Kei/IPopNum;
 
 W(EcellidX,EcellidX) = rand(EPopNum,EPopNum) <= Pee;
-W(EcellidX,EcellidX) = PopParams.Wee.*W(EcellidX,EcellidX);
+W(EcellidX,EcellidX) = W(EcellidX,EcellidX);
 
 W(IcellidX,IcellidX) = rand(IPopNum,IPopNum) <= Pii;
 W(IcellidX,IcellidX) = PopParams.Wii.*W(IcellidX,IcellidX);
