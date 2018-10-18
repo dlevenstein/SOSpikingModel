@@ -3,7 +3,7 @@ function [] = CondAdLIF_STDP_FI_Function_LogWeightMuUP(index)
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-repopath = '/scratch/jmg1030/LogWeightMu/SOSpikingModel';
+repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 
 addpath(genpath(repopath))
 
@@ -23,7 +23,7 @@ PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,2);
 
 datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LogWeightMu/';
-dataname = ['logMuWeight_' char(weightNames(LL)) '_sim_' char(num2str(ss)) '_UP'];
+dataname = ['logMuWeight_' char(weightNames(LL)) '_UP'];
 
 disp([datafolder dataname]);
 

@@ -14,11 +14,6 @@ weightNames = ["001","01","05","1"];
 %%
 LL = index;
 
-disp(['index: ' char(num2str(index))]);
-
-disp(['Sim Number: ' char(num2str(simnum))]);
-disp(['File Name: ' char(names(LL))]);
-
 load(['/scratch/jmg1030/FIcurve/data/trainedWeights/' char(names(LL))]);
 
 PopParamsAnalysis = PopParams;
@@ -27,7 +22,7 @@ PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,2);
 
 datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LogWeightSigma/';
-dataname = ['logSigmaWeight_' char(weightNames(LL)) '_sim_' char(num2str(simnum)) '_UP'];
+dataname = ['logSigmaWeight_' char(weightNames(LL)) '_UP'];
 
 disp([datafolder dataname]);
 

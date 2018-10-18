@@ -15,13 +15,14 @@ weightNames = ["01","03","1","3","10"];
 LL = index;
 
 load(['/scratch/jmg1030/FIcurve/data/trainedWeights/' char(names(LL))]);
+
 PopParamsAnalysis = PopParams;
 PopParamsAnalysis.LearningRate = 0;
 PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,2);
 
 datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/UniformWeight/';
-dataname = ['singleWeight_' char(weightNames(LL)) '_sim_' char(num2str(simnum)) '_UP'];
+dataname = ['singleWeight_' char(weightNames(LL)) '_UP'];
 
 disp([datafolder dataname]);
 
