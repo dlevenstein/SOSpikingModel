@@ -1,7 +1,7 @@
 function CondAdLIF_Training_STDPExperimentWeight(mm)
 
-vals = [0.01,0.1,1];
-names = ["001","01","1"];
+vals = [0.01,0.1,1,10];
+names = ["001","01","1","10"];
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
@@ -67,11 +67,16 @@ sigma = sqrt(log((s/m^2)+1));
 
 %%
 
+numcells = 2000;
+ 
 mTR = -0.1;
-sTR = 0.8;
-
-muTR = log((mTR^2)/sqrt(sTR+mTR^2));
-sigmaTR = sqrt(log((sTR/mTR^2)+1));
+sigmaTR = 0.8;
+ 
+%draw the log firing rates from a normal distribution with mean mTR and std sigmaTR
+logTRs = mTR + sigmaTR.*(randn(numcells,1));  
+TRs = exp(logTRs); %convert log rate to rate
+TRs = sort(TRs); %sort the target rates so the neurons will be sorted by target rate
+meanTR = mean(TRs) %mean target rate. units: Hz!
 
 %%
 
@@ -116,7 +121,7 @@ TimeParams.SimTime = SimTime+RecordTime;
 %%
 
 PopParams.LearningRate = 1e-2;
-PopParams.TargetRate = lognrnd(muTR,sigmaTR,[EPopNum,1]); %Target E rate 1Hz
+PopParams.TargetRate = TRs; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%

@@ -22,7 +22,7 @@ PopParamsAnalysis.LearningRate = 0;
 PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,2);
 
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LogWeightMu/';
 dataname = ['logMuWeight_' char(weightNames(LL)) '_sim_' char(num2str(ss)) '_UP'];
 
 disp([datafolder dataname]);
