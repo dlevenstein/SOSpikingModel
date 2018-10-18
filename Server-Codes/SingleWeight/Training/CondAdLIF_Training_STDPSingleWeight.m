@@ -8,7 +8,7 @@ names = ["01","03","1","3","10"];
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
 %repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
-repopath = '/scratch/jmg1030/SingleWeight/SOSpikingModel';
+repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
 SAVESIM = true;
@@ -76,7 +76,7 @@ SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress
     'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime]);
 
 if SAVESIM==true
-    save(['/scratch/jmg1030/SingleWeight/data/singleWeight_w_' char(names(mm))],'-v7.3')
+    save(['/scratch/jmg1030/FIcurve/data/singleWeight_w_' char(names(mm))],'-v7.3')
 end
 
 end
