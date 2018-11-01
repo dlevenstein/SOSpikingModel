@@ -320,7 +320,7 @@ end
 if isfield(PopParams,'V0')
     V(:,1) = PopParams.V0;
 else
-    V0range = [min(E_L) max(V_th)]; %make this neuron vector
+    V0range = [min(E_L) min(V_th)]; %make this neuron vector
     V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 end
 %% Time Loop
@@ -351,7 +351,7 @@ for tt=1:SimTimeLength
              - g_w.*(V-E_w) ...                      %Adaptation
              - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
              + I_e(timecounter) + X_t)./C;           %External input
-    
+        
     %s - Synaptic Output 
     dsdt =  - s./tau_s;
     %w - Adaptation Variable
@@ -382,7 +382,7 @@ for tt=1:SimTimeLength
         spikecounter = spikecounter+numspikers;
         
         %Jump the conductance
-        s(spikeneurons) = s(spikeneurons) + 1;
+        s(spikeneurons) = 1;
         %Set spiking neurons refractory period 
         t_r(spikeneurons) = t_ref(spikeneurons);
         %Jump the adaptation

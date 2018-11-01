@@ -1,4 +1,4 @@
-function [] = CondAdLIF_STDP_FI_Function_LogWeightMu(index)
+function [] = CondAdLIF_STDP_FI_Function_ExperimentRate(index)
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
@@ -8,8 +8,8 @@ repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
 %%
-names = ["logWeight_m_03.mat","logWeight_m_01.mat","logWeight_m_1.mat","logWeight_m_3.mat","logWeight_m_10.mat"];
-weightNames = ["01","03","1","3","10"];
+names = ["ExperimentRate_s_001.mat","ExperimentRate_s_01.mat","ExperimentRate_s_1.mat","ExperimentRate_s_10.mat",];
+weightNames = ["001","01","1","10"];
 
 %%
 numI = 20;
@@ -39,8 +39,8 @@ PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
 PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (max(PopParamsAnalysis.E_L)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/';
-dataname = ['logMuWeight_' char(weightNames(LL)) '_sim_' char(num2str(simnum))];
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/ExperimentRate/';
+dataname = ['ExperimentRate_' char(weightNames(LL)) '_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
 
