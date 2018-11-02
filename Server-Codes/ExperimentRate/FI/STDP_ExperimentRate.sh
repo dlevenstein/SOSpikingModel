@@ -28,7 +28,7 @@ echo
 
 cat<<EOF | srun matlab -nodisplay
 parpool('local', $SLURM_CPUS_PER_TASK)
-CondAdLIF_STDP_FI_Function_LogWeightSigma(${n})
+CondAdLIF_STDP_FI_Function_ExperimentRate(${n})
 exit
 EOF
 

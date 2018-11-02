@@ -37,9 +37,9 @@ PopParamsAnalysis.LearningRate = 0;
 PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
-PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (max(PopParamsAnalysis.E_L)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
+PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LogWeightMu/';
 dataname = ['logMuWeight_' char(weightNames(LL)) '_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
