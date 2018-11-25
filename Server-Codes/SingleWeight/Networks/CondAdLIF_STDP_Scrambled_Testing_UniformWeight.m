@@ -1,4 +1,4 @@
-function [] = CondAdLIF_STDP_FI_Function_SingleWeight(index)
+function [] = CondAdLIF_STDP_Scrambled_Testing_UniformWeight(index)
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
@@ -12,23 +12,10 @@ names = ["largePopWeight01.mat","largePopWeight03.mat","largePopWeight1.mat","la
 weightNames = ["01","03","1","3","10"];
 
 %%
-numS = 100;
 
-simnum = mod(index,numS);
-LL = ceil(index/numS);
-
-if simnum == 0
-    simnum = numS;
-end
-
-disp(['index: ' char(num2str(index))]);
-
-disp(['Sim Number: ' char(num2str(simnum))]);
-disp(['File Name: ' char(names(LL))]);
+LL = index;
 
 load(['/scratch/jmg1030/FIcurve/data/trainedWeights/' char(names(LL))]);
-
-rng(simnum,'twister');
 
 %Adaptation Properties (No adaptation)
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
@@ -40,15 +27,36 @@ PopParams.gwnorm  = 0;       %magnitude of adaptation
 PopParamsAnalysis = PopParams;
 PopParamsAnalysis.LearningRate = 0;
 PopParamsAnalysis.sigma = 0;
-PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
-PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
+%%
+W = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,end);
 
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/UniformWeight/';
-dataname = ['singleWeight_' char(weightNames(LL)) '_sim_' char(num2str(simnum))];
+Wscrambled = zeros(length(SimValues.EcellIDX),length(SimValues.IcellIDX));
+
+idInitial   = find(W ~= 0);
+idScrambled = idInitial(randperm(length(idInitial)));
+
+Wscrambled(idInitial) = W(idScrambled);
+
+W = SimValues.WeightMat(:,:,end);
+
+W(SimValues.EcellIDX,SimValues.IcellIDX) = Wscrambled;
+
+PopParamsAnalysis.W = W;
+
+%%
+
+clear SimValues
+
+TimeParams.SimTime = 1e4;
+
+datafolder = '/scratch/jmg1030/FIcurve/data/TestRun/UniformWeight/';
+dataname = ['UniformWeight_Scrambled_' char(weightNames(LL)) '_testing'];
 
 disp([datafolder dataname]);
 
-SimulateFICurveServer(PopParamsAnalysis,[0 400],21,datafolder,dataname,'up',false);
+SimValues = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,'save_weights',TimeParams.SimTime);
+
+save([datafolder dataname],'SimValues','-v7.3');
 
 end
