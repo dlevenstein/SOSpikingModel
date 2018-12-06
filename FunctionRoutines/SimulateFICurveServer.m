@@ -38,7 +38,7 @@ parfor ii = 1:numI
     end
     
     if UP == false
-    PopParamsAnalysis.I_e = @(t) (Ivals(numI) - Ivals(ii)).*heaviside(1000 - t)+Ivals(ii);
+    PopParamsAnalysis.I_e = @(t) (250 - Ivals(ii)).*heaviside(1000 - t)+Ivals(ii);
     end
     
     SimValuesArray(ii) = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime);
@@ -49,23 +49,15 @@ lastSpikeTimes = nan(numI,1);
 
 for ii = 1:numI
     
-    V = SimValuesArray(ii).V;
+    %V = SimValuesArray(ii).V;
     spikes = SimValuesArray(ii).spikes;
     
     disp([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat']);
-    disp([datafolder dataname '_ii_' char(num2str(ii)) '_voltages.mat']);
+    %disp([datafolder dataname '_ii_' char(num2str(ii)) '_voltages.mat']);
     
     save([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat'],'spikes','-v7.3');
-    save([datafolder dataname '_ii_' char(num2str(ii)) '_voltages.mat'],'V','-v7.3');
-    
-    if UP == false
-        lastSpikeTimes(ii) = SimValuesArray(ii).spikes(end,1) - 1e3;
-    end
-        
-end
-
-if UP == false
-    save([datafolder dataname '_lastSpikeTimes.mat'],'lastSpikeTimes','-v7.3'); 
+    %save([datafolder dataname '_ii_' char(num2str(ii)) '_voltages.mat'],'V','-v7.3');
+         
 end
 
 end
