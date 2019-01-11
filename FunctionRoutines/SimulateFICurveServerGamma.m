@@ -1,4 +1,4 @@
-function [] = SimulateFICurveServer(PopParams_in,Irange,numI,datafolder,dataname,varargin)
+function [] = SimulateFICurveServerGamma(PopParams_in,Irange,numI,datafolder,dataname,varargin)
 
 %% Input options
 defaulttimeparms.simtime = 2000; %ms, time to simulate each "trial"
@@ -51,13 +51,22 @@ lastSpikeTimes = nan(numI,1);
 
 for ii = 1:numI
     
+    r = [244,318,355,395,697,1055,1214,1368,1581,1981,2001,2037,2265,2284,2290,2393,2394,2399,2413,2427];
+        
+    Gamma.g_e = SimValues.g_e(r,:);
+    Gamma.g_i = SimValues.g_i(r,:);
+    
     %V = SimValuesArray(ii).V;
     %spikes = SimValuesArray(ii).spikes;
     
-    disp([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat']);
+    disp([datafolder dataname '_ii_' char(num2str(ii)) '_Gamma.mat']);
+    
+    %disp([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat']);
     %disp([datafolder dataname '_ii_' char(num2str(ii)) '_voltages.mat']);
     
-    save([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat'],'spikes','-v7.3');
+    save([datafolder dataname '_ii_' char(num2str(ii)) '_Gamma.mat'],'Gamma','-v7.3');
+    
+    %save([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat'],'spikes','-v7.3');
     %save([datafolder dataname '_ii_' char(num2str(ii)) '_voltages.mat'],'V','-v7.3');
     
 end

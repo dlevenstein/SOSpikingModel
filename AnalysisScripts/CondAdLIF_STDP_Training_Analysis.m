@@ -58,7 +58,7 @@ PopParams.Kei   = 250;        %Expected I->E In Degree
 TimeParams.dt      = 0.05;
 
 %%
-SimTime = 5e4;
+SimTime = 1e4;
 
 TimeParams.SimTime = SimTime;
 

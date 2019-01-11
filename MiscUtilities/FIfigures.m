@@ -1,4 +1,4 @@
-function [rate,peakwidth,peakheight,lastspikes,S] = FIfigures(II,name,path)
+function [rate,peakwidth,peakheight,lastspikes,S] = FIfigures(II,path)
 
 dinfo = dir;
 
@@ -12,8 +12,12 @@ Times = [];
 for dd = 1:length(dinfo)
     
     try
-
-    load(dinfo(dd).name)
+        
+    if dinfo(dd).bytes < 1000000
+        load(dinfo(dd).name)
+    else
+        continue
+    end
         
     id = find(spikes(:,1) > 1e3+10);
     
@@ -53,6 +57,12 @@ spikesbycell = spikeSorter(S,1,2500);
 Espikesbycell = spikeSorter(S,1,2000);
 Ispikesbycell = spikeSorter(S,2001,2500);
 
+rate.E = 0;
+rate.I = 0;
+
+NumEspikes = 0;
+NumIspikes = 0;
+
 ISI_E = [];
 ISI_I = [];
 
@@ -63,6 +73,7 @@ for ii = 1:2500
             ISI_E = [ISI_E; 2e3];
         else
             ISI_E = [ISI_E; diff(Espikesbycell{ii})];
+            NumEspikes = NumEspikes + length(Espikesbycell{ii});
         end
     end
     if ii > 2000
@@ -70,25 +81,13 @@ for ii = 1:2500
             ISI_I = [ISI_I; 2e3];
         else
             ISI_I = [ISI_I; diff(Ispikesbycell{ii})];
+            NumIspikes = NumIspikes + length(Ispikesbycell{ii});
         end
     end
    
 end
 
-rate.E = 1000./mean(ISI_E);
-rate.I = 1000./mean(ISI_I);
-
-bins = linspace(0,4,25);
-
-rate.Edist = hist(log10(1000./ISI_E), bins);
-rate.Idist = hist(log10(1000./ISI_I), bins);
-
-rate.bins = bins;
-
 else
-    
-    rate.Edist = zeros(1,25);
-    rate.Idist = zeros(1,25);
 
     rate.E = 0;
     rate.I = 0;
@@ -103,8 +102,34 @@ end
 
 %%
 
-if length(S(:,1)) >= 1e3
+if isempty(S)
+    
+    if isnan(rate.E)
+        rate.E = 0;
+    end
+    if isnan(rate.I)
+        rate.I = 0;
+    end
+    
+    peakheight.E = 0;
+    peakheight.I = 0;
+        
+    peakwidth.E = nan;
+    peakwidth.I = nan;
+    
+elseif length(S(:,1)) >= 1e3
 
+if length(max(S(find(S(:,2) < 2001),1))) > 0
+rate.E = (NumEspikes./max(S(find(S(:,2) < 2001),1))).*(1000./2500);
+else
+rate.E = 0; 
+end
+if length(max(S(find(S(:,2) >= 2001),1))) > 0
+rate.I = (NumIspikes./max(S(find(S(:,2) >= 2001),1))).*(1000./2500);
+else
+rate.I = 0;
+end
+    
 Espikes = cat(1,spikesbycell{1:2000});
 Ispikes = cat(1,spikesbycell{2001:2500});
 [ccg,t_ccg] = CCG({double(Espikes./1000),double(Ispikes./1000)},[],'binSize',0.001,'duration',0.1,'norm','rate');
@@ -130,7 +155,7 @@ Ispikes = cat(1,spikesbycell{2001:2500});
 % xlabel('Time Lag (ms)');ylabel('Rate (Hz)')
 % 
 % NiceSave(['Raster_II_' num2str(II)],path,[]);
-% %close all
+% close all
 
 [d,d,w] = findpeaks(ccg(:,1,1)./2000,t_ccg*1000,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
 if ismember(0,d)
@@ -185,12 +210,12 @@ else
     
 %     NiceSave([name num2str(II)],path,[]);
     
-    if isnan(rate.E)
-        rate.E = 0;
-    end
-    if isnan(rate.I)
-        rate.I = 0;
-    end
+%     if isnan(rate.E)
+%         rate.E = 0;
+%     end
+%     if isnan(rate.I)
+%         rate.I = 0;
+%     end
     
     peakheight.E = 0;
     peakheight.I = 0;

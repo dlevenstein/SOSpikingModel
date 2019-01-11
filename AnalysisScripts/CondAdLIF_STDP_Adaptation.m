@@ -37,8 +37,8 @@ PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.a       = 0;   %adaptation decay timescale (1/ms)
 PopParams.b       = 0;    %adaptation activation rate (1/ms)
-PopParams.tau_w   = 100;     %subthreshold adaptation steepness
-PopParams.gwnorm  = 1;       %magnitude of adaptation
+PopParams.tau_w   = 1000;     %subthreshold adaptation steepness
+PopParams.gwnorm  = PopParams.g_L(1);       %magnitude of adaptation
 
 %Network Properties
 PopParams.Wee   = 0;        %E->E weight (nS)
@@ -59,109 +59,266 @@ PopParams.LearningRate = 0;
 PopParams.TargetRate = 2; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
-a = 0:0.001:0.08;
-b = 0:1:100;
-
-Ivals = 0:10:1000;
-
-ISI_a = zeros(length(a),length(Ivals));
-ISI_b = zeros(length(b),length(Ivals));
-
-w_a = zeros(length(a),length(Ivals));
-w_b = zeros(length(b),length(Ivals));
-
 %%
-for aa = 10
-for ii = 26
-    
-PopParams.I_e = Ivals(ii);
-PopParams.a = a(aa);
-PopParams.b = 0;
-    
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false);
 
-ISI_a(aa,ii) = 1./mean(diff(SimValues.spikes(SimValues.spikes(:,1) > 1.5e3)));
-
-if isempty(SimValues.spikes(SimValues.spikes(:,1) > 1e3))
-    ISI_a(aa,ii) = 0;
-end
-
-w_a(aa,ii) = mean(SimValues.w(2001:end));
-
-figure
-subplot(2,1,1)
-plot(SimValues.t,SimValues.V)
-xlabel('Time (ms)');ylabel('Voltage (mV)');title(['Current ' num2str(Ivals(ii))])
-xlim([100 200]);
-subplot(2,1,2)
-plot(SimValues.t,SimValues.w)
-xlabel('Time (ms)');ylabel('Adaptation (nS)')
-xlim([100 200]);
-
-end
-end
-
-%%
-for bb = 70
-for ii = 101
-    
-PopParams.I_e = Ivals(ii);
-
+PopParams.I_e = @(t) 250.*(heaviside(t-1000)-heaviside(t-9000));
+PopParams.b = 1;
 PopParams.a = 0;
-PopParams.b = b(bb);
+
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
+
+%%
+figure
+
+pos = [0.1 0.68 0.8 0.25];
+subplot('Position',pos)
+
+plot(SimValues.t,SimValues.g_w,'k','LineWidth',2)
+
+set(gca,'xticklabel',[])
+
+ylabel('Adaptation (nS)','FontSize',16)
+
+pos = [0.1 0.39 0.8 0.25];
+subplot('Position',pos)
+
+plot(SimValues.t,SimValues.V,'k','LineWidth',2)
+
+set(gca,'xticklabel',[])
+
+ylabel('Voltage (mV)','FontSize',16)
+
+pos = [0.1 0.1 0.8 0.25];
+subplot('Position',pos)
+
+plot(SimValues.t,SimValues.Input,'k','LineWidth',2)
+
+xlabel('Current (pA)','FontSize',16);ylabel('Current (pA)','FontSize',16)
+
+NiceSave('AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+
+%%
+
+Ivals = 0:100:1e3;
+
+Rate = zeros(1,length(Ivals));
+Adaptation = zeros(1,length(Ivals));
+
+for ii = 1:length(Ivals)
+
+PopParams.I_e = Ivals(ii);
+PopParams.b = 1;
+PopParams.a = 0;
+
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
+
+if length(SimValues.spikes(:,1)) > 1
     
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false);
+    Rate(ii) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
 
-ISI_b(bb,ii) = 1./mean(diff(SimValues.spikes(SimValues.spikes(:,1) > 1e3)));
+    t0 = find(single(SimValues.t) == SimValues.spikes(end-1,1));
+    t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
+    
+    Adaptation(ii) = mean(SimValues.g_w(t0:t1));
 
-if isnan(ISI_b(bb,ii))
-    ISI_b(bb,ii) = 0;
+end
+    
 end
 
-w_b(bb,ii) = mean(SimValues.w(2001:end));
+%%
+figure
 
-if isnan(w_b(bb,ii))
-    w_b(bb,ii) = 0;
+pos = [0.1 0.54 0.8 0.4];
+subplot('Position',pos)
+
+plot(Ivals,Adaptation,'.-k','LineWidth',2,'MarkerSize',10)
+
+set(gca,'xticklabel',[])
+
+ylabel('Adaptation (nS)','FontSize',20)
+
+pos = [0.1 0.1 0.8 0.4];
+subplot('Position',pos)
+
+plot(Ivals,Rate,'.-k','LineWidth',2,'MarkerSize',10)
+
+xlabel('Current (pA)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
+
+NiceSave('CurrentvAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+
+%%
+
+avals = 0:0.001:0.01;
+
+Rate = zeros(1,length(avals));
+Adaptation = zeros(1,length(avals));
+
+for aa = 1:length(avals)
+
+PopParams.I_e = 250;
+PopParams.b = 0;
+PopParams.a = avals(aa);
+
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
+
+if length(SimValues.spikes(:,1)) > 1
+    
+    if SimValues.spikes(end,1) > 5000
+        
+        Rate(aa) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
+
+        t0 = find(single(SimValues.t) == SimValues.spikes(end-1,1));
+        t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
+
+        Adaptation(aa) = mean(SimValues.g_w(t0:t1));
+        
+    else
+        
+        Rate(aa) = 0;
+
+        t0 = find(single(SimValues.t) == 5000);
+
+        Adaptation(aa) = mean(SimValues.g_w(t0:end));
+        
+    end
+    
 end
+    
+end
+
+%%
+figure
+
+pos = [0.1 0.54 0.8 0.4];
+subplot('Position',pos)
+
+plot(avals,Adaptation,'.-k','LineWidth',2,'MarkerSize',10)
+
+set(gca,'xticklabel',[])
+
+ylabel('Adaptation (nS)','FontSize',20)
+
+pos = [0.1 0.1 0.8 0.4];
+subplot('Position',pos)
+
+plot(avals,Rate,'.-k','LineWidth',2,'MarkerSize',10)
+
+xlabel('Subthreshold Adaptation (nS)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
+
+NiceSave('SubthresholdAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+
+%%
+
+TimeParams.SimTime = 2e4;
+
+bvals = logspace(-1,2,10);%0:5:100;
+
+Rate = zeros(1,length(bvals));
+Adaptation = zeros(1,length(bvals));
+
+for bb = 1:length(bvals)
+
+PopParams.I_e = 250;
+PopParams.b = bvals(bb);
+PopParams.a = 0;
+
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
+
+% figure
+% subplot(2,1,1)
+% plot(SimValues.t,SimValues.g_w,'k')
+% subplot(2,1,2)
+% plot(SimValues.t,SimValues.V,'k')
+
+if length(SimValues.spikes(:,1)) > 1
+    
+    Rate(bb) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
+
+    t0 = find(single(SimValues.t) == SimValues.spikes(end-1,1));
+    t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
+    
+    Adaptation(bb) = mean(SimValues.g_w(t0:t1));
+
+end
+    
+end
+
+%%
+figure
+
+pos = [0.1 0.54 0.8 0.4];
+subplot('Position',pos)
+
+plot(bvals,Adaptation,'.-k','LineWidth',2,'MarkerSize',10)
+
+set(gca,'xticklabel',[])
+
+ylabel('Adaptation (nS)','FontSize',20)
+
+pos = [0.1 0.1 0.8 0.4];
+subplot('Position',pos)
+
+plot(bvals,Rate,'.-k','LineWidth',2,'MarkerSize',10)
+
+xlabel('Spike-Based Adaptation (nS)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
+
+NiceSave('Spike-BasedAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+
+%%
+
+tau_vals = logspace(-1,3,10);
+
+Rate = zeros(1,length(tau_vals));
+Adaptation = zeros(1,length(tau_vals));
+
+TimeParams.SimTime = 1e4;
+
+for tt = 1:length(tau_vals)
+
+PopParams.I_e = 250;
+PopParams.b = 1;
+PopParams.a = 0;
+
+PopParams.tau_w = tau_vals(tt);
+
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
 
 figure
 subplot(2,1,1)
-plot(SimValues.t,SimValues.V)
-xlabel('Time (ms)');ylabel('Voltage (mV)');title(['Current ' num2str(Ivals(ii))])
-xlim([0 1000])
+plot(SimValues.t,SimValues.g_w,'k')
 subplot(2,1,2)
-plot(SimValues.t,SimValues.w)
-xlabel('Time (ms)');ylabel('Adaptation (nS)')
-xlim([0 1000])
+plot(SimValues.t,SimValues.V,'k')
+
+if length(SimValues.spikes(:,1)) > 1
+    
+    Rate(tt) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
+
+    t0 = find(single(SimValues.t) == SimValues.spikes(end-1,1));
+    t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
+    
+    Adaptation(tt) = mean(SimValues.g_w(t0:t1));
 
 end
+    
 end
 
 %%
-
-for aa = 1:length(a)
-    
 figure
-plot(ISI_a(aa,:),w_a(aa,:),'.k')
-xlabel('1/ISI');ylabel('Adaptation');title(['Subthreshold Adaptation a: ' num2str(a(aa))])
 
-NiceSave(['Subthreshold_Based_Adaptation_a_' num2str(a(aa))],'~/Desktop/TrainedWeights/figures/',[])
+pos = [0.1 0.54 0.8 0.4];
+subplot('Position',pos)
 
-close all
+plot(tau_vals,Adaptation,'.-k','LineWidth',2,'MarkerSize',10)
 
-end
+set(gca,'xticklabel',[])
 
-%%
+ylabel('Adaptation (nS)','FontSize',20)
 
-for bb = 1:length(b)
-    
-figure
-plot(ISI_b(bb,:),w_b(bb,:),'.k')
-xlabel('1/ISI');ylabel('Adaptation');title(['Spike-Based Adaptation b: ' num2str(b(bb))])
+pos = [0.1 0.1 0.8 0.4];
+subplot('Position',pos)
 
-NiceSave(['Spike_Based_Adaptation_b_' num2str(b(bb))],'~/Desktop/TrainedWeights/figures/',[])
+plot(tau_vals,Rate,'.-k','LineWidth',2,'MarkerSize',10)
 
-close all
+xlabel('Adaptation Decay (ms)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
 
-end
-
+NiceSave('AdaptationDecayAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])

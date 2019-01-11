@@ -11,14 +11,14 @@ Irates = zeros(1,500);
 for ee = 1:2000
     
     S = spikesbycell{ee};
-    Erates(ee) = 1000./mean(diff(S));
+    Erates(ee) = length(S);
     
 end
 
 for ii = 2001:2500
     
     S = spikesbycell{ii};
-    Irates(ii) = 1000./mean(diff(S));
+    Irates(ii) = length(S);
     
 end
 

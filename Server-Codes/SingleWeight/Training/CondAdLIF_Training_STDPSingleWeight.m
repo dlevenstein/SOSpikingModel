@@ -8,7 +8,7 @@ names = ["01","03","1","3","10"];
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
 %repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
-repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
+repopath = '/home/jmg1030/Documents/SOSpikingModel/';
 addpath(genpath(repopath))
 
 SAVESIM = true;
@@ -40,11 +40,10 @@ PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
 
 %Adaptation Properties (No adaptation)
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
-PopParams.b_w     = 0.01;   %adaptation decay timescale (1/ms)
+PopParams.a       = 0;   %adaptation decay timescale (1/ms)
 PopParams.b       = 0;    %adaptation activation rate (1/ms)
-PopParams.delta_T = 0;     %subthreshold adaptation steepness
-PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
-PopParams.gwnorm  = 0;       %magnitude of adaptation
+PopParams.tau_w   = 1000;     %subthreshold adaptation steepness
+PopParams.gwnorm  = PopParams.g_L(1);       %magnitude of adaptation
 
 %Network Properties
 PopParams.Wee   = vals(mm);        %E->E weight (nS)
@@ -59,7 +58,7 @@ PopParams.Kei   = 250;        %Expected I->E In Degree
 TimeParams.dt      = 0.05;
 
 %%
-SimTime = 5e5;
+SimTime = 1e5;
 RecordTime = 1e4;
 
 TimeParams.SimTime = SimTime+RecordTime;
@@ -73,10 +72,10 @@ PopParams.tauSTDP = 20;
 %%
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',SimTime,'save_dt',SimTime,...
-    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime]);
+    'recordInterval',[0:RecordTime:RecordTime;(SimTime-RecordTime):RecordTime:SimTime]);
 
 if SAVESIM==true
-    save(['/scratch/jmg1030/FIcurve/data/singleWeight_w_' char(names(mm))],'-v7.3')
+    save(['/home/jmg1030/Documents/Networks/Uniform/TrainedNetworks/UniformWeight_w_' char(names(mm))],'-v7.3')
 end
 
 end
