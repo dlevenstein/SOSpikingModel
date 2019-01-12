@@ -589,6 +589,8 @@ SimValues.a_w             = gather(SimValues.a_w);
 SimValues.Input           = gather(SimValues.Input);
 SimValues.WeightMat       = gather(SimValues.WeightMat);
     
+spikes = gather(spikes);
+
 %%
 %Catch for no spiking in simulation error
 spikes(spikecounter+1:end,:)=[];

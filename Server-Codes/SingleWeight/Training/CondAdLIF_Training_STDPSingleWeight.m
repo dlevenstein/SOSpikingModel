@@ -72,7 +72,7 @@ PopParams.tauSTDP = 20;
 %%
 SimValues = AdLIFfunction_STDP_GPU(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',SimTime,'save_dt',SimTime,...
-    'recordInterval',[0:RecordTime:RecordTime;(SimTime-RecordTime):RecordTime:SimTime]);
+    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime]);
 
 if SAVESIM==true
     save(['/home/jmg1030/Documents/Networks/Uniform/TrainedNetworks/UniformWeight_w_' char(names(mm))],'-v7.3')
