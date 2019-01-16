@@ -3,8 +3,8 @@
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
+%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel'; 
 addpath(genpath(repopath))
 
 figfolder = [repopath,'/Figures/EIBalance'];

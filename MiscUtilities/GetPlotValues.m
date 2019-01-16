@@ -1,8 +1,6 @@
-function [ exNeu,t_ccg,ccg,currx,condx,t_lags ] = GetPlotValues( SimValues,PopParams,timewin )
+function [ sortrate, poprate, ISIdist, vm, exNeu,t_ccg,ccg,currx,condx,t_lags ] = GetPlotValues( SimValues,PopParams )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
-%% DEV
-%timewin = [39000 40000];
 %%
 %% Calcualte each cell's spike rate and rate sortings
 cellrates = cellfun(@length,SimValues.spikesbycell)./(SimValues.t(end)./1000);
@@ -24,7 +22,7 @@ poprate.I = sum(spikemat(:,SimValues.IcellIDX),2)./(winsize./1000)./length(SimVa
 %% Spike statistics
 
 %ISI distirbutions
-ISIdist.bins = linspace(0,3.5,50);
+ISIdist.bins = linspace(0,3.5,25);
 ISIs = cellfun(@diff,SimValues.spikesbycell,'uniformoutput',false);
 ISIdist.E = hist(log10(cat(1,ISIs{SimValues.EcellIDX})),ISIdist.bins);
 ISIdist.E = ISIdist.E./sum(ISIdist.E);

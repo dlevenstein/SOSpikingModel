@@ -66,7 +66,6 @@ addParameter(p,'save_dt',0.5,@isnumeric)
 addParameter(p,'save_weights',10,@isnumeric)
 addParameter(p,'cellout',false,@islogical)
 addParameter(p,'recordInterval',[],@isnumeric)
-addParameter(p,'intersave',[],@ischar)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
@@ -75,7 +74,6 @@ save_dt = p.Results.save_dt;
 save_weights = p.Results.save_weights;
 cellout = p.Results.cellout;
 recordIntervals = p.Results.recordInterval;
-intersave = p.Results.intersave;
 
 recordVALs = createRecorder(recordIntervals,TimeParams);
 
@@ -228,7 +226,6 @@ SimValues.g_e             = nan(PopNum,SaveTimeLength);
 SimValues.g_i             = nan(PopNum,SaveTimeLength);
 SimValues.s               = nan(PopNum,SaveTimeLength);
 SimValues.w               = nan(PopNum,SaveTimeLength);
-SimValues.x               = nan(PopNum,SaveTimeLength);
 SimValues.a_w             = nan(PopNum,SaveTimeLength);
 SimValues.Input           = nan(PopNum,SaveTimeLength);
 SimValues.t_weight        = nan(1,WeightSaveLength);
@@ -280,9 +277,9 @@ if length(E_w) == 2
 E_w         = transpose([E_w(1).*ones(1,EPopNum),     E_w(2).*ones(1,IPopNum)]);
 end
 if length(tau_w) == 2 
-tau_w       = transpose([tau_w(1).*ones(1,EPopNum), tau_w(2).*ones(1,IPopNum)]);
+tau_w     = transpose([tau_w(1).*ones(1,EPopNum), tau_w(2).*ones(1,IPopNum)]);
 elseif length(tau_w) == 1
-tau_w       = transpose([tau_w.*ones(1,EPopNum), tau_w.*ones(1,IPopNum)]);
+tau_w     = transpose([tau_w(1).*ones(1,EPopNum), 0.*ones(1,IPopNum)]);
 end
 if length(gwnorm) == 2 
 gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)]);
@@ -320,7 +317,7 @@ end
 if isfield(PopParams,'V0')
     V(:,1) = PopParams.V0;
 else
-    V0range = [min(E_L) min(V_th)]; %make this neuron vector
+    V0range = [min(E_L) max(V_th)]; %make this neuron vector
     V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 end
 %% Time Loop
@@ -333,10 +330,6 @@ for tt=1:SimTimeLength
     %% Time Counter
     if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
         display([num2str(round(100.*tt./SimTimeLength)),'% Done!']) %clearly, this needs improvement
-        if isempty(intersave) == false
-            trainedWeight = EE_mat+II_mat+EI_mat+IE_mat;
-            save(intersave,'trainedWeight','-v7.3');
-        end
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     
@@ -351,7 +344,7 @@ for tt=1:SimTimeLength
              - g_w.*(V-E_w) ...                      %Adaptation
              - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
              + I_e(timecounter) + X_t)./C;           %External input
-        
+    
     %s - Synaptic Output 
     dsdt =  - s./tau_s;
     %w - Adaptation Variable
@@ -382,7 +375,7 @@ for tt=1:SimTimeLength
         spikecounter = spikecounter+numspikers;
         
         %Jump the conductance
-        s(spikeneurons) = 1;
+        s(spikeneurons) = s(spikeneurons) + 1;
         %Set spiking neurons refractory period 
         t_r(spikeneurons) = t_ref(spikeneurons);
         %Jump the adaptation
@@ -390,18 +383,23 @@ for tt=1:SimTimeLength
         %Jump the synaptic trace
         x(spikeneurons) = x(spikeneurons) + 1;
         
-        %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
+        %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E and I->I
         %Presynaptic I Cells
         %PreIspikes = intersect(spikeneurons,Icells);
         PreIspikes = spikeneurons(spikeneurons > EPopNum);
         EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
+        II_mat(IcellIDX,PreIspikes) = II_mat(IcellIDX,PreIspikes) + LearningRate.*(x(IcellIDX)-alpha);
         %Postsynaptic E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
         PostEspikes = spikeneurons(spikeneurons <= EPopNum);
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
+        II_mat(PreIspikes,IcellIDX)  = II_mat(PreIspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
+        
+        II_mat = II_mat.*isconnected; %Keep only connected pairs
+        II_mat(II_mat<=0) = 0; %Get rid of any negative synapses...
         
     end
 
@@ -422,13 +420,7 @@ for tt=1:SimTimeLength
         
     %% Add data to the output variables
     %Question: is accessing structure slower than doubles?
-    
-    if any(V == inf)
-        warning('Numerical Error');
-    elseif any(isnan(V))
-        warning('Numerical Error');
-    end
-    
+
     if mod(timecounter,save_dt)==0 && timecounter>=0
         if recordVALs(tt)
             
@@ -439,7 +431,6 @@ for tt=1:SimTimeLength
          SimValues.g_i(:,savecounter)             = g_i;
          SimValues.s(:,savecounter)               = s;
          SimValues.w(:,savecounter)               = w;
-         SimValues.x(:,savecounter)               = x;
          SimValues.a_w(:,savecounter)             = a_w;
          SimValues.Input(:,savecounter)           = I_e(timecounter) + X_t;
         

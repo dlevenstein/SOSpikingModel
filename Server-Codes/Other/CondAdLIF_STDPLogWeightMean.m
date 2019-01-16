@@ -1,13 +1,14 @@
-function CondAdLIF_STDPWeightServer(w)
+function CondAdLIF_STDPLogWeightMean(mm)
 
-Weights = [1,3,10];
+Mvals = [0.1,0.3,1,3,10];
+Mnames = ["01","03","1","3","10"];
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
 %repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
-repopath = '/home/jmg1030/SOSpikingModel';
+repopath = '/scratch/jmg1030/LogWeightMean/SOSpikingModel';
 addpath(genpath(repopath))
 
 SAVESIM = true;
@@ -46,10 +47,10 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-PopParams.Wee   = Weights(w);        %E->E weight (nS)
-PopParams.Wii   = Weights(w);        %I->I weight
-PopParams.Wie   = Weights(w);        %E->I weight
-PopParams.Wei   = Weights(w);        %I->E weight
+PopParams.Wee   = Mvals(mm);        %E->E weight (nS)
+PopParams.Wii   = Mvals(mm);        %I->I weight
+PopParams.Wie   = Mvals(mm);        %E->I weight
+PopParams.Wei   = Mvals(mm);        %I->E weight
 PopParams.Kee   = 250;        %Expected E->E In Degree
 PopParams.Kii   = 250;        %Expected I->I In Degree
 PopParams.Kie   = 250;        %Expected E->I In Degree
@@ -57,13 +58,54 @@ PopParams.Kei   = 250;        %Expected I->E In Degree
 
 TimeParams.dt      = 0.05;
 
-close all
+%%
 
-%PopParams.p0spike = 0.1; %Proportion of neurons spiking in the beginning of the simulation
+m = Mvals(mm);
+s = 1;
+
+mu = log((m^2)/sqrt(s+m^2));
+sigma = sqrt(log((s/m^2)+1));
 
 %%
 
-TimeParams.SimTime = 200000;
+EPopNum = PopParams.EPopNum;
+IPopNum = PopParams.IPopNum;
+PopNum = EPopNum + IPopNum;
+
+EcellidX = 1:EPopNum;
+IcellidX = EPopNum+1:PopNum;
+
+W = zeros(PopNum,PopNum);
+
+Pee = PopParams.Kee/(EPopNum-1);
+Pii = PopParams.Kii/(IPopNum-1);
+Pie = PopParams.Kie/EPopNum;
+Pei = PopParams.Kei/IPopNum;
+
+W(EcellidX,EcellidX) = rand(EPopNum,EPopNum) <= Pee;
+W(EcellidX,EcellidX) = PopParams.Wee.*W(EcellidX,EcellidX);
+
+W(IcellidX,IcellidX) = rand(IPopNum,IPopNum) <= Pii;
+W(IcellidX,IcellidX) = PopParams.Wii.*W(IcellidX,IcellidX);
+
+W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
+W(IcellidX,EcellidX) = PopParams.Wie.*W(IcellidX,EcellidX);
+
+W(EcellidX,IcellidX) = rand(EPopNum,IPopNum) <= Pei;
+W(EcellidX,IcellidX) = PopParams.Wei.*W(EcellidX,IcellidX);
+
+W(EcellidX,EcellidX) = lognrnd(mu,sigma,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
+
+W(diag(diag(true(size(W)))))=0;
+
+PopParams.W = W;
+
+
+%%
+SimTime = 5e5;
+RecordTime = 1e4;
+
+TimeParams.SimTime = SimTime+RecordTime;
 
 %%
 
@@ -73,11 +115,11 @@ PopParams.tauSTDP = 20;
 
 %%
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',1e4,'save_dt',500000,...
-    'recordInterval',[0:1e5:200000;(0:1e5:200000) + 1e4]);
+    'save_weights',SimTime,'save_dt',SimTime,...
+    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime]);
 
 if SAVESIM==true
-    save(['/scratch/jmg1030/largePopWeight' num2str(Weights(w))],'-v7.3')
+    save(['/scratch/jmg1030/LogWeightMean/data/logWeight_s_' char(Snames(mm))],'-v7.3')
 end
 
 end

@@ -1,7 +1,7 @@
-%Conductance-Based Adapting LIF Model, Euler Mayurama   implementation 
+%Conductance-Based Adapting LIF Model for GPU, Euler Mayurama implementation 
 %with Conductance-based Jump-decay STDP synapses
 %by Jonathan Gornet and DLevenstein
-%Last update: 4/8/2018
+%Last update: 01/11/2019
 
 %INPUTS
 %   PopParams       a structure that gives all the parameters of the population
@@ -54,8 +54,16 @@
 %
 
 %--------------------------------------------------------------------------
-function [SimValues] = AdLIFfunction_STDP(PopParams,TimeParams,varargin)
-
+function [SimValues] = AdLIFfunction_STDP_GPU(PopParams,TimeParams,varargin)
+%% Check if GPU Available
+try
+    gpuArray()
+    gpuAvail = true;
+catch
+    gpuAvail = false;
+    warning('Warning, code is only made for gpu');
+end
+%%
 %--------------------------------------------------------------------------
 %Parse optional inputs
 p = inputParser;
@@ -197,6 +205,44 @@ tauSTDP      = PopParams.tauSTDP;    %Time Constant for the STDP curve (Units of
 alpha = 2.*(TargetRate./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
 %Note target rate is converted to spks/ms
 
+    
+E_L         = PopParams.E_L;      %Reversal potential (mV)
+g_L         = PopParams.g_L;     %conductance (nS)
+C           = PopParams.C;       %capacitance (pF)
+I_e         = PopParams.I_e;      %current (pA)
+V_th        = PopParams.V_th;    %spike threshhold (mV)
+V_reset     = PopParams.V_reset; %reset value (mV)
+
+t_ref       = PopParams.t_ref;   %refractory period (ms)
+
+sigma       = PopParams.sigma;   %Standard deviation of noise
+theta       = PopParams.theta;   %Strength to mean (time scale of noise, ms^-1)
+
+%--------------------------------------------------------------------------
+%Adaptation
+E_w         = PopParams.E_w;     %Adaptation reversal potential, (mV)
+
+tau_w       = PopParams.tau_w;   %Adaptation Decay
+
+gwnorm      = PopParams.gwnorm;  %Adaptation norm (nS)
+
+a           = PopParams.a;       %Subthreshhold Adaptation (nS)
+b           = PopParams.b;       %Spike Adaptation (nS)
+
+%--------------------------------------------------------------------------
+% Synapse Parameters
+E_e         = PopParams.E_e;     %Excitatory reversal potential (mV)
+E_i         = PopParams.E_i;     %Inhibitory reversal potential (mV)
+
+tau_s       = PopParams.tau_s;     %Synaptic decay (ms)
+
+%STDP parameters
+LearningRate = PopParams.LearningRate;
+TargetRate   = PopParams.TargetRate; %Target Rate for Excitatory cells (units of Hz)
+tauSTDP      = PopParams.tauSTDP;    %Time Constant for the STDP curve (Units of ms)
+
+alpha = 2.*(TargetRate./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
+
 %% Input: convert into function of t
 if isa(I_e, 'function_handle')
 elseif isequal(size(I_e),[1 1])
@@ -323,34 +369,103 @@ else
     V0range = [min(E_L) min(V_th)]; %make this neuron vector
     V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 end
+
+%%
+if gpuAvail
+    %Time Parameters
+    dt      = gpuArray(dt);
+    
+    %Noise Parameters
+    theta = gpuArray(theta);
+    sigma = gpuArray(sigma);
+    
+    %Voltage Parameters
+    C = gpuArray(C);
+    
+    g_L = gpuArray(g_L);
+    E_L = gpuArray(E_L);
+    
+    gwnorm = gpuArray(gwnorm);
+    E_w = gpuArray(E_w);
+    E_e = gpuArray(E_e);
+    E_i = gpuArray(E_i);
+    
+    %Weight Parameters
+    EE_mat = gpuArray(EE_mat);
+    II_mat = gpuArray(II_mat);
+    IE_mat = gpuArray(IE_mat);
+    EI_mat = gpuArray(EI_mat);
+    
+    %Spike Parameters
+    V_th = gpuArray(V_th);
+    t_r  = gpuArray(t_r);
+    V_reset = gpuArray(V_reset);
+    
+    %Adaptation Parameters
+    a = gpuArray(a);
+    b = gpuArray(b);
+    tau_w = gpuArray(tau_w);
+    
+    %Plasticity Parameters
+    tauSTDP = gpuArray(tauSTDP);
+    LearningRate = gpuArray(LearningRate);
+    alpha = gpuArray(alpha);
+    
+    %Variables
+    X_t = gpuArray(X_t);
+    V = gpuArray(V);
+    s = gpuArray(s);
+    w = gpuArray(w);
+    x = gpuArray(x);
+    
+    g_w = gpuArray(g_w);
+    g_e = gpuArray(g_e);
+    g_i = gpuArray(g_i);
+    
+    spikes = gpuArray(spikes);
+    
+    % Random Numbers
+    gpurng(0, 'Philox4x32-10');
+    
+    % Save Parameters
+    SimValues.V               = gpuArray(SimValues.V);
+    SimValues.g_w             = gpuArray(SimValues.g_w);
+    SimValues.g_e             = gpuArray(SimValues.g_e);
+    SimValues.g_i             = gpuArray(SimValues.g_i);
+    SimValues.s               = gpuArray(SimValues.s);
+    SimValues.w               = gpuArray(SimValues.w);
+    SimValues.x               = gpuArray(SimValues.x);
+    SimValues.a_w             = gpuArray(SimValues.a_w);
+    SimValues.Input           = gpuArray(SimValues.Input);
+    SimValues.WeightMat       = gpuArray(SimValues.WeightMat);
+
+end
+
 %% Time Loop
 savecounter = 1;
 weightcounter = 1;
-timecounter = -onsettime-dt;
+timecounter = gather(-onsettime-dt);
+gputimecounter = -onsettime-dt;
 spikecounter = 0;
 tic
 for tt=1:SimTimeLength
     %% Time Counter
     if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
         display([num2str(round(100.*tt./SimTimeLength)),'% Done!']) %clearly, this needs improvement
-        if isempty(intersave) == false
-            trainedWeight = EE_mat+II_mat+EI_mat+IE_mat;
-            save(intersave,'trainedWeight','-v7.3');
-        end
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     
     %Noise input (independent for each neuron... could also be correlated)
     %To do: precompte drive, so don't need random number generation each dt
     if sigma~=0
-        dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*randn(PopNum,1).*sqrt(dt);
+        dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*gpuArray.randn(PopNum,1).*sqrt(dt);
     end
     
     %V - Voltage Equation
     dVdt =  (- g_L.*(V-E_L) ...                      %Leak
              - g_w.*(V-E_w) ...                      %Adaptation
              - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
-             + I_e(timecounter) + X_t)./C;           %External input
+             + I_e(gputimecounter) + X_t)./C;           %External input
         
     %s - Synaptic Output 
     dsdt =  - s./tau_s;
@@ -365,8 +480,9 @@ for tt=1:SimTimeLength
     w   = w + dwdt.*dt;
     x   = x + dxdt.*dt;
 
-    timecounter = round(timecounter+dt,4);  %Round to deal with computational error
-
+    timecounter = round(timecounter+gather(dt),4);  %Round to deal with computational error
+    gputimecounter = gputimecounter+dt;
+    
     %% Spiking
     if any(V > V_th)
         %Find neurons that crossed threshold and record the spiketimes 
@@ -376,7 +492,7 @@ for tt=1:SimTimeLength
         
         if recordVALs(tt)
             spikes(spikecounter+1:spikecounter+numspikers,:) = ...
-                [timecounter.*ones(numspikers,1),spikeneurons];
+                [gputimecounter.*gpuArray(ones(numspikers,1)),gpuArray(spikeneurons)];
         end
         
         spikecounter = spikecounter+numspikers;
@@ -441,7 +557,7 @@ for tt=1:SimTimeLength
          SimValues.w(:,savecounter)               = w;
          SimValues.x(:,savecounter)               = x;
          SimValues.a_w(:,savecounter)             = a_w;
-         SimValues.Input(:,savecounter)           = I_e(timecounter) + X_t;
+         SimValues.Input(:,savecounter)           = I_e(gputimecounter) + X_t;
         
          savecounter = savecounter+1;
         end
@@ -460,11 +576,25 @@ for tt=1:SimTimeLength
 end
 toc
 
+%% Put back to CPU
+
+SimValues.V               = gather(SimValues.V);
+SimValues.g_w             = gather(SimValues.g_w);
+SimValues.g_e             = gather(SimValues.g_e);
+SimValues.g_i             = gather(SimValues.g_i);
+SimValues.s               = gather(SimValues.s);
+SimValues.w               = gather(SimValues.w);
+SimValues.x               = gather(SimValues.x);
+SimValues.a_w             = gather(SimValues.a_w);
+SimValues.Input           = gather(SimValues.Input);
+SimValues.WeightMat       = gather(SimValues.WeightMat);
+    
+spikes = gather(spikes);
+
 %%
 %Catch for no spiking in simulation error
 spikes(spikecounter+1:end,:)=[];
 if isempty(spikes); spikes = [nan nan]; end
-
 
 %% Figure
 if SHOWFIG
@@ -495,6 +625,7 @@ SimValues.spikes          = spikes;
 
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
-%SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
 
 end
+
+

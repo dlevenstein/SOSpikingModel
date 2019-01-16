@@ -6,13 +6,13 @@ repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel/';
 %repopath = '/home/jmg1030/SOSpikingModel';
 
 buzpath = '/Users/jonathangornet/Documents/GitHub/buzcode/';
-datafolder = '/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/05-5-2018/';
+%datafolder = '/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/05-5-2018/';
 
-figfolder = '~/Desktop/';
+%figfolder = '~/Desktop/';
 
 addpath(genpath(repopath))
 addpath(genpath(buzpath))
-addpath([repopath datafolder])
+%addpath([repopath datafolder])
 
 %%
 %Input
