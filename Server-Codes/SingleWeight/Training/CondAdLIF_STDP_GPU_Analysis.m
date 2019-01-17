@@ -68,7 +68,7 @@ PopParams.tauSTDP = 20;
 %%
 rng(1,'twister');
 
-PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
+PopParams.V0 = min(PopParams.E_L) + (min(PopParams.V_th)-min(PopParams.E_L)).*rand(PopParams.EPopNum + PopParams.IPopNum,1);
 
 %%
 
