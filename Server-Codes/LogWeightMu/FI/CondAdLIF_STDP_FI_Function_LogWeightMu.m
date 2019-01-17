@@ -8,7 +8,7 @@ repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
 %%
-names = ["logWeight_m_03.mat","logWeight_m_01.mat","logWeight_m_1.mat","logWeight_m_3.mat","logWeight_m_10.mat"];
+names = ["logWeight_m_01.mat","logWeight_m_03.mat","logWeight_m_1.mat","logWeight_m_3.mat","logWeight_m_10.mat"];
 weightNames = ["01","03","1","3","10"];
 
 %%
@@ -39,7 +39,7 @@ PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
 PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LogWeightMu/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LogWeightMu/spikes/';
 dataname = ['logMuWeight_' char(weightNames(LL)) '_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);

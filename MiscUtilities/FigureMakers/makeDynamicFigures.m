@@ -67,7 +67,7 @@ ww = indices(3);
 plot(dynamicVals(ww).t_ccg*1000,dynamicVals(ww).ccg(:,1,1)./2000,'Color',[0 0 0.5],'linewidth',2)
 
 ylabel('Rate (Hz)','fontsize',20);title('ACG','fontsize',20)
-ylim([0 5])
+%ylim([0 5])
 
 legend(legendnames(indices))
 

@@ -59,17 +59,17 @@ s = exp(-t./tau_s);
 for gg = 1:length(G)
 for n = 1:T-1
     
-    dvE = - vE(:,n,gg) + v_inf(1) - w.*s(n).*(vE(:,n,gg) - E_e);
-    dvI = - vI(:,n,gg) + v_inf(2) - w.*s(n).*(vI(:,n,gg) - E_i);
+    dvE = - G(gg).*vE(:,n,gg) + v_inf(1) - ((w.*s(n))./g_L(1)).*(vE(:,n,gg) - E_e);
+    dvI = - G(gg).*vI(:,n,gg) + v_inf(2) - ((w.*s(n))./g_L(2)).*(vI(:,n,gg) - E_i);
         
-    vE(:,n+1,gg) = vE(:,n,gg) + dvE.*dt.*(G(gg)./tau(1));
-    vI(:,n+1,gg) = vI(:,n,gg) + dvI.*dt.*(G(gg)./tau(2));
+    vE(:,n+1,gg) = vE(:,n,gg) + dvE.*dt./tau(1);
+    vI(:,n+1,gg) = vI(:,n,gg) + dvI.*dt./tau(2);
     
-    dVE = - VE(:,n,gg) + v_inf(1) - W.*s(n).*(VE(:,n,gg) - E_e);
-    dVI = - VI(:,n,gg) + v_inf(2) - W.*s(n).*(VI(:,n,gg) - E_i);
+    dVE = - G(gg).*VE(:,n,gg) + v_inf(1) - ((W.*s(n))./g_L(1)).*(VE(:,n,gg) - E_e);
+    dVI = - G(gg).*VI(:,n,gg) + v_inf(2) - ((W.*s(n))./g_L(2)).*(VI(:,n,gg) - E_i);
         
-    VE(:,n+1,gg) = VE(:,n,gg) + dVE.*dt.*(G(gg)./tau(1));
-    VI(:,n+1,gg) = VI(:,n,gg) + dVI.*dt.*(G(gg)./tau(2));
+    VE(:,n+1,gg) = VE(:,n,gg) + dVE.*dt./tau(1);
+    VI(:,n+1,gg) = VI(:,n,gg) + dVI.*dt./tau(2);
     
 end
 end

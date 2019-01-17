@@ -205,7 +205,9 @@ tauSTDP      = PopParams.tauSTDP;    %Time Constant for the STDP curve (Units of
 alpha = 2.*(TargetRate./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
 %Note target rate is converted to spks/ms
 
-    
+%--------------------------------------------------------------------------
+%Simulation Parameters
+%LIF Parameters
 E_L         = PopParams.E_L;      %Reversal potential (mV)
 g_L         = PopParams.g_L;     %conductance (nS)
 C           = PopParams.C;       %capacitance (pF)
@@ -492,7 +494,7 @@ for tt=1:SimTimeLength
         
         if recordVALs(tt)
             spikes(spikecounter+1:spikecounter+numspikers,:) = ...
-                [gputimecounter.*gpuArray(ones(numspikers,1)),gpuArray(spikeneurons)];
+                [gpuArray(timecounter).*gpuArray(ones(numspikers,1)),gpuArray(spikeneurons)];
         end
         
         spikecounter = spikecounter+numspikers;

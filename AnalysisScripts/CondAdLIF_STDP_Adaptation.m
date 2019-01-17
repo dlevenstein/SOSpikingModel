@@ -37,8 +37,8 @@ PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.a       = 0;   %adaptation decay timescale (1/ms)
 PopParams.b       = 0;    %adaptation activation rate (1/ms)
-PopParams.tau_w   = 1000;     %subthreshold adaptation steepness
-PopParams.gwnorm  = PopParams.g_L(1);       %magnitude of adaptation
+PopParams.tau_w   = 200;     %subthreshold adaptation steepness
+PopParams.gwnorm  = 1;%PopParams.g_L(1);       %magnitude of adaptation
 
 %Network Properties
 PopParams.Wee   = 0;        %E->E weight (nS)
@@ -53,15 +53,16 @@ PopParams.Kei   = 0;        %Expected I->E In Degree
 PopParams.V0    = -65;
 
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 1e4;
+TimeParams.SimTime = 1e3;
 
 PopParams.LearningRate = 0;
 PopParams.TargetRate = 2; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%
+TimeParams.SimTime = 1e3;
 
-PopParams.I_e = @(t) 250.*(heaviside(t-1000)-heaviside(t-9000));
+PopParams.I_e = @(t) 250.*(heaviside(t-100)-heaviside(t-900));
 PopParams.b = 1;
 PopParams.a = 0;
 
@@ -93,11 +94,13 @@ subplot('Position',pos)
 
 plot(SimValues.t,SimValues.Input,'k','LineWidth',2)
 
-xlabel('Current (pA)','FontSize',16);ylabel('Current (pA)','FontSize',16)
+ylim([0 400])
+xlabel('Time (ms)','FontSize',16);ylabel('Current (pA)','FontSize',16)
 
 NiceSave('AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
 %%
+TimeParams.SimTime = 1e4;
 
 Ivals = 0:100:1e3;
 
@@ -211,7 +214,7 @@ NiceSave('SubthresholdAdaptation','/Users/jonathangornet/Google Drive/Computatio
 
 TimeParams.SimTime = 2e4;
 
-bvals = logspace(-1,2,10);%0:5:100;
+bvals = [0 logspace(-1,2,10)];
 
 Rate = zeros(1,length(bvals));
 Adaptation = zeros(1,length(bvals));
@@ -249,8 +252,8 @@ figure
 pos = [0.1 0.54 0.8 0.4];
 subplot('Position',pos)
 
-plot(bvals,Adaptation,'.-k','LineWidth',2,'MarkerSize',10)
-
+plot(bvals,log10(Adaptation),'.-k','LineWidth',2,'MarkerSize',10)
+LogScale('y',10)
 set(gca,'xticklabel',[])
 
 ylabel('Adaptation (nS)','FontSize',20)
@@ -258,8 +261,8 @@ ylabel('Adaptation (nS)','FontSize',20)
 pos = [0.1 0.1 0.8 0.4];
 subplot('Position',pos)
 
-plot(bvals,Rate,'.-k','LineWidth',2,'MarkerSize',10)
-
+plot(bvals,log10(Rate),'.-k','LineWidth',2,'MarkerSize',10)
+LogScale('y',10)
 xlabel('Spike-Based Adaptation (nS)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
 
 NiceSave('Spike-BasedAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
@@ -283,11 +286,11 @@ PopParams.tau_w = tau_vals(tt);
 
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
 
-figure
-subplot(2,1,1)
-plot(SimValues.t,SimValues.g_w,'k')
-subplot(2,1,2)
-plot(SimValues.t,SimValues.V,'k')
+% figure
+% subplot(2,1,1)
+% plot(SimValues.t,SimValues.g_w,'k')
+% subplot(2,1,2)
+% plot(SimValues.t,SimValues.V,'k')
 
 if length(SimValues.spikes(:,1)) > 1
     
@@ -317,8 +320,8 @@ ylabel('Adaptation (nS)','FontSize',20)
 pos = [0.1 0.1 0.8 0.4];
 subplot('Position',pos)
 
-plot(tau_vals,Rate,'.-k','LineWidth',2,'MarkerSize',10)
-
+plot(tau_vals,log10(Rate),'.-k','LineWidth',2,'MarkerSize',10)
+LogScale('y',10)
 xlabel('Adaptation Decay (ms)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
 
 NiceSave('AdaptationDecayAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])

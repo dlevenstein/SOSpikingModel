@@ -35,11 +35,11 @@ Network(ww).t_lags = t_lags;
 
 [d,d,w] = findpeaks(-mean(C(:,1:2000),2),t_lags,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
 Network(ww).peakwidthE = w(1);
-Network(ww).peakheightE = max(mean(C(:,1:2000))) - min(mean(C(:,1:2000)));
+Network(ww).peakheightE = max(mean(C(:,1:2000),2)) - min(mean(C(:,1:2000),2));
 
 [d,d,w] = findpeaks(-mean(C(:,2001:2500),2),t_lags,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
 Network(ww).peakwidthI = w(1);
-Network(ww).peakheightI = max(mean(C(:,2001:2500))) - min(mean(C(:,2001:2500)));
+Network(ww).peakheightI = max(mean(C(:,2001:2500),2)) - min(mean(C(:,2001:2500),2));
 
 end
 

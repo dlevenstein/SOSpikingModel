@@ -22,7 +22,7 @@ imagesc(dynamicVals(ww).ISIdist.bins,[0 max(SimValuesArray(ww).IcellIDX)],log10(
     ylabel(h,'log P(ISI)')
     %caxis([0 1])
     
-xlabel('ISI (ms)','fontsize',15);ylabel('Neuron (Rate)','fontsize',15);title('ISI','fontsize',20)
+ylabel('Neuron (Rate)','fontsize',15);title('ISI','fontsize',20)
 
 pos = [0.1,0.4,0.25,0.25];
 subplot('Position',pos)
@@ -64,7 +64,7 @@ imagesc(dynamicVals(ww).ISIdist.bins,[0 max(SimValuesArray(ww).IcellIDX)],log10(
     ylabel(h,'log P(ISI)')
     %caxis([0 1])
     
-ylabel('Neuron (Rate)','fontsize',15)
+xlabel('ISI (ms)','fontsize',15);ylabel('Neuron (Rate)','fontsize',15)
 
 NiceSave([network 'ISIdist'],path,[])
 
