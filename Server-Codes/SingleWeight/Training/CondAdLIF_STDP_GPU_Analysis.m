@@ -75,11 +75,11 @@ PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',100,'save_dt',1);
 
-save('CPUSimValues.mat','-struct','SimValues','-v7.3')
+save('/home/jmg1030/Documents/Networks/GPUAnalysis/CPUSimValues.mat','-struct','SimValues','-v7.3')
 
 SimValues = AdLIFfunction_STDP_GPU(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',100,'save_dt',1);
 
-save('GPUSimValues.mat','-struct','SimValues','-v7.3')
+save('/home/jmg1030/Documents/Networks/GPUAnalysis/GPUSimValues.mat','-struct','SimValues','-v7.3')
 
 end
