@@ -333,10 +333,6 @@ for tt=1:SimTimeLength
     %% Time Counter
     if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
         display([num2str(round(100.*tt./SimTimeLength)),'% Done!']) %clearly, this needs improvement
-        if isempty(intersave) == false
-            trainedWeight = EE_mat+II_mat+EI_mat+IE_mat;
-            save(intersave,'trainedWeight','-v7.3');
-        end
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     

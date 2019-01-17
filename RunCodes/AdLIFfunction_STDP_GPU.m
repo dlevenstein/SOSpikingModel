@@ -492,7 +492,7 @@ for tt=1:SimTimeLength
         
         if recordVALs(tt)
             spikes(spikecounter+1:spikecounter+numspikers,:) = ...
-                [timecounter.*ones(numspikers,1),spikeneurons];
+                [timecounter.*ones(numspikers,1),gather(spikeneurons)];
         end
         
         spikecounter = spikecounter+numspikers;
