@@ -427,17 +427,17 @@ if gpuAvail
     % Random Numbers
     gpurng(0, 'Philox4x32-10');
     
-    % Save Parameters
-    SimValues.V               = gpuArray(SimValues.V);
-    SimValues.g_w             = gpuArray(SimValues.g_w);
-    SimValues.g_e             = gpuArray(SimValues.g_e);
-    SimValues.g_i             = gpuArray(SimValues.g_i);
-    SimValues.s               = gpuArray(SimValues.s);
-    SimValues.w               = gpuArray(SimValues.w);
-    SimValues.x               = gpuArray(SimValues.x);
-    SimValues.a_w             = gpuArray(SimValues.a_w);
-    SimValues.Input           = gpuArray(SimValues.Input);
-    SimValues.WeightMat       = gpuArray(SimValues.WeightMat);
+%     % Save Parameters
+%     SimValues.V               = gpuArray(SimValues.V);
+%     SimValues.g_w             = gpuArray(SimValues.g_w);
+%     SimValues.g_e             = gpuArray(SimValues.g_e);
+%     SimValues.g_i             = gpuArray(SimValues.g_i);
+%     SimValues.s               = gpuArray(SimValues.s);
+%     SimValues.w               = gpuArray(SimValues.w);
+%     SimValues.x               = gpuArray(SimValues.x);
+%     SimValues.a_w             = gpuArray(SimValues.a_w);
+%     SimValues.Input           = gpuArray(SimValues.Input);
+%     SimValues.WeightMat       = gpuArray(SimValues.WeightMat);
 
 end
 
@@ -549,15 +549,15 @@ for tt=1:SimTimeLength
         if recordVALs(tt)
             
          SimValues.t(savecounter)                 = timecounter;
-         SimValues.V(:,savecounter)               = V;
-         SimValues.g_w(:,savecounter)             = g_w;
-         SimValues.g_e(:,savecounter)             = g_e;
-         SimValues.g_i(:,savecounter)             = g_i;
-         SimValues.s(:,savecounter)               = s;
-         SimValues.w(:,savecounter)               = w;
-         SimValues.x(:,savecounter)               = x;
-         SimValues.a_w(:,savecounter)             = a_w;
-         SimValues.Input(:,savecounter)           = I_e(gputimecounter) + X_t;
+         SimValues.V(:,savecounter)               = gather(V);
+         SimValues.g_w(:,savecounter)             = gather(g_w);
+         SimValues.g_e(:,savecounter)             = gather(g_e);
+         SimValues.g_i(:,savecounter)             = gather(g_i);
+         SimValues.s(:,savecounter)               = gather(s);
+         SimValues.w(:,savecounter)               = gather(w);
+         SimValues.x(:,savecounter)               = gather(x);
+         SimValues.a_w(:,savecounter)             = gather(a_w);
+         SimValues.Input(:,savecounter)           = gather(I_e(gputimecounter) + X_t);
         
          savecounter = savecounter+1;
         end
@@ -567,7 +567,7 @@ for tt=1:SimTimeLength
     if mod(timecounter,save_weights)==0 && timecounter>=0 
         if recordVALs(tt)
         SimValues.t_weight(weightcounter)            = timecounter;
-        SimValues.WeightMat(:,:,weightcounter)       = EE_mat+II_mat+EI_mat+IE_mat;
+        SimValues.WeightMat(:,:,weightcounter)       = gather(EE_mat+II_mat+EI_mat+IE_mat);
     	weightcounter = weightcounter+1;
         end
     end
@@ -578,16 +578,16 @@ toc
 
 %% Put back to CPU
 
-SimValues.V               = gather(SimValues.V);
-SimValues.g_w             = gather(SimValues.g_w);
-SimValues.g_e             = gather(SimValues.g_e);
-SimValues.g_i             = gather(SimValues.g_i);
-SimValues.s               = gather(SimValues.s);
-SimValues.w               = gather(SimValues.w);
-SimValues.x               = gather(SimValues.x);
-SimValues.a_w             = gather(SimValues.a_w);
-SimValues.Input           = gather(SimValues.Input);
-SimValues.WeightMat       = gather(SimValues.WeightMat);
+% SimValues.V               = gather(SimValues.V);
+% SimValues.g_w             = gather(SimValues.g_w);
+% SimValues.g_e             = gather(SimValues.g_e);
+% SimValues.g_i             = gather(SimValues.g_i);
+% SimValues.s               = gather(SimValues.s);
+% SimValues.w               = gather(SimValues.w);
+% SimValues.x               = gather(SimValues.x);
+% SimValues.a_w             = gather(SimValues.a_w);
+% SimValues.Input           = gather(SimValues.Input);
+% SimValues.WeightMat       = gather(SimValues.WeightMat);
 
 %%
 %Catch for no spiking in simulation error
