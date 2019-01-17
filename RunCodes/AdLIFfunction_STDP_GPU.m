@@ -424,8 +424,6 @@ if gpuAvail
     g_e = gpuArray(g_e);
     g_i = gpuArray(g_i);
     
-    spikes = gpuArray(spikes);
-    
     % Random Numbers
     gpurng(0, 'Philox4x32-10');
     
@@ -494,7 +492,7 @@ for tt=1:SimTimeLength
         
         if recordVALs(tt)
             spikes(spikecounter+1:spikecounter+numspikers,:) = ...
-                [gpuArray(timecounter).*gpuArray(ones(numspikers,1)),gpuArray(spikeneurons)];
+                [timecounter.*ones(numspikers,1),spikeneurons];
         end
         
         spikecounter = spikecounter+numspikers;
@@ -590,8 +588,6 @@ SimValues.x               = gather(SimValues.x);
 SimValues.a_w             = gather(SimValues.a_w);
 SimValues.Input           = gather(SimValues.Input);
 SimValues.WeightMat       = gather(SimValues.WeightMat);
-    
-spikes = gather(spikes);
 
 %%
 %Catch for no spiking in simulation error

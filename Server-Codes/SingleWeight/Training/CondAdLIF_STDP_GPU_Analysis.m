@@ -4,7 +4,8 @@ function CondAdLIF_STDP_GPU_Analysis()
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
-repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
+%repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
+repopath = '/home/jmg1030/Documents/SOSpikingModel';
 %repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
