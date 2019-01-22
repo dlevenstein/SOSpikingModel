@@ -17,7 +17,7 @@ for ii = 1:length(SimValuesArray)
         
         spikes = SimValuesArray(ii).spikesbycell{jj};
         
-        Krate(jj) = length(spikes)./(1000.*SimValuesArray(ii).t(end));
+        Krate(jj) = length(spikes).*(1000./SimValuesArray(ii).t(end));
         
     end
     

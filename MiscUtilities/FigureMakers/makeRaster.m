@@ -63,7 +63,7 @@ set(gca,'xticklabel',[])
 set(gca,'ytick',[])
 set(gca,'yticklabel',[])
 
-xlabel('Time (ms)','fontsize',20)
+%xlabel('Time (ms)','fontsize',20)
 
 NiceSave(name,folder,[])
 
@@ -133,7 +133,7 @@ set(gca,'xticklabel',[])
 set(gca,'ytick',[])
 set(gca,'yticklabel',[])
 
-xlabel('Time (ms)','fontsize',20)
+%xlabel('Time (ms)','fontsize',20)
 
 NiceSave(name,folder,[])
 

@@ -41,7 +41,7 @@ for dd = 1:length(dinfo)
     else
         S = [S;spikes(id,1)-(1e3+10),spikes(id,2)];
         Times = [Times spikes(end,1)];
-        if length(S(:,1)) > 1e4
+        if length(S(:,1)) > 1e5
             break
         end
     end
@@ -103,28 +103,28 @@ Espikes = cat(1,spikesbycell{1:2000});
 Ispikes = cat(1,spikesbycell{2001:2500});
 [ccg,t_ccg] = CCG({double(Espikes./1000),double(Ispikes./1000)},[],'binSize',0.001,'duration',0.1,'norm','rate');
 
-figure
-
-subplot(3,1,1)
-plot(S(:,1),S(:,2),'.k','markersize',1)
-hold on
-for tt = 1:length(Times)
-    plot([Times(tt) Times(tt)],[0 2500],'r')
-    hold on
-end
-xlim([0 1e3]);ylim([0 2500])
-xlabel('Time (ms)');ylabel('Neuron ID')
-
-subplot(3,1,2)
-plot(t_ccg*1000,ccg(:,1,1)./2000,'b')
-xlabel('Time Lag (ms)');ylabel('Rate (Hz)')
-
-subplot(3,1,3)
-plot(t_ccg*1000,ccg(:,2,2)./500,'r')
-xlabel('Time Lag (ms)');ylabel('Rate (Hz)')
-
-NiceSave(['Raster_II_' num2str(II)],path,[]);
-close all
+% figure
+% 
+% subplot(3,1,1)
+% plot(S(:,1),S(:,2),'.k','markersize',1)
+% hold on
+% for tt = 1:length(Times)
+%     plot([Times(tt) Times(tt)],[0 2500],'r')
+%     hold on
+% end
+% xlim([0 1e3]);ylim([0 2500])
+% xlabel('Time (ms)');ylabel('Neuron ID')
+% 
+% subplot(3,1,2)
+% plot(t_ccg*1000,ccg(:,1,1)./2000,'b')
+% xlabel('Time Lag (ms)');ylabel('Rate (Hz)')
+% 
+% subplot(3,1,3)
+% plot(t_ccg*1000,ccg(:,2,2)./500,'r')
+% xlabel('Time Lag (ms)');ylabel('Rate (Hz)')
+% 
+% NiceSave(['Raster_II_' num2str(II)],path,[]);
+% close all
 
 [d,d,w] = findpeaks(ccg(:,1,1)./2000,t_ccg*1000,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
 if ismember(0,d)

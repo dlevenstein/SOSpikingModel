@@ -6,7 +6,8 @@ for ww = 1:length(SimValuesArray)
 w = SimValuesArray(ww).WeightMat(:,:,end);
 w(find(w == 0)) = nan;
 
-Bounds = [floor(log10(min(min(w)))) ceil(log10(max(max(w))))];
+EBounds = [floor(log10(min(min(w(1:2000,1:2000))))) ceil(log10(max(max(w(1:2000,1:2000)))))];
+IBounds = [floor(log10(min(min(w(1:2000,2001:2500))))) ceil(log10(max(max(w(1:2000,2001:2500)))))];
 
 cellrates = cellfun(@length,SimValuesArray(ww).spikesbycell)./(SimValuesArray(ww).t(end)./1000);
 
@@ -29,7 +30,9 @@ SortedRate = SortedRate(SortedRate < 2001);
     
 B = 100;
 
-bins = linspace(Bounds(1),Bounds(2),B);
+Ebins = linspace(EBounds(1),EBounds(2),B);
+Ibins = linspace(IBounds(1),IBounds(2),B);
+
 wEDist = zeros(2000,B);
 wIDist = zeros(2000,B);
 
@@ -38,18 +41,19 @@ for jj = 1:2000
     wiE(jj,1:2000) = reshape(w(SortedRate(jj),1:2000),[1,2000]);
     wiI(jj,1:500) = reshape(w(SortedRate(jj),2001:2500),[1,500]);
     
-    wEDist(jj,:) = hist(log10(wiE(jj,:)),bins);
-    wIDist(jj,:) = hist(log10(wiI(jj,:)),bins);
+    wEDist(jj,:) = hist(log10(wiE(jj,:)),Ebins);
+    wIDist(jj,:) = hist(log10(wiI(jj,:)),Ibins);
     
     wEDist(jj,:) = wEDist(jj,:)./sum(wEDist(jj,:));
     wIDist(jj,:) = wIDist(jj,:)./sum(wIDist(jj,:));
     
 end
 
-EEDist = hist(log10(reshape(w(1:2000,1:2000),[2000*2000,1])),bins);
-EIDist = hist(log10(reshape(w(1:2000,2001:2500),[2000*500,1])),bins);
+EEDist = hist(log10(reshape(w(1:2000,1:2000),[2000*2000,1])),Ebins);
+EIDist = hist(log10(reshape(w(1:2000,2001:2500),[2000*500,1])),Ibins);
 
-vals.bins = bins;
+vals.Ebins = Ebins;
+vals.Ibins = Ibins;
 
 vals.EEDist = EEDist./sum(EEDist);
 vals.EIDist = EIDist./sum(EIDist);

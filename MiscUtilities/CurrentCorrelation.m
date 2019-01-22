@@ -33,13 +33,15 @@ end
 Network(ww).C = C;
 Network(ww).t_lags = t_lags;
 
+tt = find(t_lags == 0);
+
 [d,d,w] = findpeaks(-mean(C(:,1:2000),2),t_lags,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
 Network(ww).peakwidthE = w(1);
-Network(ww).peakheightE = max(mean(C(:,1:2000),2)) - min(mean(C(:,1:2000),2));
+Network(ww).peakheightE = max(mean(C(:,1:2000),2)) - mean(C(tt,1:2000),2);
 
 [d,d,w] = findpeaks(-mean(C(:,2001:2500),2),t_lags,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
 Network(ww).peakwidthI = w(1);
-Network(ww).peakheightI = max(mean(C(:,2001:2500),2)) - min(mean(C(:,2001:2500),2));
+Network(ww).peakheightI = max(mean(C(:,2001:2500),2)) - mean(C(tt,2001:2500),2);
 
 end
 
