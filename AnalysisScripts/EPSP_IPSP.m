@@ -77,17 +77,61 @@ end
 %%
 
 for gg = 1:length(G)
+    
 figure
 subplot(2,1,1)
-plot(t,vE(:,:,gg),'b')
+plot(t,vE(1,:,gg),'Color',[0.7 0.7 1],'linewidth',2)
+hold on
+plot(t,vE(2,:,gg),'Color',[0.5 0.5 1],'linewidth',2)
+hold on
+plot(t,vE(3,:,gg),'Color',[0.3 0.3 1],'linewidth',2)
+hold on
+plot(t,vE(4,:,gg),'Color',[0 0 1],'linewidth',2)
+hold on
+plot(t,vE(5,:,gg),'Color',[0 0 0.5],'linewidth',2)
 xlim([0 100])
 xlabel('Time (ms)','fontsize',20);ylabel('Voltage (mV)','fontsize',20);title('EPSP','fontsize',20)
+legend(["0.1 nS","0.3 nS","1 nS","3 nS","10 nS"])
+
 subplot(2,1,2)
-plot(t,vI(:,:,gg),'r')
+plot(t,vI(1,:,gg),'Color',[1 0.7 0.7],'linewidth',2)
+hold on
+plot(t,vI(2,:,gg),'Color',[1 0.5 0.5],'linewidth',2)
+hold on
+plot(t,vI(3,:,gg),'Color',[1 0.3 0.3],'linewidth',2)
+hold on
+plot(t,vI(4,:,gg),'Color',[1 0 0],'linewidth',2)
+hold on
+plot(t,vI(5,:,gg),'Color',[0.5 0 0],'linewidth',2)
 xlim([0 100])
-xlabel('Time (ms)','fontsize',20);ylabel('Voltage (mV)','fontsize',20);title('IPSP','fontsize',20)
+xlabel('Time (ms)','fontsize',20);ylabel('Voltage (mV)','fontsize',20);title('EPSP','fontsize',20)
+legend(["0.1 nS","0.3 nS","1 nS","3 nS","10 nS"])
 NiceSave(['Example_EPSP_IPSP_G_' char(num2str(G(gg)))],'/Users/jonathangornet/Documents/GitHub/SOSpikingModel/Figures',[])
+
 end
+
+%%
+figure
+subplot(2,1,1)
+plot(t,vE(3,:,1),'Color',[0.7 0.7 1],'linewidth',2)
+hold on
+plot(t,vE(3,:,2),'Color',[0.3 0.3 1],'linewidth',2)
+hold on
+plot(t,vE(3,:,3),'Color',[0 0 0.5],'linewidth',2)
+xlim([0 100])
+xlabel('Time (ms)','fontsize',20);ylabel('Voltage (mV)','fontsize',20);title('EPSP','fontsize',20)
+legend(["\Gamma 1","\Gamma 3","\Gamma 10"])
+
+subplot(2,1,2)
+plot(t,vI(3,:,1),'Color',[1 0.7 0.7],'linewidth',2)
+hold on
+plot(t,vI(3,:,2),'Color',[1 0.3 0.3],'linewidth',2)
+hold on
+plot(t,vI(3,:,3),'Color',[0.5 0 0],'linewidth',2)
+xlim([0 100])
+xlabel('Time (ms)','fontsize',20);ylabel('Voltage (mV)','fontsize',20);title('EPSP','fontsize',20)
+legend(["\Gamma 1","\Gamma 3","\Gamma 10"])
+NiceSave(['Example_EPSP_IPSP_Gamma'],'/Users/jonathangornet/Documents/GitHub/SOSpikingModel/Figures',[])
 
 %%
 VEmax = zeros(N,length(G));
