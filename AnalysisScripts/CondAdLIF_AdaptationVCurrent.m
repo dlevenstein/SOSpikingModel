@@ -41,7 +41,14 @@ SimValuesArray(ii,bb) = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cel
 
 end
 for bb = 1:length(bvals)
-    SimValues = SimValuesArray(ii,bb);
+    
+    SimValues.spikes = SimValuesArray(ii,bb).spikes;
+    SimValues.V = SimValuesArray(ii,bb).V;
+    
+    SimValues.g_e = SimValuesArray(ii,bb).g_e;
+    SimValues.g_i = SimValuesArray(ii,bb).g_i;
+    SimValues.g_w = SimValuesArray(ii,bb).g_w;
+    
     save(['/home/jmg1030/Documents/spikingModel/data/AdaptationVCurrent_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'struct','-v7.3') 
 end
 clear SimValuesArray
