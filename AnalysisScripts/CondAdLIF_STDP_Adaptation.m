@@ -38,7 +38,7 @@ PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.a       = 0;   %adaptation decay timescale (1/ms)
 PopParams.b       = 0;    %adaptation activation rate (1/ms)
 PopParams.tau_w   = 200;     %subthreshold adaptation steepness
-PopParams.gwnorm  = 1;%PopParams.g_L(1);       %magnitude of adaptation
+PopParams.gwnorm  = PopParams.g_L(1);       %magnitude of adaptation
 
 %Network Properties
 PopParams.Wee   = 0;        %E->E weight (nS)
@@ -111,7 +111,7 @@ NiceSave('AdaptationExample','/Users/jonathangornet/Google Drive/Computational_N
 %%
 TimeParams.SimTime = 1e4;
 
-Ivals = 0:100:1e3;
+Ivals = linspace(0,400,21);
 
 Rate = zeros(1,length(Ivals));
 Adaptation = zeros(1,length(Ivals));
@@ -132,6 +132,7 @@ if length(SimValues.spikes(:,1)) > 1
     t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
     
     Adaptation(ii) = mean(SimValues.g_w(t0:t1));
+    CurrentAdaptation(ii) = mean(SimValues.g_w(t0:t1).*(SimValues.V(t0:t1)-PopParams.E_w));
 
 end
     
@@ -159,11 +160,13 @@ xlabel('Current (pA)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
 NiceSave('CurrentvAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
 %%
+TimeParams.SimTime = 1e4;
 
 avals = 0:0.01:0.1;
 
 Rate = zeros(1,length(avals));
 Adaptation = zeros(1,length(avals));
+CurrentAdaptation = zeros(1,length(avals));
 
 for aa = 1:length(avals)
 
@@ -183,6 +186,7 @@ if length(SimValues.spikes(:,1)) > 1
         t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
 
         Adaptation(aa) = mean(SimValues.g_w(t0:t1));
+        CurrentAdaptation(aa) = mean(SimValues.g_w(t0:t1).*(SimValues.g_w(t0:t1)-PopParams.E_w));
         
     else
         
@@ -191,6 +195,7 @@ if length(SimValues.spikes(:,1)) > 1
         t0 = find(single(SimValues.t) == 5000);
 
         Adaptation(aa) = mean(SimValues.g_w(t0:end));
+        CurrentAdaptation(aa) = mean(SimValues.g_w(t0:end).*(SimValues.g_w(t0:end)-PopParams.E_w));
         
     end
     
@@ -226,14 +231,21 @@ xlabel('Rate (Hz)','FontSize',20);ylabel('Adaptation (nS)','FontSize',20)
 NiceSave('SubthresholdNullcline','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
 %%
+figure
+plot(Rate,CurrentAdaptation,'.-k','LineWidth',2,'MarkerSize',10)
+xlabel('Rate (Hz)','FontSize',20);ylabel('Adaptation (nS)','FontSize',20)
+
+%%
 
 TimeParams.SimTime = 2e4;
 
-bvals = [0 logspace(-1,2,10)];
+bvals = 0:0.1:1;
 
 Rate = zeros(1,length(bvals));
 Adaptation = zeros(1,length(bvals));
 CurrentAdaptation = zeros(1,length(bvals));
+
+PopParams.tau_w = 200;
 
 for bb = 1:length(bvals)
 
@@ -309,12 +321,12 @@ xlabel('Adaptation b','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
 figure
 plot(Rate,Adaptation,'.-k','LineWidth',2,'MarkerSize',10)
 xlabel('Rate (Hz)','FontSize',20);ylabel('Adaptation (nS)','FontSize',20)
-NiceSave('Spike-BasedNullcline','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+%NiceSave('Spike-BasedNullcline','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
 %%
 figure
 plot(Rate,CurrentAdaptation,'.-k','LineWidth',2,'MarkerSize',10)
-xlabel('Rate (Hz)','FontSize',20);ylabel('Adaptation (nS)','FontSize',20)
+xlabel('Rate (Hz)','FontSize',20);ylabel('Adaptation (pA)','FontSize',20)
 %NiceSave('Spike-BasedNullcline','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
 %%
