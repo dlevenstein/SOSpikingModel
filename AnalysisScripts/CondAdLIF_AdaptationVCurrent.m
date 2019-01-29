@@ -27,6 +27,9 @@ I_e = Ivals(ii);
     
 parfor bb = 1:length(bvals)
     
+ii
+bb 
+
 PopParamsAnalysis = PopParams_in;
 
 b = bvals(bb);
@@ -34,7 +37,7 @@ b = bvals(bb);
 PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
-SimValuesArray(ii,bb) = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime);
+SimValuesArray(ii,bb) = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime);
 
 end
 for bb = 1:length(bvals)
