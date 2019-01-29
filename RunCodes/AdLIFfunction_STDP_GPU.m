@@ -57,7 +57,7 @@
 function [SimValues] = AdLIFfunction_STDP_GPU(PopParams,TimeParams,varargin)
 %% Check if GPU Available
 try
-    gpuArray()
+    gpuArray();
     gpuAvail = true;
 catch
     gpuAvail = false;
