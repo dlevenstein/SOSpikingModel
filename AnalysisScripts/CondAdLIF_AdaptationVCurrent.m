@@ -1,6 +1,9 @@
 repopath = '/home/jmg1030/Documents/spikingModel/SOSpikingModel';
 addpath(genpath(repopath))
 
+g = gpuDevice();
+pause(60); %for compiling
+
 load('/home/jmg1030/Documents/spikingModel/data/ExperimentRate_s_10.mat');
 
 PopParams_in = PopParams;
@@ -34,13 +37,9 @@ PopParamsAnalysis.b = b;
 SimValuesArray(ii,bb) = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime);
 
 end
-end
-
-for ii = 1:length(Ivals)
 for bb = 1:length(bvals)
-    
     SimValues = SimValuesArray(ii,bb);
-    save(['/home/jmg1030/Documents/spikingModel/data/AdaptationVCurrent_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'struct','-v7.3')
-    
+    save(['/home/jmg1030/Documents/spikingModel/data/AdaptationVCurrent_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'struct','-v7.3') 
 end
+clear SimValuesArray
 end
