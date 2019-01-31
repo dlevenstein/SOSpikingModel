@@ -43,6 +43,6 @@ SimValuesSave.g_e = SimValuesArray.g_e;
 SimValuesSave.g_i = SimValuesArray.g_i;
 SimValuesSave.g_w = SimValuesArray.g_w;
 
-save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/ExperimentRate/AdaptationVCurrent_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'SimValuesSave','-struct','-v7.3') 
+save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/ExperimentRate/AdaptationVCurrent_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'SimValuesSave','-v7.3') 
 
 end
