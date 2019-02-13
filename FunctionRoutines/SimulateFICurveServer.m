@@ -52,7 +52,7 @@ lastSpikeTimes = nan(numI,1);
 for ii = 1:numI
     
     %V = SimValuesArray(ii).V;
-    %spikes = SimValuesArray(ii).spikes;
+    spikes = SimValuesArray(ii).spikes;
     
     disp([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat']);
     %disp([datafolder dataname '_ii_' char(num2str(ii)) '_voltages.mat']);

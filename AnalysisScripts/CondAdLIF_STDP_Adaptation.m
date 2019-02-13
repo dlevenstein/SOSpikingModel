@@ -60,9 +60,9 @@ PopParams.TargetRate = 2; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%
-TimeParams.SimTime = 1e3;
+TimeParams.SimTime = 1e4;
 
-PopParams.I_e = @(t) 250.*(heaviside(t-100)-heaviside(t-900));
+PopParams.I_e = @(t) 250.*(heaviside(t-1e3)-heaviside(t-(TimeParams.SimTime-1e3)));
 PopParams.b = 1;
 PopParams.a = 0;
 
@@ -99,7 +99,7 @@ ylabel('Voltage (mV)','FontSize',16)
 pos = [0.1 0.3 0.8 0.05];
 subplot('Position',pos)
 
-plot(SimValues.t,SimValues.Input,'k','LineWidth',2)
+plot(SimValues.t./1e3,SimValues.Input,'k','LineWidth',2)
 
 ylim([0 400])
 

@@ -33,7 +33,7 @@ gwnorm  = 0;       %magnitude of adaptation
 v_inf = [-55 -55];      %Input Voltage from Population
 tau   = C./g_L;         %Cell tau
 w     = [0.1;0.3;1;3;10]; %Weight of incoming signal
-W     = transpose(logspace(-1,1,25));
+W     = transpose(logspace(-1,1.5,25));
 G     = [1,3,10];              %Background tau
 
 N     = length(w);
@@ -73,6 +73,35 @@ for n = 1:T-1
     
 end
 end
+
+%%
+figure
+pos = [0.1,0.53,0.8,0.4];
+subplot('position',pos)
+plot(t,vE(4,:,1),'Color',[0.7 0.7 1],'linewidth',5)
+hold on
+plot(t,vE(4,:,2),'Color',[0.5 0.5 1],'linewidth',5)
+hold on
+plot(t,vE(4,:,3),'Color',[0.3 0.3 1],'linewidth',5)
+xlim([0 100])
+ylabel('Voltage (mV)','FontSize',20)
+
+legend('\Gamma: 1','\Gamma: 3','\Gamma: 10')
+
+set(gca,'XTickLabel',[])
+pos = [0.1,0.1,0.8,0.4];
+subplot('position',pos)
+plot(t,vI(4,:,1),'Color',[1 0.7 0.7],'linewidth',5)
+hold on
+plot(t,vI(4,:,2),'Color',[1 0.5 0.5],'linewidth',5)
+hold on
+plot(t,vI(4,:,3),'Color',[1 0.3 0.3],'linewidth',5)
+xlim([0 100])
+xlabel('Time (ms)','FontSize',20);ylabel('Voltage (mV)','FontSize',20)
+
+legend('\Gamma: 1','\Gamma: 3','\Gamma: 10')
+
+NiceSave('Example_EPSP_IPSP_w_3','/Users/jonathangornet/Documents/GitHub/SOSpikingModel/Figures',[])
 
 %%
 
