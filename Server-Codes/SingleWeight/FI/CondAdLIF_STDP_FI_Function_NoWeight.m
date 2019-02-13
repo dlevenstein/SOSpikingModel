@@ -1,7 +1,9 @@
+function CondAdLIF_STDP_FI_Function_NoWeight(ii)
+
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-repopath = '/home/jmg1030/Documents/spikingModel/SOSpikingModel';
+repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
 %% Example Neuron Properties
@@ -51,9 +53,6 @@ TimeParams.dt      = 0.05;
 
 %%
 SimTime = 3e3;
-
-PopParams.I_e = @(t) (250 - Ivals(ii)).*heaviside(1000 - t)+Ivals(ii);
-
 TimeParams.SimTime = SimTime;
 
 %%
@@ -65,19 +64,13 @@ PopParams.tauSTDP = 20;
 %%
 
 Ivals = linspace(0,400,21);
+  
+PopParams.I_e = @(t) (250 - Ivals(ii)).*heaviside(1000 - t)+Ivals(ii);
+PopParams.V0 = min(PopParams.E_L) + (min(PopParams.V_th)-min(PopParams.E_L)).*rand(PopParams.EPopNum + PopParams.IPopNum,1);
 
-parfor ii = 1:length(Ivals)
-   
-PopParamsAnalysis = PopParams;
-PopParamsAnalysis.I_e = @(t) (250 - Ivals(ii)).*heaviside(1000 - t)+Ivals(ii);
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime);
 
-SimValuesArray(ii) = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime);
-
-end
-
-for ii = 1:length(Ivals)
-
-    spikes = SimValuesArray(ii).spikes;
-    save(['/home/jmg1030/Documents/spikingModel/data/sUniform_w_0_FI_ii_' char(num2str(ii)) '_spikes.mat'],'spikes','-v7.3');
+spikes = SimValues.spikes;
+save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/UniformWeight/noWeight/Uniform_w_0_FI_ii_' char(num2str(ii)) '_spikes.mat'],'spikes','-v7.3');
 
 end
