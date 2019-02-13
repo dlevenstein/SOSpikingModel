@@ -3,10 +3,12 @@ function makeISI(dynamicVals,SimValuesArray,indices,network,path)
 %%
 figure
 
-ww = indices(1);
-
 pos = [0.1,0.7,0.25,0.25];
 subplot('Position',pos)
+
+box off 
+
+ww = indices(1);
 
 A = repmat(1,size(dynamicVals(ww).ISIdist.all(dynamicVals(ww).sortrate.ratetype,:)));
 A(dynamicVals(ww).ISIdist.all(dynamicVals(ww).sortrate.ratetype,:) == 0) = 0; 
@@ -26,6 +28,8 @@ ylabel('Neuron (Rate)','fontsize',15);title('ISI','fontsize',20)
 
 pos = [0.1,0.4,0.25,0.25];
 subplot('Position',pos)
+
+box off 
 
 ww = indices(2);
 
@@ -47,6 +51,8 @@ ylabel('Neuron (Rate)','fontsize',15)
 
 pos = [0.1,0.1,0.25,0.25];
 subplot('Position',pos)
+
+box off 
 
 ww = indices(3);
 

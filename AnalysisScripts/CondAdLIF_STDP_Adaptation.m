@@ -112,30 +112,34 @@ NiceSave('AdaptationExample','/Users/jonathangornet/Google Drive/Computational_N
 TimeParams.SimTime = 1e4;
 
 Ivals = linspace(0,400,21);
+bvals = 0:0.1:1;
 
-Rate = zeros(1,length(Ivals));
+Rate = zeros(length(bvals),length(Ivals));
 Adaptation = zeros(1,length(Ivals));
+CurrentAdaptation = zeros(1,length(Ivals));
 
+for bb = 1:length(bvals)
 for ii = 1:length(Ivals)
 
 PopParams.I_e = Ivals(ii);
-PopParams.b = 1;
+PopParams.b = bvals(bb);
 PopParams.a = 0;
 
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
 
 if length(SimValues.spikes(:,1)) > 1
     
-    Rate(ii) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
+    Rate(bb,ii) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
 
     t0 = find(single(SimValues.t) == SimValues.spikes(end-1,1));
     t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
     
-    Adaptation(ii) = mean(SimValues.g_w(t0:t1));
-    CurrentAdaptation(ii) = mean(SimValues.g_w(t0:t1).*(SimValues.V(t0:t1)-PopParams.E_w));
+    Adaptation(bb,ii) = mean(SimValues.g_w(t0:t1));
+    CurrentAdaptation(bb,ii) = mean(SimValues.g_w(t0:t1).*(SimValues.V(t0:t1)-PopParams.E_w));
 
 end
-    
+
+end    
 end
 
 %%
