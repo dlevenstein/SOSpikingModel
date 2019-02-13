@@ -66,14 +66,18 @@ PopParams.tauSTDP = 20;
 
 Ivals = linspace(0,400,21);
 
+parfor ii = 1:length(Ivals)
+   
+PopParamsAnalysis = PopParams;
+PopParamsAnalysis.I_e = @(t) (250 - Ivals(ii)).*heaviside(1000 - t)+Ivals(ii);
+
+SimValuesArray(ii) = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime);
+
+end
+
 for ii = 1:length(Ivals)
-    
-PopParams.I_e = @(t) (250 - Ivals(ii)).*heaviside(1000 - t)+Ivals(ii);
 
-SimValues = AdLIFfunction_STDP_GPU(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime);
-
-spikes = SimValues.spikes;
-
-save([datafolder dataname 'Uniform_w_0_FI_ii_' char(num2str(ii)) '_spikes.mat'],'spikes','-v7.3');
+    spikes = SimValuesArray(ii).spikes;
+    save(['/home/jmg1030/Documents/spikingModel/data/sUniform_w_0_FI_ii_' char(num2str(ii)) '_spikes.mat'],'spikes','-v7.3');
 
 end
