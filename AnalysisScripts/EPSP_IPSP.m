@@ -76,7 +76,7 @@ end
 
 %%
 figure
-pos = [0.1,0.53,0.8,0.4];
+pos = [0.1,0.53,0.35,0.4];
 subplot('position',pos)
 plot(t,vE(4,:,1),'Color',[0.7 0.7 1],'linewidth',5)
 hold on
@@ -89,7 +89,7 @@ ylabel('Voltage (mV)','FontSize',20)
 legend('\Gamma: 1','\Gamma: 3','\Gamma: 10')
 
 set(gca,'XTickLabel',[])
-pos = [0.1,0.1,0.8,0.4];
+pos = [0.1,0.1,0.35,0.4];
 subplot('position',pos)
 plot(t,vI(4,:,1),'Color',[1 0.7 0.7],'linewidth',5)
 hold on
@@ -101,7 +101,35 @@ xlabel('Time (ms)','FontSize',20);ylabel('Voltage (mV)','FontSize',20)
 
 legend('\Gamma: 1','\Gamma: 3','\Gamma: 10')
 
-NiceSave('Example_EPSP_IPSP_w_3','/Users/jonathangornet/Documents/GitHub/SOSpikingModel/Figures',[])
+%NiceSave('Example_EPSP_IPSP_w_3','/Users/jonathangornet/Documents/GitHub/SOSpikingModel/Figures',[])
+
+pos = [0.55,0.53,0.35,0.4];
+subplot('position',pos)
+plot(t,vE(1,:,1),'Color',[0.7 0.7 1],'linewidth',5)
+hold on
+plot(t,vE(3,:,1),'Color',[0.5 0.5 1],'linewidth',5)
+hold on
+plot(t,vE(5,:,1),'Color',[0.3 0.3 1],'linewidth',5)
+xlim([0 100])
+ylabel('Voltage (mV)','FontSize',20)
+
+legend('\Gamma: 1','\Gamma: 3','\Gamma: 10')
+
+set(gca,'XTickLabel',[])
+
+pos = [0.55,0.1,0.35,0.4];
+subplot('position',pos)
+plot(t,vI(1,:,1),'Color',[1 0.7 0.7],'linewidth',5)
+hold on
+plot(t,vI(3,:,1),'Color',[1 0.5 0.5],'linewidth',5)
+hold on
+plot(t,vI(5,:,1),'Color',[1 0.3 0.3],'linewidth',5)
+xlim([0 100])
+xlabel('Time (ms)','FontSize',20);ylabel('Voltage (mV)','FontSize',20)
+
+legend('w: 0.1 nS','w: 1 nS','w: 10 nS')
+
+NiceSave('Example_EPSP_IPSP_Examples','/Users/jonathangornet/Documents/GitHub/SOSpikingModel/Figures',[])
 
 %%
 

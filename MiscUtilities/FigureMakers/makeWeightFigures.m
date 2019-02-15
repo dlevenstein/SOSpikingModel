@@ -18,6 +18,11 @@ plot(weightVals(ww).Ebins, weightVals(ww).EEDist./sum(weightVals(ww).EEDist),'Co
 
 ylim([0 inf])
 
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 16)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 16)
+
 %--------------------------------------------------------------------------
 
 id1 = find(weightVals(indices(1)).EEDist./sum(weightVals(indices(1)).EEDist) > 0.001);
@@ -36,6 +41,11 @@ Bmin = min([B1min, B2min, B3min]);
 Bmax = max([B1max, B2max, B3max]);
 
 xlim([Bmin Bmax]);
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 16)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 16)
 
 LogScale('x',10);
 
@@ -59,6 +69,11 @@ hold on
 ww = indices(3);
 plot(weightVals(ww).Ibins, weightVals(ww).EIDist./sum(weightVals(ww).EIDist),'Color',[0.5 0 0],'linewidth',2)
 
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 16)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 16)
+
 ylim([0 inf])
 
 %--------------------------------------------------------------------------
@@ -81,6 +96,11 @@ Bmax = max([B1max, B2max, B3max]);
 xlim([Bmin Bmax]);
 
 LogScale('x',10);
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 16)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 16)
 
 xlabel('Weight (nS)','fontsize',20);ylabel('Probability','fontsize',20);
 
@@ -127,6 +147,11 @@ subplot(3,3,3.*(figval-1)+1)
         xlim([weightVals(ii).Ebins(1) weightVals(ii).Ebins(end)])
     end
     
+    AX = get(gca,'XAxis');
+    set(AX,'FontSize', 16)
+    AX = get(gca,'YAxis');
+    set(AX,'FontSize', 16)
+
     xticks([-2,-1,0,1]);xticklabels({'0.01','0.1','1','10'})
     xlabel('Weight (nS)');ylabel('Neuron (Rate)')
     
@@ -139,6 +164,11 @@ subplot(3,3,3.*(figval-1)+2)
     imagesc(weightVals(ii).Ibins,1:2000,weightVals(ii).wIDist)
     alpha(A)
     xlim([weightVals(ii).Ibins(1) weightVals(ii).Ibins(end)])
+
+    AX = get(gca,'XAxis');
+    set(AX,'FontSize', 16)
+    AX = get(gca,'YAxis');
+    set(AX,'FontSize', 16)
 
     figval = figval + 1;
     xlabel('Weight (nS)');ylabel('Neuron (Rate)')

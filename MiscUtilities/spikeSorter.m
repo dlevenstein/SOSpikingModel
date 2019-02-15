@@ -2,7 +2,7 @@ function spikesbycell = spikeSorter(spikes,cellStart,cellEnd)
 
 cellID = cellStart:cellEnd;
 
-parfor cc = cellID
+for cc = cellID
 
 spikesbycell{cc} = spikes(spikes(:,2)==cc,1);
 

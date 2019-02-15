@@ -1,5 +1,6 @@
 function [dynamicVals,kvals] = AnalyzeDynamics(SimValuesArray)
 
+%%
 KweightE = zeros(2500,1);
 KweightI = zeros(2500,1);
 Kweight = zeros(2500,1);

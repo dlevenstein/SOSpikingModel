@@ -24,6 +24,11 @@ imagesc(dynamicVals(ww).ISIdist.bins,[0 max(SimValuesArray(ww).IcellIDX)],log10(
     ylabel(h,'log P(ISI)')
     %caxis([0 1])
     
+    AX = get(gca,'XAxis');
+    set(AX,'FontSize', 16)
+    AX = get(gca,'YAxis');
+    set(AX,'FontSize', 16)
+
 ylabel('Neuron (Rate)','fontsize',15);title('ISI','fontsize',20)
 
 pos = [0.1,0.4,0.25,0.25];
@@ -46,6 +51,11 @@ imagesc(dynamicVals(ww).ISIdist.bins,[0 max(SimValuesArray(ww).IcellIDX)],log10(
     h = colorbar;
     ylabel(h,'log P(ISI)')
     %caxis([0 1])
+    
+    AX = get(gca,'XAxis');
+    set(AX,'FontSize', 16)
+    AX = get(gca,'YAxis');
+    set(AX,'FontSize', 16)
     
 ylabel('Neuron (Rate)','fontsize',15)
 
@@ -70,6 +80,11 @@ imagesc(dynamicVals(ww).ISIdist.bins,[0 max(SimValuesArray(ww).IcellIDX)],log10(
     ylabel(h,'log P(ISI)')
     %caxis([0 1])
     
+    AX = get(gca,'XAxis');
+    set(AX,'FontSize', 16)
+    AX = get(gca,'YAxis');
+    set(AX,'FontSize', 16)
+
 xlabel('ISI (ms)','fontsize',15);ylabel('Neuron (Rate)','fontsize',15)
 
 NiceSave([network 'ISIdist'],path,[])

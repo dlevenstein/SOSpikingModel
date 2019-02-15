@@ -83,6 +83,9 @@ plot(SimValues.t(t0),SimValues.g_w(t0),'.r','MarkerSize',25);
 hold on
 plot(SimValues.t(t1),SimValues.g_w(t1),'.r','MarkerSize',25);
 
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
+
 set(gca,'xticklabel',[])
 
 ylabel('Adaptation (nS)','FontSize',16)
@@ -91,6 +94,9 @@ pos = [0.1 0.39 0.8 0.25];
 subplot('Position',pos)
 
 plot(SimValues.t,SimValues.V,'k','LineWidth',2)
+
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
 
 set(gca,'xticklabel',[])
 
@@ -104,6 +110,10 @@ plot(SimValues.t./1e3,SimValues.Input,'k','LineWidth',2)
 ylim([0 400])
 
 set(gca,'yticklabel',[])
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+
 xlabel('Time (ms)','FontSize',16);%ylabel('Current (pA)','FontSize',16)
 
 NiceSave('AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
@@ -111,12 +121,12 @@ NiceSave('AdaptationExample','/Users/jonathangornet/Google Drive/Computational_N
 %%
 TimeParams.SimTime = 1e4;
 
-Ivals = linspace(0,400,21);
-bvals = 0:0.1:1;
+Ivals = linspace(0,400,51);
+bvals = [0 logspace(-1,2,10)];
 
 Rate = zeros(length(bvals),length(Ivals));
-Adaptation = zeros(1,length(Ivals));
-CurrentAdaptation = zeros(1,length(Ivals));
+Adaptation = zeros(length(bvals),length(Ivals));
+CurrentAdaptation = zeros(length(bvals),length(Ivals));
 
 for bb = 1:length(bvals)
 for ii = 1:length(Ivals)
@@ -145,36 +155,88 @@ end
 %%
 figure
 
-pos = [0.1 0.54 0.8 0.4];
-subplot('Position',pos)
+subplot(2,2,1)
 
-plot(Ivals,Adaptation,'.-k','LineWidth',2,'MarkerSize',10)
+plot(Ivals,CurrentAdaptation(end,:),'.-k','LineWidth',2,'MarkerSize',10)
+hold on
+text(50,300,'b: 100','FontSize',18)
 
-set(gca,'xticklabel',[])
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
 
-ylabel('Adaptation (nS)','FontSize',20)
+xlabel('Current (pA)','FontSize',20);ylabel('Adaptation (pA)','FontSize',20)
 
-pos = [0.1 0.1 0.8 0.4];
-subplot('Position',pos)
+subplot(2,2,2)
 
-plot(Ivals,Rate,'.-k','LineWidth',2,'MarkerSize',10)
+plot(Ivals,Rate(end,:),'.-k','LineWidth',2,'MarkerSize',10)
+hold on
+text(50,0.8,'b: 100','FontSize',18)
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
 
 xlabel('Current (pA)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
 
-NiceSave('CurrentvAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+subplot(2,2,3)
+
+plot(CurrentAdaptation(5,:),Rate(5,:),'.-','Color',[0.7,0.7,0.7],'LineWidth',2,'MarkerSize',10)
+hold on
+plot(CurrentAdaptation(8,:),Rate(8,:),'.-','Color',[0.5,0.5,0.5],'LineWidth',2,'MarkerSize',10)
+hold on
+plot(CurrentAdaptation(end,:),Rate(end,:),'.-','Color',[0.1,0.1,0.1],'LineWidth',2,'MarkerSize',10)
+legend('b: 1','b: 10','b: 100')
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
+
+xlabel({'Adaptation','Current (pA)'},'FontSize',20);ylabel('Rate (Hz)','FontSize',20)
+
+subplot(2,2,4)
+
+plot(bvals,CurrentAdaptation(:,40),'.-k','LineWidth',2,'MarkerSize',10)
+hold on
+text(20,100,['Current: ' num2str(Ivals(40)) ' pA'],'FontSize',18)
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
+
+xlabel({'Adaptation','Strength b'},'FontSize',20);ylabel({'Adaptation','Current (pA)'},'FontSize',20);
+
+NiceSave('FIAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+
+%%
+figure
+pos = [0.1 0.54 0.4 0.4];
+subplot('Position',pos)
+plot(bvals,CurrentAdaptation(:,16),'k')
+xlabel('Adaptation b','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
+
+%NiceSave('CurrentvAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+
+%%
+plot(bvals,CurrentAdaptation(:,16),'k')
 
 %%
 TimeParams.SimTime = 1e4;
 
 avals = 0:0.01:0.1;
 
-Rate = zeros(1,length(avals));
-Adaptation = zeros(1,length(avals));
-CurrentAdaptation = zeros(1,length(avals));
+RateA = zeros(length(avals),length(Ivals));
+AdaptationA = zeros(length(avals),length(Ivals));
+CurrentAdaptationA = zeros(length(avals),length(Ivals));
 
 for aa = 1:length(avals)
-
-PopParams.I_e = 250;
+for ii = 1:length(Ivals)
+    
+PopParams.I_e = Ivals(ii);
 PopParams.b = 0;
 PopParams.a = avals(aa);
 
@@ -184,28 +246,120 @@ if length(SimValues.spikes(:,1)) > 1
     
     if SimValues.spikes(end,1) > 5000
         
-        Rate(aa) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
+        RateA(aa,ii) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
 
         t0 = find(single(SimValues.t) == SimValues.spikes(end-1,1));
         t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
 
-        Adaptation(aa) = mean(SimValues.g_w(t0:t1));
-        CurrentAdaptation(aa) = mean(SimValues.g_w(t0:t1).*(SimValues.g_w(t0:t1)-PopParams.E_w));
+        AdaptationA(aa,ii) = mean(SimValues.g_w(t0:t1));
+        CurrentAdaptationA(aa,ii) = mean(SimValues.g_w(t0:t1).*(SimValues.g_w(t0:t1)-PopParams.E_w));
         
     else
         
-        Rate(aa) = 0;
+        RateA(aa,ii) = 0;
 
         t0 = find(single(SimValues.t) == 5000);
 
-        Adaptation(aa) = mean(SimValues.g_w(t0:end));
-        CurrentAdaptation(aa) = mean(SimValues.g_w(t0:end).*(SimValues.g_w(t0:end)-PopParams.E_w));
+        AdaptationA(aa,ii) = mean(SimValues.g_w(t0:end));
+        CurrentAdaptationA(aa,ii) = mean(SimValues.g_w(t0:end).*(SimValues.g_w(t0:end)-PopParams.E_w));
         
     end
     
 end
-    
+
+end    
 end
+
+%%
+figure
+
+subplot(2,2,1)
+
+plot(Ivals,CurrentAdaptationA(2,:),'.-k','LineWidth',2,'MarkerSize',10)
+hold on
+text(50,40,'a: 0.01','FontSize',18)
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
+
+xlabel('Current (pA)','FontSize',20);ylabel('Adaptation (pA)','FontSize',20)
+
+subplot(2,2,2)
+
+plot(Ivals,RateA(2,:),'.-k','LineWidth',2,'MarkerSize',10)
+hold on
+text(50,40,'a: 0.01','FontSize',18)
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
+
+xlabel('Current (pA)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
+
+subplot(2,2,3)
+
+plot(CurrentAdaptationA(2,:),RateA(2,:),'.-k','LineWidth',2,'MarkerSize',10)
+hold on
+text(50,40,'a: 0.01','FontSize',18)
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
+
+xlabel({'Adaptation','Current (pA)'},'FontSize',20);ylabel('Rate (Hz)','FontSize',20)
+
+subplot(2,2,4)
+
+plot(avals,CurrentAdaptationA(:,40),'.-k','LineWidth',2,'MarkerSize',10)
+hold on
+text(0.01,1350,['Current: ' num2str(Ivals(40)) ' pA'],'FontSize',18)
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
+
+xlabel({'Adaptation','Strength a'},'FontSize',20);ylabel({'Adaptation','Current (pA)'},'FontSize',20);
+
+NiceSave('FIAdaptationAvals','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+
+%%
+figure
+
+pos = [0.08 0.54 0.4 0.4];
+subplot('Position',pos)
+
+plot(Ivals,CurrentAdaptationA(2,:),'.-k','LineWidth',2,'MarkerSize',10)
+
+set(gca,'xticklabel',[])
+
+ylabel('Adaptation (pA)','FontSize',20)
+
+pos = [0.08 0.1 0.4 0.4];
+subplot('Position',pos)
+
+plot(Ivals,RateA(2,:),'.-k','LineWidth',2,'MarkerSize',10)
+
+xlabel('Current (pA)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
+
+pos = [0.57 0.54 0.4 0.4];
+subplot('Position',pos)
+
+plot(CurrentAdaptationA(2,:),RateA(2,:),'.-k','LineWidth',2,'MarkerSize',10)
+xlabel('Adaptation (pA)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
+
+NiceSave('FIAdaptationAvals','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+
+%%
+figure
+plot(CurrentAdaptation(end,:),Rate(end,:),'.-k','LineWidth',2,'MarkerSize',10)
+xlabel('Current (pA)','FontSize',20);ylabel('Rate (Hz)','FontSize',20)
+
+NiceSave('CurrentvAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
 %%
 figure

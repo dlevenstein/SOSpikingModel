@@ -17,6 +17,11 @@ hold on
 ww = indices(3);
 plot(dynamicVals(ww).bins,dynamicVals(ww).ISImapE./sum(dynamicVals(ww).ISImapE),'Color',[0 0 0.5],'linewidth',2)
 
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 16)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 16)
+
 LogScale('x',10)
 ylabel('Probability','fontsize',20);title('ISI','fontsize',20)
 
@@ -39,6 +44,11 @@ hold on
 
 ww = indices(3);
 plot(dynamicVals(ww).bins,dynamicVals(ww).ISImapI./sum(dynamicVals(ww).ISImapI),'Color',[0.5 0 0],'linewidth',2)
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 16)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 16)
 
 LogScale('x',10)
 
@@ -64,7 +74,13 @@ hold on
 ww = indices(3);
 plot(dynamicVals(ww).t_ccg*1000,dynamicVals(ww).ccg(:,1,1)./2000,'Color',[0 0 0.5],'linewidth',2)
 
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 16)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 16)
+
 ylabel('Rate (Hz)','fontsize',20);title('ACG','fontsize',20)
+
 %ylim([0 5])
 
 legend(legendnames(indices))
@@ -85,7 +101,14 @@ hold on
 ww = indices(3);
 plot(dynamicVals(ww).t_ccg*1000,dynamicVals(ww).ccg(:,2,2)./500,'Color',[0.5 0 0],'linewidth',2)
 
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 16)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 16)
+
 xlabel('Time Lag (ms)','fontsize',20);ylabel('Rate (Hz)','fontsize',20)
+
+%ylim([0 7])
 
 legend(legendnames(indices))
 
@@ -96,7 +119,7 @@ NiceSave([network 'ISI_and_ACG'],path,[])
 %%
 figure
 
-pos = [0.1 0.52 0.38 0.4];
+pos = [0.1 0.55 0.38 0.4];
 subplot('Position',pos)
 
 for ww = 1:length(dynamicVals)
@@ -111,6 +134,11 @@ xlim([0 length(dynamicVals)+1])
 
 set(gca,'xticklabel',[])
 
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
+
 ylabel('Peak Height (ms)','fontsize',20);title('ACG','fontsize',20)
 
 box OFF 
@@ -124,6 +152,11 @@ for ww = 1:length(dynamicVals)
     plot(ww,dynamicVals(ww).peakwidth(2),'.r','markersize',20)
     hold on
 end 
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 16)
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 16)
 
 xticklabels(networknames)
 xlim([0 length(dynamicVals)+1])

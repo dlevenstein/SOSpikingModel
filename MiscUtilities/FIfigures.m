@@ -9,6 +9,15 @@ sim = 1;
 
 Times = [];
 
+rate.E = 0;
+rate.I = 0;
+
+peakwidth.E = 0;
+peakheight.E = 0;
+
+peakwidth.I = 0;
+peakheight.I = 0;
+
 for dd = 1:length(dinfo)
     
     try
@@ -52,32 +61,32 @@ end
 
 if isempty(S) == false
    
-spikesbycell = spikeSorter(S,1,2500);
-
-Espikesbycell = spikeSorter(S,1,2000);
-Ispikesbycell = spikeSorter(S,2001,2500);
-
-ISI_E = [];
-ISI_I = [];
-
-for ii = 1:2500
-
-    if ii <= 2000
-        if isempty(Espikesbycell{ii})
-            ISI_E = [ISI_E; 2e3];
-        else
-            ISI_E = [ISI_E; diff(Espikesbycell{ii})];
-        end
-    end
-    if ii > 2000
-        if isempty(Ispikesbycell{ii})
-            ISI_I = [ISI_I; 2e3];
-        else
-            ISI_I = [ISI_I; diff(Ispikesbycell{ii})];
-        end
-    end
-   
-end
+% spikesbycell = spikeSorter(S,1,2500);
+% 
+% Espikesbycell = spikeSorter(S,1,2000);
+% Ispikesbycell = spikeSorter(S,2001,2500);
+% 
+% ISI_E = [];
+% ISI_I = [];
+% 
+% for ii = 1:2500
+% 
+%     if ii <= 2000
+%         if isempty(Espikesbycell{ii})
+%             ISI_E = [ISI_E; 2e3];
+%         else
+%             ISI_E = [ISI_E; diff(Espikesbycell{ii})];
+%         end
+%     end
+%     if ii > 2000
+%         if isempty(Ispikesbycell{ii})
+%             ISI_I = [ISI_I; 2e3];
+%         else
+%             ISI_I = [ISI_I; diff(Ispikesbycell{ii})];
+%         end
+%     end
+%    
+% end
 
 else
     
@@ -96,12 +105,12 @@ if length(S(:,1)) >= 1e3
 % rate.E = sum(cellfun(@length,Espikesbycell));
 % rate.I = sum(cellfun(@length,Ispikesbycell));
 
-rate.E = (sum(cellfun(@length,Espikesbycell))./S(end,1)).*(1000./2000);
-rate.I = (sum(cellfun(@length,Ispikesbycell))./S(end,1)).*(1000./500);
-
-Espikes = cat(1,spikesbycell{1:2000});
-Ispikes = cat(1,spikesbycell{2001:2500});
-[ccg,t_ccg] = CCG({double(Espikes./1000),double(Ispikes./1000)},[],'binSize',0.001,'duration',0.1,'norm','rate');
+% rate.E = (sum(cellfun(@length,Espikesbycell))./S(end,1)).*(1000./2000);
+% rate.I = (sum(cellfun(@length,Ispikesbycell))./S(end,1)).*(1000./500);
+% 
+% Espikes = cat(1,spikesbycell{1:2000});
+% Ispikes = cat(1,spikesbycell{2001:2500});
+% [ccg,t_ccg] = CCG({double(Espikes./1000),double(Ispikes./1000)},[],'binSize',0.001,'duration',0.1,'norm','rate');
 
 % figure
 % 
@@ -126,33 +135,33 @@ Ispikes = cat(1,spikesbycell{2001:2500});
 % NiceSave(['Raster_II_' num2str(II)],path,[]);
 % close all
 
-[d,d,w] = findpeaks(ccg(:,1,1)./2000,t_ccg*1000,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
-if ismember(0,d)
-    peakwidth.E = w(1);
-elseif any(isnan(ccg(:,1,1)))
-    peakwidth.E = nan;
-elseif all(ccg(:,1,1) == 0)
-    peakwidth.E = nan;
-else
-    [d,d,w] = findpeaks(-ccg(:,1,1)./2000,t_ccg*1000,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
-    peakwidth.E = w(1);
-end
-
-peakheight.E = max(ccg(:,1,1)./2000)-min(ccg(:,1,1)./2000);
-
-[d,d,w] = findpeaks(ccg(:,2,2)./500,t_ccg*1000,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
-if ismember(0,d)
-    peakwidth.I = w(1);
-elseif any(isnan(ccg(:,2,2)))
-    peakwidth.I = nan;
-elseif all(ccg(:,2,2) == 0)
-    peakwidth.I = nan;
-else 
-    [d,d,w] = findpeaks(-ccg(:,2,2)./500,t_ccg*1000,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
-    peakwidth.I = w(1);
-end
-
-peakheight.I = max(ccg(:,2,2)./500)-min(ccg(:,2,2)./500);
+% [d,d,w] = findpeaks(ccg(:,1,1)./2000,t_ccg*1000,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
+% if ismember(0,d)
+%     peakwidth.E = w(1);
+% elseif any(isnan(ccg(:,1,1)))
+%     peakwidth.E = nan;
+% elseif all(ccg(:,1,1) == 0)
+%     peakwidth.E = nan;
+% else
+%     [d,d,w] = findpeaks(-ccg(:,1,1)./2000,t_ccg*1000,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
+%     peakwidth.E = w(1);
+% end
+% 
+% peakheight.E = max(ccg(:,1,1)./2000)-min(ccg(:,1,1)./2000);
+% 
+% [d,d,w] = findpeaks(ccg(:,2,2)./500,t_ccg*1000,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
+% if ismember(0,d)
+%     peakwidth.I = w(1);
+% elseif any(isnan(ccg(:,2,2)))
+%     peakwidth.I = nan;
+% elseif all(ccg(:,2,2) == 0)
+%     peakwidth.I = nan;
+% else 
+%     [d,d,w] = findpeaks(-ccg(:,2,2)./500,t_ccg*1000,'Annotate','extents','WidthReference','halfprom','SortStr','descend');
+%     peakwidth.I = w(1);
+% end
+% 
+% peakheight.I = max(ccg(:,2,2)./500)-min(ccg(:,2,2)./500);
 
 else
 

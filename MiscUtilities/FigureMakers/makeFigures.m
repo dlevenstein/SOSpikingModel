@@ -29,15 +29,25 @@ figval = 1;
 
 for ii = indices
 
-    subplot(3,3,3.*(figval-1)+2)
+        subplot(3,3,3.*(figval-1)+2)
         plot(kvals(ii).Kweight(1:2000),log10(kvals(ii).Krate(1:2000)),'.b','markersize',1)
         xlabel('K_{EI}','fontsize',15);ylabel('Rate (Hz)','fontsize',15)
         LogScale('y',10)
+        
+        AX = get(gca,'XAxis');
+        set(AX,'FontSize', 16)
+        AX = get(gca,'YAxis');
+        set(AX,'FontSize', 16)
         
         subplot(3,3,3.*(figval-1)+3)
         plot(kvals(ii).Kweight(2001:2500),log10(kvals(ii).Krate(2001:2500)),'.r','markersize',1)
         xlabel('K_{EI}','fontsize',15);ylabel('Rate (Hz)','fontsize',15)
         LogScale('y',10)
+        
+        AX = get(gca,'XAxis');
+        set(AX,'FontSize', 16)
+        AX = get(gca,'YAxis');
+        set(AX,'FontSize', 16)
 
     figval = figval + 1;
     
