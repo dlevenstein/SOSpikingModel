@@ -31,7 +31,7 @@ disp(['index: ' char(num2str(index))]);
 disp(['Sim Number: ' char(num2str(simnum))]);
 disp(['File Name: ' char(names(LL))]);
 
-load(['/scratch/jmg1030/FIcurve/data/trainedWeights/' char(names(LL))]);
+load(['/scratch/jmg1030/FIcurve/data/trainedWeights/ExperimentRate/' char(names(LL))]);
 
 rng(simnum,'twister');
 
