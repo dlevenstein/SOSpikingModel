@@ -8,8 +8,11 @@ repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
 %%
-names = ["largePopWeight01.mat","largePopWeight03.mat","largePopWeight1.mat","largePopWeight3.mat","largePopWeight10.mat"];
-weightNames = ["01","03","1","3","10"];
+% names = ["largePopWeight01.mat","largePopWeight03.mat","largePopWeight1.mat","largePopWeight3.mat","largePopWeight10.mat"];
+% weightNames = ["01","03","1","3","10"];
+
+names = ["largePopWeight01.mat","largePopWeight1.mat","largePopWeight3.mat","largePopWeight10.mat"];
+weightNames = ["01","1","3","10"];
 
 %%
 numS = 100;

@@ -8,8 +8,11 @@ repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
 %%
-names = ["ExperimentRate_m_01.mat","ExperimentRate_m_03.mat","ExperimentRate_m_1.mat","ExperimentRate_m_3.mat","ExperimentRate_m_10.mat"];
-weightNames = ["01","03","1","3","10"];
+% names = ["ExperimentRate_m_01.mat","ExperimentRate_m_03.mat","ExperimentRate_m_1.mat","ExperimentRate_m_3.mat","ExperimentRate_m_10.mat"];
+% weightNames = ["01","03","1","3","10"];
+
+names = ["ExperimentRate_m_01.mat","ExperimentRate_m_1.mat","ExperimentRate_m_10.mat"];
+weightNames = ["01","1","10"];
 
 %%
 numI = 20;
@@ -39,7 +42,7 @@ PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
 PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/ExperimentRate/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/ExperimentRateMean/';
 dataname = ['ExperimentRate_m_' char(weightNames(LL)) '_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
