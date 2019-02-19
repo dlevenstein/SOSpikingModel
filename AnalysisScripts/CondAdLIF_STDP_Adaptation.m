@@ -90,6 +90,8 @@ set(gca,'xticklabel',[])
 
 ylabel('Adaptation (nS)','FontSize',16)
 
+box OFF
+
 pos = [0.1 0.39 0.8 0.25];
 subplot('Position',pos)
 
@@ -101,6 +103,8 @@ set(AX,'FontSize', 12)
 set(gca,'xticklabel',[])
 
 ylabel('Voltage (mV)','FontSize',16)
+
+box OFF
 
 pos = [0.1 0.3 0.8 0.05];
 subplot('Position',pos)
@@ -114,7 +118,9 @@ set(gca,'yticklabel',[])
 AX = get(gca,'XAxis');
 set(AX,'FontSize', 12)
 
-xlabel('Time (ms)','FontSize',16);%ylabel('Current (pA)','FontSize',16)
+xlabel('Time (sec)','FontSize',16);%ylabel('Current (pA)','FontSize',16)
+
+box OFF
 
 NiceSave('AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
@@ -210,7 +216,7 @@ set(AX,'FontSize', 12)
 
 xlabel({'Adaptation','Strength b'},'FontSize',20);ylabel({'Adaptation','Current (pA)'},'FontSize',20);
 
-NiceSave('FIAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+%NiceSave('FIAdaptation','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
 %%
 figure

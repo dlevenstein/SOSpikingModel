@@ -63,8 +63,8 @@ if isempty(S) == false
    
 % spikesbycell = spikeSorter(S,1,2500);
 % 
-% Espikesbycell = spikeSorter(S,1,2000);
-% Ispikesbycell = spikeSorter(S,2001,2500);
+Espikesbycell = spikeSorter(S,1,2000);
+Ispikesbycell = spikeSorter(S,2001,2500);
 % 
 % ISI_E = [];
 % ISI_I = [];
@@ -105,8 +105,8 @@ if length(S(:,1)) >= 1e3
 % rate.E = sum(cellfun(@length,Espikesbycell));
 % rate.I = sum(cellfun(@length,Ispikesbycell));
 
-% rate.E = (sum(cellfun(@length,Espikesbycell))./S(end,1)).*(1000./2000);
-% rate.I = (sum(cellfun(@length,Ispikesbycell))./S(end,1)).*(1000./500);
+rate.E = (sum(cellfun(@length,Espikesbycell))./S(end,1)).*(1000./2000);
+rate.I = (sum(cellfun(@length,Ispikesbycell))./S(end,1)).*(1000./500);
 % 
 % Espikes = cat(1,spikesbycell{1:2000});
 % Ispikes = cat(1,spikesbycell{2001:2500});

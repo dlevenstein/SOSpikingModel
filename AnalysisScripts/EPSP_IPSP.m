@@ -113,7 +113,7 @@ plot(t,vE(5,:,1),'Color',[0.3 0.3 1],'linewidth',5)
 xlim([0 100])
 ylabel('Voltage (mV)','FontSize',20)
 
-legend('\Gamma: 1','\Gamma: 3','\Gamma: 10')
+legend('w: 0.1 nS','w: 1 nS','w: 10 nS')
 
 set(gca,'XTickLabel',[])
 
