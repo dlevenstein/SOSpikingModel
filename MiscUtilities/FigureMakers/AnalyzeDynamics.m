@@ -27,6 +27,7 @@ for ii = 1:length(SimValuesArray)
 
 end
 
+%%
 for ii = 1:length(SimValuesArray)
         
     S = find(SimValuesArray(ii).spikes(:,1) > 1e3);

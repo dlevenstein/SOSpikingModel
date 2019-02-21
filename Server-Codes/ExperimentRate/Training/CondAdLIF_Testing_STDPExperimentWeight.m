@@ -12,10 +12,8 @@ weightNames = ["01","1","10"];
 %%
 
 for index = 1:3
-    
-LL = index;
 
-load(['/home/jmg1030/Documents/spikingModel/data/' char(names(LL))]);
+load(['/home/jmg1030/Documents/spikingModel/data/' char(names(index))]);
 
 PopParamsAnalysis = PopParams;
 PopParamsAnalysis.LearningRate = 0;
@@ -25,7 +23,7 @@ PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 TimeParams.SimTime = 5e4;
 
 datafolder = '/home/jmg1030/Documents/spikingModel/data/';
-dataname = ['ExperimentRate_s_' char(weightNames(LL)) '_testing'];
+dataname = ['ExperimentRate_s_' char(weightNames(index)) '_testing'];
 
 disp([datafolder dataname]);
 
