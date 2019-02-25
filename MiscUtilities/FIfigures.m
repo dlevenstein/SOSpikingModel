@@ -28,14 +28,14 @@ for dd = 1:length(dinfo)
         continue
     end
         
-    id = find(spikes(:,1) > 1e3+10);
+    id = find(spikes(:,1) > 5e2+10);
     
 %     figure
 %     plot(spikes(:,1),spikes(:,2),'.k','markersize',1)
 %     hold on
 %     plot([spikes(end,1) spikes(end,1)],[0 2500],'r')
 %     hold on
-%     plot([1e3 1e3],[0 2500],'r')
+%     plot([500 500],[0 2500],'r')
 %     NiceSave(['PeakWidth_II_' num2str(II)],[path 'Rasters'],[]);
 %     close all
     
@@ -45,10 +45,10 @@ for dd = 1:length(dinfo)
     end
     
     if isempty(S) == false
-        S = [S;(spikes(id,1)-(1e3+10))+S(end,1),spikes(id,2)];
+        S = [S;(spikes(id,1)-(500+10))+S(end,1),spikes(id,2)];
         Times = [Times spikes(end,1)];
     else
-        S = [S;spikes(id,1)-(1e3+10),spikes(id,2)];
+        S = [S;spikes(id,1)-(500+10),spikes(id,2)];
         Times = [Times spikes(end,1)];
         if length(S(:,1)) > 1e5
             break

@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --time=100:00:00
 #SBATCH --mem=10GB
-#SBATCH --job-name=LogWeightMu
-#SBATCH --output=LogWeightMu_%j.out
+#SBATCH --job-name=ExperimentRateM1
+#SBATCH --output=ExperimentRateM1_%j.out
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
 
@@ -28,7 +28,7 @@ echo
 
 cat<<EOF | srun matlab -nodisplay
 parpool('local', $SLURM_CPUS_PER_TASK)
-CondAdLIF_STDP_FI_Function_LogWeightMu(${n})
+CondAdLIF_STDP_FI_Function_ExperimentRateM1(${n})
 exit
 EOF
 
