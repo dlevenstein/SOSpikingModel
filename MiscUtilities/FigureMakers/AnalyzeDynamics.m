@@ -12,8 +12,8 @@ for ii = 1:length(SimValuesArray)
        
     for jj = 1:2500
         
-        KweightE(jj) = sum(SimValuesArray(ii).WeightMat(jj,1:2000,2));
-        KweightI(jj) = sum(SimValuesArray(ii).WeightMat(jj,2001:2500,2));
+        KweightE(jj) = sum(SimValuesArray(ii).WeightMat(jj,1:2000,end));
+        KweightI(jj) = sum(SimValuesArray(ii).WeightMat(jj,2001:2500,end));
         Kweight(jj)  = KweightE(jj)/KweightI(jj);
         
         spikes = SimValuesArray(ii).spikesbycell{jj};

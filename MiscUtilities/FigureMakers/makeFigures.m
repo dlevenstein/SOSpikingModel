@@ -24,10 +24,9 @@ makeWeightFigures(weightVals,indices,legendnames,network,path)
 
 makeISI(dynamicVals,SimValuesArray,indices,network,path)
 
+%%
 figure
 figval = 1;
-
-%%
 for ii = indices
 
         subplot(3,3,3.*(figval-1)+2)

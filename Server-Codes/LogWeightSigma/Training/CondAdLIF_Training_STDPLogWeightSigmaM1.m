@@ -1,4 +1,4 @@
-function CondAdLIF_Training_STDPLogWeightSigmaM1(mm)
+function CondAdLIF_Training_STDPLogWeightSigmaM1(ss)
 
 vals = [0.01,0.1,1,10];
 names = ["001","01","1","10"];
@@ -47,10 +47,10 @@ PopParams.w_r     = 0.1;     %adaptation at rest (0-1)
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-PopParams.Wee   = 3;        %E->E weight (nS)
-PopParams.Wii   = 3;        %I->I weight
-PopParams.Wie   = 3;        %E->I weight
-PopParams.Wei   = 3;        %I->E weight
+PopParams.Wee   = 1;        %E->E weight (nS)
+PopParams.Wii   = 1;        %I->I weight
+PopParams.Wie   = 1;        %E->I weight
+PopParams.Wei   = 1;        %I->E weight
 PopParams.Kee   = 250;        %Expected E->E In Degree
 PopParams.Kii   = 250;        %Expected I->I In Degree
 PopParams.Kie   = 250;        %Expected E->I In Degree
