@@ -28,7 +28,7 @@ for dd = 1:length(dinfo)
         continue
     end
         
-    id = find(spikes(:,1) > 5e2+10);
+    id = find(spikes(:,1) > 500+10);
     
 %     figure
 %     plot(spikes(:,1),spikes(:,2),'.k','markersize',1)
@@ -40,7 +40,7 @@ for dd = 1:length(dinfo)
 %     close all
     
     if isempty(id) == false
-    lastspikes(sim) = spikes(end,1) - (1e3+10);
+    lastspikes(sim) = spikes(end,1) - (500+10);
     sim = sim + 1;
     end
     
@@ -100,7 +100,7 @@ end
 
 %%
 
-if length(S(:,1)) >= 1e3
+if ~isempty(S(:,1))
 
 % rate.E = sum(cellfun(@length,Espikesbycell));
 % rate.I = sum(cellfun(@length,Ispikesbycell));

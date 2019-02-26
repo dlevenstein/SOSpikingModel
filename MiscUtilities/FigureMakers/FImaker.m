@@ -13,7 +13,7 @@ EndSpikes = nan(length(folders),21,110);
 
 FIspikes = cell(length(folders),21);
 
-for ff = 1:3
+for ff = 1:length(folders)
     
     cd([startpath char(folders(ff))])
     
