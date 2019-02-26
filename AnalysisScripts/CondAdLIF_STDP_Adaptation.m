@@ -66,7 +66,7 @@ PopParams.tau_w   = 300;
 TimeParams.SimTime = 4e3;
 
 PopParams.I_e = @(t) 250.*(heaviside(t-5e2)-heaviside(t-(TimeParams.SimTime-5e2)));
-PopParams.b = 0.1;
+PopParams.b = 1;
 PopParams.a = 0;
 
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
@@ -494,7 +494,7 @@ Rate = zeros(1,length(bvals));
 Adaptation = zeros(1,length(bvals));
 CurrentAdaptation = zeros(1,length(bvals));
 
-PopParams.tau_w = 200;
+PopParams.tau_w = 300;
 
 for bb = 1:length(bvals)
 

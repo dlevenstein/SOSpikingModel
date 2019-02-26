@@ -46,10 +46,10 @@ PopParams.tau_w   = 100;     %subthreshold adaptation steepness
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-PopParams.Wee   = 3;        %E->E weight (nS)
-PopParams.Wii   = 3;        %I->I weight
-PopParams.Wie   = 3;        %E->I weight
-PopParams.Wei   = 3;        %I->E weight
+PopParams.Wee   = 1;        %E->E weight (nS)
+PopParams.Wii   = 1;        %I->I weight
+PopParams.Wie   = 1;        %E->I weight
+PopParams.Wei   = 1;        %I->E weight
 PopParams.Kee   = 250;        %Expected E->E In Degree
 PopParams.Kii   = 250;        %Expected I->I In Degree
 PopParams.Kie   = 250;        %Expected E->I In Degree
