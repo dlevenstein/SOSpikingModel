@@ -117,7 +117,7 @@ SimValues = AdLIFfunction_STDP_GPU(PopParams,TimeParams,'cellout',true,'showprog
     'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime]);
 
 if SAVESIM==true
-    save(['/scratch/jmg1030/FIcurve/data/logWeight_m_1_s_' char(names(mm))],'-v7.3')
+    save(['/scratch/jmg1030/FIcurve/data/logWeight_m_1_s_' char(names(ss))],'-v7.3')
 end
 
 end
