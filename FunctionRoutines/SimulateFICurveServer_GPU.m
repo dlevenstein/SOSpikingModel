@@ -21,13 +21,11 @@ timeparms.simtime = timeparms.simtime;
 
 TimeParams.dt      = 0.05;
 
-if UP
-TimeParams.SimTime = timeparms.simtime;
-else
 TimeParams.SimTime = timeparms.simtime+500;
-end
 
 clear SimValues
+
+t = 0:TimeParams.dt:TimeParams.SimTime;
 
 parfor ii = 1:numI
     
@@ -40,7 +38,7 @@ parfor ii = 1:numI
     end
     
     if UP == false
-    PopParamsAnalysis.I_e = @(t) (300 - Ivals(ii)).*heaviside(500 - t)+Ivals(ii);
+    PopParamsAnalysis.I_e = (300 - Ivals(ii)).*heaviside(500 - t)+Ivals(ii);
     end
     
     SimValuesArray(ii) = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.SimTime,'save_weights',TimeParams.SimTime);
