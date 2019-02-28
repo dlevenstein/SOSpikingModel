@@ -1,4 +1,4 @@
-function [] = SimulateFICurveServer(PopParams_in,Irange,numI,datafolder,dataname,varargin)
+function [] = SimulateFICurveServer_GPU(PopParams_in,Irange,numI,datafolder,dataname,varargin)
 
 %% Input options
 defaulttimeparms.simtime = 2000; %ms, time to simulate each "trial"
