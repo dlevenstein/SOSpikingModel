@@ -1,26 +1,48 @@
+function [] = CondAdLIF_STDP_FI_Function_LogWeightSigmaM1(index)
+
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-repopath = '/home/jmg1030/Documents/spikingModel/SOSpikingModel';
+repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 
 addpath(genpath(repopath))
 
 %%
 
-load('/home/jmg1030/Documents/spikingModel/data/logWeight_m_1_s_10.mat');
+names = ["logWeight_m_1_s_01.mat","logWeight_m_1_s_1.mat","logWeight_m_1_s_10.mat"];
+weightNames = ["01","1","10"];
+
+%%
+numS = 100;
+
+simnum = mod(index,numS);
+LL = ceil(index/numS);
+
+if simnum == 0
+    simnum = numS;
+end
+
+disp(['index: ' char(num2str(index))]);
+
+disp(['Sim Number: ' char(num2str(simnum))]);
+disp(['File Name: ' char(names(LL))]);
+
+load(['/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/' char(names(LL))]);
 
 rng(simnum,'twister');
 
 PopParamsAnalysis = PopParams;
 PopParamsAnalysis.LearningRate = 0;
-PopParamsAnalysis.sigma = 10;
+PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
 PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
-datafolder = '/home/jmg1030/Documents/spikingModel/data/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LogWeightSigmaM1/';
 dataname = ['logSigmaWeight_m_1_' char(weightNames(LL)) '_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
 
 SimulateFICurveServer(PopParamsAnalysis,[0 400],21,datafolder,dataname,'up',false);
+
+end
