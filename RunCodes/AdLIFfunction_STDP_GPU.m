@@ -424,21 +424,11 @@ if gpuAvail
     g_e = gpuArray(g_e);
     g_i = gpuArray(g_i);
     
+    I_e = gpuArray(I_e);
+    
     % Random Numbers
     gpurng(0, 'Philox4x32-10');
     
-%     % Save Parameters
-%     SimValues.V               = gpuArray(SimValues.V);
-%     SimValues.g_w             = gpuArray(SimValues.g_w);
-%     SimValues.g_e             = gpuArray(SimValues.g_e);
-%     SimValues.g_i             = gpuArray(SimValues.g_i);
-%     SimValues.s               = gpuArray(SimValues.s);
-%     SimValues.w               = gpuArray(SimValues.w);
-%     SimValues.x               = gpuArray(SimValues.x);
-%     SimValues.a_w             = gpuArray(SimValues.a_w);
-%     SimValues.Input           = gpuArray(SimValues.Input);
-%     SimValues.WeightMat       = gpuArray(SimValues.WeightMat);
-
 end
 
 %% Time Loop
@@ -465,7 +455,7 @@ for tt=1:SimTimeLength
     dVdt =  (- g_L.*(V-E_L) ...                      %Leak
              - g_w.*(V-E_w) ...                      %Adaptation
              - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
-             + I_e(gputimecounter) + X_t)./C;           %External input
+             + I_e(tt) + X_t)./C;           %External input
         
     %s - Synaptic Output 
     dsdt =  - s./tau_s;
@@ -557,7 +547,7 @@ for tt=1:SimTimeLength
          SimValues.w(:,savecounter)               = gather(w);
          SimValues.x(:,savecounter)               = gather(x);
          SimValues.a_w(:,savecounter)             = gather(a_w);
-         SimValues.Input(:,savecounter)           = gather(I_e(gputimecounter) + X_t);
+         SimValues.Input(:,savecounter)           = gather(I_e(tt) + X_t);
         
          savecounter = savecounter+1;
         end
