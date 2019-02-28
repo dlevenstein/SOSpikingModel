@@ -36,7 +36,7 @@ parfor ii = 1:numI
     PopParamsAnalysis = PopParams_in;
      
     if UP
-    PopParamsAnalysis.I_e = Ivals(ii);
+    PopParamsAnalysis.I_e = Ivals(ii).*heaviside(t - 500);
     end
     
     if UP == false
