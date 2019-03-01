@@ -40,7 +40,7 @@ parfor ii = 1:length(Ivals)
 end
 end
 
-    save(['simulation_num_' char(num2str(simnum)) '_SimValues.mat'],'SimValuesArray','-v7.3')
+    save(['/home/jmg1030/Documents/spikingModel/data/UP/simulation_num_' char(num2str(simnum)) '_SimValues.mat'],'SimValuesArray','-v7.3')
     
     clear SimValuesArray
     
