@@ -28,7 +28,7 @@ for dd = 1:length(dinfo)
         continue
     end
         
-    id = find(spikes(:,1) > 500+10);
+    id = find(spikes(:,1) > 500);
     
 %     figure
 %     plot(spikes(:,1),spikes(:,2),'.k','markersize',1)
@@ -40,15 +40,15 @@ for dd = 1:length(dinfo)
 %     close all
     
     if isempty(id) == false
-    lastspikes(sim) = spikes(end,1) - (500+10);
+    lastspikes(sim) = spikes(end,1) - (500);
     sim = sim + 1;
     end
     
     if isempty(S) == false
-        S = [S;(spikes(id,1)-(500+10))+S(end,1),spikes(id,2)];
+        S = [S;(spikes(id,1)-(500))+S(end,1),spikes(id,2)];
         Times = [Times spikes(end,1)];
     else
-        S = [S;spikes(id,1)-(500+10),spikes(id,2)];
+        S = [S;spikes(id,1)-(500),spikes(id,2)];
         Times = [Times spikes(end,1)];
         if length(S(:,1)) > 1e5
             break
