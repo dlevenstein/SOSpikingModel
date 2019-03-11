@@ -97,6 +97,7 @@ PopNum      = EPopNum + IPopNum;    %Number of all neurons
 
 SimTime     = TimeParams.SimTime;   %Simulation Time (ms)
 dt          = TimeParams.dt;        %differential (ms)
+t           = -onsettime:dt:SimTime;
 
 %Calculate time vector from time parameters
 SimTimeLength  = length([-onsettime:dt:SimTime]);   %Time Steps (simulated)
@@ -424,7 +425,10 @@ if gpuAvail
     g_e = gpuArray(g_e);
     g_i = gpuArray(g_i);
     
-    I_e = gpuArray(I_e);
+    I_e = gpuArray(I_e(t));
+    if length(I_e) == 1
+        I_e = I_e.*ones(length(t),1);
+    end
     
     % Random Numbers
     gpurng(0, 'Philox4x32-10');
