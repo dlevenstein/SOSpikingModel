@@ -51,7 +51,10 @@ LogScale('x',10);
 
 ylabel('Probability','fontsize',20);
 
-legend(legendnames(indices))
+lg = legend(legendnames(indices))
+lg.FontSize = 14;
+
+box OFF
 
 %--------------------------------------------------------------------------
 
@@ -104,7 +107,10 @@ set(AX,'FontSize', 16)
 
 xlabel('Weight (nS)','fontsize',20);ylabel('Probability','fontsize',20);
 
-legend(legendnames(indices))
+lg = legend(legendnames(indices))
+lg.FontSize = 14;
+
+box OFF
 
 % figval = 1;
 % for ii = indices

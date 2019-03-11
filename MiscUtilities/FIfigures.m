@@ -62,10 +62,10 @@ end
 if isempty(S) == false
    
 % spikesbycell = spikeSorter(S,1,2500);
-% 
+
 Espikesbycell = spikeSorter(S,1,2000);
 Ispikesbycell = spikeSorter(S,2001,2500);
-% 
+
 % ISI_E = [];
 % ISI_I = [];
 % 
@@ -107,7 +107,7 @@ if ~isempty(S(:,1))
 
 rate.E = (sum(cellfun(@length,Espikesbycell))./S(end,1)).*(1000./2000);
 rate.I = (sum(cellfun(@length,Ispikesbycell))./S(end,1)).*(1000./500);
-% 
+ 
 % Espikes = cat(1,spikesbycell{1:2000});
 % Ispikes = cat(1,spikesbycell{2001:2500});
 % [ccg,t_ccg] = CCG({double(Espikes./1000),double(Ispikes./1000)},[],'binSize',0.001,'duration',0.1,'norm','rate');

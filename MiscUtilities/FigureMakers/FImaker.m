@@ -26,18 +26,18 @@ for ff = 1:length(folders)
         [rate,peakwidth,peakheight,lastspikes,S] = FIfigures(II,path);
         
 %         FIspikes{ff,II} = S;
-%         
+
         Erate(ff,II) = rate.E;
         Irate(ff,II) = rate.I;
-%         
+
 %         Epeakwidth(ff,II) = peakwidth.E;
 %         Ipeakwidth(ff,II) = peakwidth.I;
 %         
 %         Epeakheight(ff,II) = peakheight.E;
 %         Ipeakheight(ff,II) = peakheight.I;
-%         
+
         EndSpikes(ff,II,1:length(lastspikes)) = lastspikes;
-%         
+        
         cd([startpath char(folders(ff))])
         
     end

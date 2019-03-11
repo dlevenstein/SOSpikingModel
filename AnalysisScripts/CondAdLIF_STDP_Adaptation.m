@@ -1,6 +1,6 @@
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
-
+% 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
 repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
 %repopath = '/scratch/jmg1030/LogWeightSigma/SOSpikingModel';
@@ -63,10 +63,78 @@ PopParams.tauSTDP = 20;
 
 PopParams.tau_w   = 300;
 
-TimeParams.SimTime = 4e3;
+TimeParams.SimTime = 3e3;
 
 PopParams.I_e = @(t) 250.*(heaviside(t-5e2)-heaviside(t-(TimeParams.SimTime-5e2)));
-PopParams.b = 1;
+PopParams.b = 0;
+PopParams.a = 0.03;
+
+SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
+
+%%
+figure
+
+pos = [0.1 0.68 0.8 0.25];
+subplot('Position',pos)
+
+% t0 = find(single(SimValues.t) == SimValues.spikes(end-1,1));
+% t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
+
+plot(SimValues.t,SimValues.g_w,'k','LineWidth',2)
+% hold on
+% plot(SimValues.t(t0),SimValues.g_w(t0),'.r','MarkerSize',25);
+% hold on
+% plot(SimValues.t(t1),SimValues.g_w(t1),'.r','MarkerSize',25);
+
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
+
+set(gca,'xticklabel',[])
+
+ylabel('Adaptation (nS)','FontSize',16)
+
+box OFF
+
+pos = [0.1 0.39 0.8 0.25];
+subplot('Position',pos)
+
+plot(SimValues.t,SimValues.V,'k','LineWidth',2)
+
+AX = get(gca,'YAxis');
+set(AX,'FontSize', 12)
+
+set(gca,'xticklabel',[])
+
+ylabel('Voltage (mV)','FontSize',16)
+
+box OFF
+
+pos = [0.1 0.3 0.8 0.05];
+subplot('Position',pos)
+
+plot(SimValues.t./1e3,SimValues.Input,'k','LineWidth',2)
+
+ylim([0 400])
+
+set(gca,'yticklabel',[])
+
+AX = get(gca,'XAxis');
+set(AX,'FontSize', 12)
+
+xlabel('Time (sec)','FontSize',16);
+
+box OFF
+
+NiceSave('Subthreshold-Based_AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+
+%%
+
+PopParams.tau_w   = 300;
+
+TimeParams.SimTime = 3e3;
+
+PopParams.I_e = @(t) 250.*(heaviside(t-5e2)-heaviside(t-(TimeParams.SimTime-5e2)));
+PopParams.b = 0.1;
 PopParams.a = 0;
 
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
@@ -121,11 +189,11 @@ set(gca,'yticklabel',[])
 AX = get(gca,'XAxis');
 set(AX,'FontSize', 12)
 
-xlabel('Time (sec)','FontSize',16);%ylabel('Current (pA)','FontSize',16)
+xlabel('Time (sec)','FontSize',16);
 
 box OFF
 
-%NiceSave('AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+NiceSave('Spike-Based_AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
 %%
 TimeParams.SimTime = 1e4;
@@ -137,11 +205,11 @@ Rate = zeros(length(bvals),length(Ivals));
 Adaptation = zeros(length(bvals),length(Ivals));
 CurrentAdaptation = zeros(length(bvals),length(Ivals));
 
-for bb = 1
+for bb = 1:length(bvals)
 for ii = 1:length(Ivals)
 
 PopParams.I_e = Ivals(ii);
-PopParams.b = 1;
+PopParams.b = bvals(bb);
 PopParams.a = 0;
 
 SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
@@ -162,13 +230,17 @@ end
 end
 
 %%
+save('/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/FI_300/Adaptation/Spike-BasedCurrentAdaptation.mat','CurrentAdaptation','-v7.3');
+save('/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/FI_300/Adaptation/Spike-BasedRate.mat','Rate','-v7.3');
+
+%%
 figure
 
 subplot(2,2,1)
 
 plot(Ivals,CurrentAdaptation(8,:),'.-k','LineWidth',2,'MarkerSize',10)
 hold on
-text(50,300,'b: 10','FontSize',18)
+text(50,200,'b: 10','FontSize',18)
 
 AX = get(gca,'XAxis');
 set(AX,'FontSize', 12)
@@ -182,7 +254,7 @@ subplot(2,2,2)
 
 plot(Ivals,Rate(8,:),'.-k','LineWidth',2,'MarkerSize',10)
 hold on
-text(50,0.3,'b: 10','FontSize',18)
+text(50,1,'b: 10','FontSize',18)
 
 AX = get(gca,'XAxis');
 set(AX,'FontSize', 12)
@@ -194,12 +266,14 @@ box OFF
 
 subplot(2,2,3)
 
-plot(CurrentAdaptation(5,:),Rate(5,:),'.-','Color',[0.7,0.7,0.7],'LineWidth',2,'MarkerSize',10)
+plot(CurrentAdaptation(5,:),log10(Rate(5,:)),'.-','Color',[0.7,0.7,0.7],'LineWidth',2,'MarkerSize',10)
 hold on
-plot(CurrentAdaptation(8,:),Rate(8,:),'.-','Color',[0.5,0.5,0.5],'LineWidth',2,'MarkerSize',10)
+plot(CurrentAdaptation(8,:),log10(Rate(8,:)),'.-','Color',[0.5,0.5,0.5],'LineWidth',2,'MarkerSize',10)
 hold on
-plot(CurrentAdaptation(end,:),Rate(end,:),'.-','Color',[0.1,0.1,0.1],'LineWidth',2,'MarkerSize',10)
-legend('b: 1','b: 10','b: 100')
+plot(CurrentAdaptation(end,:),log10(Rate(end,:)),'.-','Color',[0.1,0.1,0.1],'LineWidth',2,'MarkerSize',10)
+legend('b: 1','b: 10','b: 100','Location','southeast')
+ylim([-1 1])
+LogScale('y',10)
 
 AX = get(gca,'XAxis');
 set(AX,'FontSize', 12)

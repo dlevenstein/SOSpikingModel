@@ -27,7 +27,8 @@ ylabel('Probability','fontsize',20);title('ISI','fontsize',20)
 
 ylim([0 0.2])
 
-legend(legendnames(indices))
+lg = legend(legendnames(indices))
+lg.FontSize = 14;
 
 box OFF 
 
@@ -56,7 +57,8 @@ xlabel('ISI (ms)','fontsize',20);ylabel('Probability','fontsize',20)
 
 ylim([0 0.2])
 
-legend(legendnames(indices))
+lg = legend(legendnames(indices))
+lg.FontSize = 14;
 
 box OFF 
 
@@ -83,7 +85,8 @@ ylabel('Rate (Hz)','fontsize',20);title('ACG','fontsize',20)
 
 %ylim([0 5])
 
-legend(legendnames(indices))
+lg = legend(legendnames(indices))
+lg.FontSize = 14;
 
 box OFF 
 
@@ -110,7 +113,8 @@ xlabel('Time Lag (ms)','fontsize',20);ylabel('Rate (Hz)','fontsize',20)
 
 %ylim([0 7])
 
-legend(legendnames(indices))
+lg = legend(legendnames(indices))
+lg.FontSize = 14;
 
 box OFF 
 
