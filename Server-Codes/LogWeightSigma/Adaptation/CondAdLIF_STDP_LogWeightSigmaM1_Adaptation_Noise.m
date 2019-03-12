@@ -15,10 +15,10 @@ PopParams_in.gwnorm = PopParams_in.g_L(1);
 PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_in.E_L)).*rand(PopParams_in.EPopNum + PopParams_in.IPopNum,1);
 
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 1e4;
+TimeParams.SimTime = 5e4;
 
 Ivals = linspace(0,400,21);
-bvals = [0 logspace(-1,2,9)];
+bvals = [0 logspace(-1,2.7,9)];
 
 ii = mod(index,21)+1;
 bb = ceil(index/21);
@@ -34,15 +34,20 @@ b = bvals(bb);
 PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
-SimValuesArray = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime);
+SimValuesArray = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.SimTime,'save_weights',TimeParams.SimTime);
     
-SimValuesSave.spikes = SimValuesArray.spikes;
-SimValuesSave.V = SimValuesArray.V;
+spikes = SimValuesArray.spikes;
 
-SimValuesSave.g_e = SimValuesArray.g_e;
-SimValuesSave.g_i = SimValuesArray.g_i;
-SimValuesSave.g_w = SimValuesArray.g_w;
+% SimValuesSave.spikes = SimValuesArray.spikes;
+% 
+% SimValuesSave.V = SimValuesArray.V;
+% 
+% SimValuesSave.g_e = SimValuesArray.g_e;
+% SimValuesSave.g_i = SimValuesArray.g_i;
+% SimValuesSave.g_w = SimValuesArray.g_w;
+% 
+% save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrent_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'SimValuesSave','-v7.3') 
 
-save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrent_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'SimValuesSave','-v7.3') 
+save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
 
 end
