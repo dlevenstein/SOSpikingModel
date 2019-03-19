@@ -17,11 +17,11 @@ PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_
 TimeParams.dt      = 0.05;
 TimeParams.SimTime = 4e4;
 
-Ivals = linspace(0,400,21);
-bvals = [0 logspace(-1,2.7,9)];
+Ivals = linspace(100,300,41);
+bvals = 0:10:100;
 
-ii = mod(index,21)+1;
-bb = ceil(index/21);
+ii = mod(index,41)+1;
+bb = ceil(index/41);
     
 ii
 bb 
