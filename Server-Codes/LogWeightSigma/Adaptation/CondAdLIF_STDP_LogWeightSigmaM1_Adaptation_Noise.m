@@ -15,7 +15,7 @@ PopParams_in.gwnorm = PopParams_in.g_L(1);
 PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_in.E_L)).*rand(PopParams_in.EPopNum + PopParams_in.IPopNum,1);
 
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 5e4;
+TimeParams.SimTime = 4e4;
 
 Ivals = linspace(0,400,21);
 bvals = [0 logspace(-1,2.7,9)];
@@ -34,7 +34,7 @@ b = bvals(bb);
 PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
-SimValuesArray = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.SimTime,'save_weights',TimeParams.SimTime);
+SimValuesArray = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.SimTime,'save_weights',TimeParams.SimTime,'onsettime',3e4);
     
 spikes = SimValuesArray.spikes;
 
