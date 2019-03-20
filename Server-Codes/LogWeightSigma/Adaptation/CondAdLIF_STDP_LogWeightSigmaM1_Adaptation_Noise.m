@@ -35,19 +35,7 @@ PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
 SimValuesArray = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.SimTime,'save_weights',TimeParams.SimTime,'onsettime',3e4);
-    
-spikes = SimValuesArray.spikes;
 
-% SimValuesSave.spikes = SimValuesArray.spikes;
-% 
-% SimValuesSave.V = SimValuesArray.V;
-% 
-% SimValuesSave.g_e = SimValuesArray.g_e;
-% SimValuesSave.g_i = SimValuesArray.g_i;
-% SimValuesSave.g_w = SimValuesArray.g_w;
-% 
-% save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrent_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'SimValuesSave','-v7.3') 
-
-save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'SimValuesArray.spikes','-v7.3') 
 
 end
