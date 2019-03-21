@@ -34,7 +34,7 @@ b = bvals(bb);
 PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
-SimValuesArray = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.SimTime,'save_weights',TimeParams.SimTime,'onsettime',1e4);
+SimValuesArray = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,'save_dt',TimeParams.SimTime,'save_weights',TimeParams.SimTime,'onsettime',1e4);
 
 save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'SimValuesArray.spikes','-v7.3') 
 
