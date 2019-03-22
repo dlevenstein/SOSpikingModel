@@ -1,7 +1,7 @@
 %Conductance-Based Adapting LIF Model for GPU, Euler Mayurama implementation 
 %with Conductance-based Jump-decay STDP synapses
 %by Jonathan Gornet and DLevenstein
-%Last update: 01/11/2019
+%Last update: 03/22/2019
 
 %INPUTS
 %   PopParams       a structure that gives all the parameters of the population
@@ -176,6 +176,7 @@ V_th        = PopParams.V_th;    %spike threshhold (mV)
 V_reset     = PopParams.V_reset; %reset value (mV)
 
 t_ref       = PopParams.t_ref;   %refractory period (ms)
+syn_ref     = PopParams.syn_ref;   %refractory period (ms)
 
 sigma       = PopParams.sigma;   %Standard deviation of noise
 theta       = PopParams.theta;   %Strength to mean (time scale of noise, ms^-1)
@@ -265,7 +266,8 @@ a_w          = zeros(PopNum,1); %adaptation rise (1/ms)
 s            = zeros(PopNum,1); %synapse 
 w            = zeros(PopNum,1); %adaptation
 X_t          = zeros(PopNum,1); %OU noise
-t_r = zeros(PopNum,1);
+t_r          = zeros(PopNum,1);
+s_r          = zeros(PopNum,1);
 
 x            = zeros(PopNum,1); %Synaptic trace
 
@@ -317,6 +319,11 @@ if length(t_ref) == 2
 t_ref       = transpose([t_ref(1).*ones(1,EPopNum),   t_ref(2).*ones(1,IPopNum)]);
 elseif length(t_ref) == 1
 t_ref       = transpose([t_ref.*ones(1,EPopNum),   t_ref.*ones(1,IPopNum)]);
+end
+if length(syn_ref) == 2 
+syn_ref       = transpose([syn_ref(1).*ones(1,EPopNum),   syn_ref(2).*ones(1,IPopNum)]);
+elseif length(syn_ref) == 1
+syn_ref       = transpose([syn_ref.*ones(1,EPopNum),   syn_ref.*ones(1,IPopNum)]);
 end
 if length(sigma) == 2 
 sigma       = transpose([sigma(1).*ones(1,EPopNum),   sigma(2).*ones(1,IPopNum)]);
@@ -402,6 +409,7 @@ if gpuAvail
     %Spike Parameters
     V_th = gpuArray(V_th);
     t_r  = gpuArray(t_r);
+    s_r  = gpuArray(s_r);
     V_reset = gpuArray(V_reset);
     
     %Adaptation Parameters
@@ -491,8 +499,6 @@ for tt=1:SimTimeLength
         
         spikecounter = spikecounter+numspikers;
         
-        %Jump the conductance
-        s(spikeneurons) = 1;
         %Set spiking neurons refractory period 
         t_r(spikeneurons) = t_ref(spikeneurons);
         %Jump the adaptation
@@ -525,6 +531,16 @@ for tt=1:SimTimeLength
         t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
     end
         
+    %%  Synapse Refractory period Countdowns
+    if any(s_r <= 0)
+        refractorysynapses = s_r <= 0;
+        %Jump the conductance
+        s(refractorysynapses) = 1;
+    else
+        %Count down the refractory period
+        s_r(refractoryneurons) = s_r(refractoryneurons) - dt;
+    end
+    
     %% Synaptic,Adaptaion Conductances for the next time step
         g_w = gwnorm.*w;
         g_e = EE_mat*s + IE_mat*s;
