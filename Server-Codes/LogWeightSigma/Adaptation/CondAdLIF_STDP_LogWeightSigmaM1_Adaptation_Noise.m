@@ -42,7 +42,7 @@ SimValuesArray = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,
     'save_weights',SimTime,'save_dt',SimTime,...
     'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime]);
 
-spikes = SimValuesArray.SimValuesArray;
+spikes = SimValuesArray.spikes;
 
 save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
 
