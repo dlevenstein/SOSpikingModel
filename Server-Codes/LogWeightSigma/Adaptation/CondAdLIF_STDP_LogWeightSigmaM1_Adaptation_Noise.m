@@ -15,7 +15,11 @@ PopParams_in.gwnorm = PopParams_in.g_L(1);
 PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_in.E_L)).*rand(PopParams_in.EPopNum + PopParams_in.IPopNum,1);
 
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 2e4;
+
+SimTime = 1e4;
+RecordTime = 1e4;
+
+TimeParams.SimTime = SimTime+RecordTime;
 
 Ivals = linspace(100,300,41);
 bvals = 0:10:100;
@@ -34,7 +38,9 @@ b = bvals(bb);
 PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
-SimValuesArray = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,'save_dt',TimeParams.SimTime,'save_weights',TimeParams.SimTime,'onsettime',1e4);
+SimValuesArray = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
+    'save_weights',SimTime,'save_dt',SimTime,...
+    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime]);
 
 save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'SimValuesArray.spikes','-v7.3') 
 
