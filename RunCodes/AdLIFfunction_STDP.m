@@ -273,7 +273,7 @@ t_ref       = transpose([t_ref.*ones(1,EPopNum),   t_ref.*ones(1,IPopNum)]);
 end
 if length(syn_ref) == 2 
 syn_ref       = transpose([syn_ref(1).*ones(1,EPopNum),   syn_ref(2).*ones(1,IPopNum)]);
-elseif length(t_ref) == 1
+elseif length(syn_ref) == 1
 syn_ref       = transpose([syn_ref.*ones(1,EPopNum),   syn_ref.*ones(1,IPopNum)]);
 end
 if length(sigma) == 2 
