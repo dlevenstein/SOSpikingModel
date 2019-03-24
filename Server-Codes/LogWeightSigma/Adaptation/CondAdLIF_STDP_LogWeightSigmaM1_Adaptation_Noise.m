@@ -40,8 +40,7 @@ PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
 SimValuesArray = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',SimTime,'save_dt',SimTime,...
-    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime]);
+    'save_weights',SimTime,'save_dt',SimTime);
 
 spikes = SimValuesArray.spikes;
 
