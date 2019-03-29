@@ -394,7 +394,7 @@ if gpuAvail
     
     I_e = gpuArray(I_e(-onsettime:dt:SimTime));
     if length(I_e) == 1
-        I_e = I_e.*ones(length(t),1);
+        I_e = I_e.*ones(length(-onsettime:dt:SimTime),1);
     end
     
     % Random Numbers
