@@ -411,7 +411,6 @@ for tt=1:SimTimeLength
     %%  Neuron Refractory period Countdowns
     if any(t_r > 0)
         refractoryneurons = t_r > 0;
-        
         %Hold voltage, synaptic/adaptation rates at spike levels
         V(refractoryneurons) = V_reset(refractoryneurons);
         %Count down the refractory period
@@ -424,8 +423,9 @@ for tt=1:SimTimeLength
         %Jump the conductance
         s(refractorysynapses) = 1;
     else
+        refractorysynapses = s_r > 0;
         %Count down the refractory period
-        s_r(refractoryneurons) = s_r(refractoryneurons) - dt;
+        s_r(refractorysynapses) = s_r(refractorysynapses) - dt;
     end
         
     %% Synaptic,Adaptaion Conductances for the next time step
