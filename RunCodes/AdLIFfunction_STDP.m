@@ -217,6 +217,7 @@ s            = zeros(PopNum,1); %synapse
 w            = zeros(PopNum,1); %adaptation
 X_t          = zeros(PopNum,1); %OU noise
 t_r = zeros(PopNum,1);
+t_s = -dt.*ones(PopNum,1);
 
 x            = zeros(PopNum,1); %Synaptic trace
 
@@ -377,38 +378,49 @@ for tt=1:SimTimeLength
         
         spikecounter = spikecounter+numspikers;
         
-        %Jump the conductance
-        s(spikeneurons) = 1;
-        %Set spiking neurons refractory period 
+
+        %Set spiking neurons refractory period and synaptic delay counters
         t_r(spikeneurons) = t_ref(spikeneurons);
+        t_s(spikeneurons) = t_syn(spikeneurons);
         %Jump the adaptation
         w(spikeneurons) = w(spikeneurons) + b(spikeneurons); 
-        %Jump the synaptic trace
-        x(spikeneurons) = x(spikeneurons) + 1;
+  
+    end
+
+    %%  Refractory period Countdowns
+    if any(t_r > 0) || any(t_s >= 0)
+        refractoryneurons = t_r > 0;
+        delayneurons = t_s >= 0;
+        
+        %Count down the refractory periods
+        t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
+        t_s(delayneurons) = t_r(delayneurons) - dt;
+        
+        %Hold voltage, synaptic/adaptation rates at spike levels
+        V(refractoryneurons) = V_reset(refractoryneurons);
+        
+        
+        activatedsynapses = delayneurons & (t_s < 0);
+            
+        %Jump the postsynaptic conductance
+        s(activatedsynapses) = 1; %Do this later... after delay
+        %Jump the postsynaptic trace
+        x(activatedsynapses) = x(activatedsynapses) + 1;  %Do this later... after delay
+        
         
         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
-        %Presynaptic I Cells
+        %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
         %PreIspikes = intersect(spikeneurons,Icells);
-        PreIspikes = spikeneurons(spikeneurons > EPopNum);
+        PreIspikes = activatedsynapses(activatedsynapses > EPopNum);
         EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
-        %Postsynaptic E cells
+        %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
-        PostEspikes = spikeneurons(spikeneurons <= EPopNum);
+        PostEspikes = activatedsynapses(activatedsynapses <= EPopNum);
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
         
-    end
-
-    %%  Refractory period Countdowns
-    if any(t_r > 0)
-        refractoryneurons = t_r > 0;
-        
-        %Hold voltage, synaptic/adaptation rates at spike levels
-        V(refractoryneurons) = V_reset(refractoryneurons);
-        %Count down the refractory period
-        t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
     end
         
     %% Synaptic,Adaptaion Conductances for the next time step
