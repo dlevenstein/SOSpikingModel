@@ -501,8 +501,6 @@ for tt=1:SimTimeLength
         
         %Set spiking neurons refractory period 
         t_r(spikeneurons) = t_ref(spikeneurons);
-        %Set spiking neurons refractory period 
-        s_r(spikeneurons) = syn_ref(spikeneurons);
         %Jump the adaptation
         w(spikeneurons) = w(spikeneurons) + b(spikeneurons); 
         %Jump the synaptic trace
@@ -540,7 +538,7 @@ for tt=1:SimTimeLength
         s(refractorysynapses) = 1;
     else
         %Count down the refractory period
-        s_r(refractorysynapses) = s_r(refractorysynapses) - dt;
+        s_r(refractoryneurons) = s_r(refractoryneurons) - dt;
     end
     
     %% Synaptic,Adaptaion Conductances for the next time step
