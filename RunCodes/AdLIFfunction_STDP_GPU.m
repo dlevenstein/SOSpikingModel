@@ -533,11 +533,11 @@ for tt=1:SimTimeLength
     end
         
     %%  Synapse Refractory period Countdowns
-    if any(abs(s_r-dt) < 1e-8)
-        refractorysynapses = find(abs(s_r-dt) < 1e-8);
+    if any(s_r <= 0)
+        refractorysynapses = s_r <= 0;
         %Jump the conductance
         s(refractorysynapses) = 1;
-    elseif any(s_r > 0)
+    else
         refractorysynapses = s_r > 0;
         %Count down the refractory period
         s_r(refractorysynapses) = s_r(refractorysynapses) - dt;
