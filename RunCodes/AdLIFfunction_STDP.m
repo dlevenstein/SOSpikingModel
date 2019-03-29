@@ -400,7 +400,7 @@ for tt=1:SimTimeLength
         
         %Count down the refractory periods
         t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
-        t_s(delayneurons) = t_r(delayneurons) - dt;
+        t_s(delayneurons) = t_s(delayneurons) - dt;
         
         %Hold voltage, synaptic/adaptation rates at spike levels
         V(refractoryneurons) = V_reset(refractoryneurons);
