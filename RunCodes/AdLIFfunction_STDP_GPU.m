@@ -400,12 +400,25 @@ if gpuAvail
     % Random Numbers
     gpurng(0, 'Philox4x32-10');
     
+    SimValues.V               = gpuArray(SimValues.V);
+    SimValues.g_w             = gpuArray(SimValues.g_w);
+    SimValues.g_e             = gpuArray(SimValues.g_e);
+    SimValues.g_i             = gpuArray(SimValues.g_i);
+    SimValues.s               = gpuArray(SimValues.s);
+    SimValues.w               = gpuArray(SimValues.w);
+    SimValues.x               = gpuArray(SimValues.x);
+    SimValues.a_w             = gpuArray(SimValues.a_w);
+    SimValues.Input           = gpuArray(SimValues.Input);
+    
+    SimValues.t_weight        = gpuArray(SimValues.t_weight);
+    SimValues.WeightMat       = gpuArray(SimValues.WeightMat);
+    
 end
 
 %% Time Loop
 savecounter = 1;
 weightcounter = 1;
-timecounter = -onsettime-dt;
+timecounter = -onsettime-gather(dt);
 spikecounter = 0;
 tic
 for tt=1:SimTimeLength
@@ -452,7 +465,7 @@ for tt=1:SimTimeLength
     w   = w + dwdt.*dt;
     x   = x + dxdt.*dt;
 
-    timecounter = round(timecounter+dt,4);  %Round to deal with computational error
+    timecounter = round(timecounter+gather(dt),4);  %Round to deal with computational error
 
     %% Spiking
     if any(V > V_th)
