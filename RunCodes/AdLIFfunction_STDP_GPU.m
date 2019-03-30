@@ -552,8 +552,12 @@ for tt=1:SimTimeLength
          SimValues.w(:,savecounter)               = w;
          SimValues.x(:,savecounter)               = x;
          SimValues.a_w(:,savecounter)             = a_w;
+         if gpuAvail
+         SimValues.Input(:,savecounter)           = I_e(tt) + X_t;
+         else
          SimValues.Input(:,savecounter)           = I_e(timecounter) + X_t;
-        
+         end
+         
          savecounter = savecounter+1;
          
         end
