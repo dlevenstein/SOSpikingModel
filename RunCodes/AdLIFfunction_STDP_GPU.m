@@ -55,15 +55,6 @@
 
 %--------------------------------------------------------------------------
 function [SimValues] = AdLIFfunction_STDP_GPU(PopParams,TimeParams,varargin)
-%% Check if GPU Available
-try
-    gpuArray();
-    gpuAvail = true;
-    warning('Warning, code is moving to GPU');
-catch
-    gpuAvail = false;
-    warning('Warning, code is moving to CPU');
-end
 %--------------------------------------------------------------------------
 %Parse optional inputs
 p = inputParser;
@@ -74,7 +65,7 @@ addParameter(p,'save_dt',0.5,@isnumeric)
 addParameter(p,'save_weights',10,@isnumeric)
 addParameter(p,'cellout',false,@islogical)
 addParameter(p,'recordInterval',[],@isnumeric)
-addParameter(p,'intersave',[],@ischar)
+addParameter(p,'useGPU',[],@ischar)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
@@ -83,9 +74,24 @@ save_dt = p.Results.save_dt;
 save_weights = p.Results.save_weights;
 cellout = p.Results.cellout;
 recordIntervals = p.Results.recordInterval;
-intersave = p.Results.intersave;
+useGPU = p.Results.useGPU;
 
 recordVALs = createRecorder(recordIntervals,TimeParams);
+
+%% Check if GPU Available
+try
+    gpuArray();
+    if useGPU
+        gpuAvail = true;
+        warning('Warning, code is moving to GPU');
+    else
+        gpuAvail = false;
+        warning('Warning, code is moving to CPU');
+    end
+catch
+    gpuAvail = false;
+    warning('Warning, code is moving to CPU');
+end
 
 %%
 %--------------------------------------------------------------------------
