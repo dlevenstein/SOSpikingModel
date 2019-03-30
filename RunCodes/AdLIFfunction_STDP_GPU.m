@@ -65,7 +65,7 @@ addParameter(p,'save_dt',0.5,@isnumeric)
 addParameter(p,'save_weights',10,@isnumeric)
 addParameter(p,'cellout',false,@islogical)
 addParameter(p,'recordInterval',[],@isnumeric)
-addParameter(p,'useGPU',[],@ischar)
+addParameter(p,'useGPU',true,@islogical)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
@@ -83,14 +83,14 @@ try
     gpuArray();
     if useGPU
         gpuAvail = true;
-        warning('Warning, code is moving to GPU');
+        warning('code is moving to GPU');
     else
         gpuAvail = false;
-        warning('Warning, code is moving to CPU');
+        warning('code is moving to CPU');
     end
 catch
     gpuAvail = false;
-    warning('Warning, code is moving to CPU');
+    warning('code is moving to CPU');
 end
 
 %%
@@ -482,7 +482,7 @@ for tt=1:SimTimeLength
         
         if recordVALs(tt)
             spikes(spikecounter+1:spikecounter+numspikers,:) = ...
-                [timecounter.*ones(numspikers,1),spikeneurons];
+                [timecounter.*ones(numspikers,1),gather(spikeneurons)];
         end
         
         spikecounter = spikecounter+numspikers;
