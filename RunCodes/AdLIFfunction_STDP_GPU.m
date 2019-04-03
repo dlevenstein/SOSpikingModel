@@ -493,7 +493,9 @@ for tt=1:SimTimeLength
         t_s(spikeneurons) = t_syn(spikeneurons);
         %Jump the adaptation
         w(spikeneurons) = w(spikeneurons) + b(spikeneurons); 
-  
+        %Jump the postsynaptic trace
+        x(activatedsynapses) = x(activatedsynapses) + 1;  %Do this later... after delay
+        
     end
 
     %%  Refractory period Countdowns
@@ -514,7 +516,7 @@ for tt=1:SimTimeLength
         %Jump the postsynaptic conductance
         s(activatedsynapses) = 1; %Do this later... after delay
         %Jump the postsynaptic trace
-        x(activatedsynapses) = x(activatedsynapses) + 1;  %Do this later... after delay
+        % x(activatedsynapses) = x(activatedsynapses) + 1;  %Do this later... after delay
         
         
         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
