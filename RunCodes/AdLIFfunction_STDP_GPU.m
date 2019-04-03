@@ -494,7 +494,7 @@ for tt=1:SimTimeLength
         %Jump the adaptation
         w(spikeneurons) = w(spikeneurons) + b(spikeneurons); 
         %Jump the postsynaptic trace
-        x(activatedsynapses) = x(activatedsynapses) + 1;  %Do this later... after delay
+        x(spikeneurons) = x(spikeneurons) + 1;  %Do this later... after delay
         
     end
 
