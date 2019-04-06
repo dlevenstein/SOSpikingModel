@@ -496,6 +496,19 @@ for tt=1:SimTimeLength
         %Jump the postsynaptic trace
         x(spikeneurons) = x(spikeneurons) + 1;  %Do this later... after delay
         
+        %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
+        %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
+        %PreIspikes = intersect(spikeneurons,Icells);
+        PreIspikes = spikeneurons(spikeneurons > EPopNum);
+        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
+        %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
+        %PostEspikes = intersect(spikeneurons,Ecells);
+        PostEspikes = spikeneurons(spikeneurons <= EPopNum);
+        EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
+        
+        EI_mat = EI_mat.*isconnected; %Keep only connected pairs
+        EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
+        
     end
 
     %%  Refractory period Countdowns
@@ -516,21 +529,21 @@ for tt=1:SimTimeLength
         %Jump the postsynaptic conductance
         s(activatedsynapses) = 1; %Do this later... after delay
         %Jump the postsynaptic trace
-        % x(activatedsynapses) = x(activatedsynapses) + 1;  %Do this later... after delay
+%         x(activatedsynapses) = x(activatedsynapses) + 1;  %Do this later... after delay
         
         
-        %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
-        %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
-        %PreIspikes = intersect(spikeneurons,Icells);
-        PreIspikes = activatedsynapses(activatedsynapses > EPopNum);
-        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
-        %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
-        %PostEspikes = intersect(spikeneurons,Ecells);
-        PostEspikes = activatedsynapses(activatedsynapses <= EPopNum);
-        EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
-        
-        EI_mat = EI_mat.*isconnected; %Keep only connected pairs
-        EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
+%         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
+%         %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
+%         %PreIspikes = intersect(spikeneurons,Icells);
+%         PreIspikes = activatedsynapses(activatedsynapses > EPopNum);
+%         EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
+%         %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
+%         %PostEspikes = intersect(spikeneurons,Ecells);
+%         PostEspikes = activatedsynapses(activatedsynapses <= EPopNum);
+%         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
+%         
+%         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
+%         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
         
     end
         
