@@ -2,11 +2,11 @@ function [Espikes,Ispikes] = RasterSorter(SimValues)
 
 spikesbycell = SimValues.spikesbycell;
 
-Espikes = SimValues.spikes(find(SimValues.spikes(:,2) <= SimValues.EcellIDx(end)),:);
-Ispikes = SimValues.spikes(find(SimValues.spikes(:,2) > SimValues.EcellIDx(end)),:);
+Espikes = SimValues.spikes(find(SimValues.spikes(:,2) <= SimValues.EcellIDX(end)),:);
+Ispikes = SimValues.spikes(find(SimValues.spikes(:,2) > SimValues.EcellIDX(end)),:);
 
-Erates = zeros(1,length(SimValues.EcellIDx));
-Irates = zeros(1,length(SimValues.IcellIDx));
+Erates = zeros(1,length(SimValues.EcellIDX));
+Irates = zeros(1,length(SimValues.IcellIDX));
 
 for ee = 1:2000
     
