@@ -587,20 +587,6 @@ toc
 spikes(spikecounter+1:end,:)=[];
 if isempty(spikes); spikes = [nan nan]; end
 
-
-%% Figure
-if SHOWFIG
- 
-exneuron = randi(PopNum,1);
-exspiketimes = spikes(spikes(:,2)==exneuron,1);
-      
-figure
-    plot(spikes(:,1),spikes(:,2),'k.', 'Markersize' , 0.1)
-    hold on
-    plot([0 0],[0 PopNum],'r')
-    xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
-    xlim([-onsettime SimTime]);ylim([0 PopNum+1]);
-end
 %% Output Structure
 
 %Remove onset time
@@ -617,6 +603,37 @@ SimValues.spikes          = spikes;
 
 SimValues.EcellIDX        = Ecells;
 SimValues.IcellIDX        = Icells;
-%SimValues.WeightMat       = EE_mat+II_mat+EI_mat+IE_mat;
+
+%% Figure
+if SHOWFIG
+ 
+    
+exneuron = randi(PopNum,1);
+exspiketimes = spikes(spikes(:,2)==exneuron,1);
+
+[Espikes,Ispikes] = RasterSorter(SimValues);
+
+poprate.dt = 1;   overlap = 6;   winsize = poprate.dt.*overlap;
+
+[spikemat,t_rate,~] = SpktToSpkmat(SimValues.spikesbycell, [], poprate.dt,overlap);
+poprate.E = sum(spikemat(:,SimValues.EcellIDX),2)./(winsize./1000)./length(SimValues.EcellIDX);
+poprate.I = sum(spikemat(:,SimValues.IcellIDX),2)./(winsize./1000)./length(SimValues.IcellIDX);
+
+plot(Espikes(:,1),Espikes(:,2),'.b','markersize',1)
+hold on
+plot(Ispikes(:,1),Ispikes(:,2),'.r','markersize',1)
+hold on
+plot(t_rate,50.*poprate.E,'b','linewidth',2)
+hold on
+plot(t_rate,50.*poprate.I,'r','linewidth',2)
+hold on
+plot([0.8650.*TimeParams.SimTime 0.8700.*TimeParams.SimTime],[500 500],'k','LineWidth',2) 
+hold on
+text(0.8705.*TimeParams.SimTime, 510,'10 Hz','FontSize',16)
+
+xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
+xlim([-onsettime SimTime]);ylim([0 PopNum+1]);
+    
+end
 
 end
