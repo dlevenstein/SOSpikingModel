@@ -1,7 +1,7 @@
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-repopath = '/home/jmg1030/Documents/GitHub/SOSpikingModel';
+repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
 SAVESIM = true;
@@ -11,7 +11,7 @@ clear PopParams
 
 %Input
 PopParams.I_e  = 200;       %External input
-PopParams.sigma = 0;        %niose magnitude: variance
+PopParams.sigma = 50;        %niose magnitude: variance
 PopParams.theta = 0.1;        %noise time scale (1/ms)
 
 % One neuron
@@ -54,7 +54,7 @@ TimeParams.dt      = 0.05;
 
 %%
 SimTime = 1e5;
-RecordTime = 1e4;
+RecordTime = 1e3;
 
 TimeParams.SimTime = SimTime+RecordTime;
 
@@ -69,4 +69,5 @@ SimValues = AdLIFfunction_STDP_GPU(PopParams,TimeParams,'cellout',true,'showprog
     'save_weights',SimTime,'save_dt',SimTime,...
     'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime]);
 
-save('/home/jmg1030/Documents/spikingModel/data/VogelsParams','-v7.3')
+save('/scratch/jmg1030/FIcurve/data/trainedWeights/VogelsParams','-v7.3')
+
