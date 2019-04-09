@@ -48,6 +48,8 @@ PopParams.Kii   = 40;        %Expected I->I In Degree
 PopParams.Kie   = 160;        %Expected E->I In Degree
 PopParams.Kei   = 40;        %Expected I->E In Degree
 
+PopParams.t_syn = 0;
+
 TimeParams.dt      = 0.05;
 
 %%
