@@ -102,7 +102,7 @@ W(diag(diag(true(size(W)))))=0;
 PopParams.W = W;
 
 %%
-SimTime = 1e5;
+SimTime = 1e6;
 RecordTime = 1e4;
 
 TimeParams.SimTime = SimTime+RecordTime;
@@ -121,4 +121,4 @@ SimValues = AdLIFfunction_STDP_GPU(PopParams,TimeParams,'cellout',true,'showprog
 SimValues.t_syn = PopParams.t_syn;
 
 %%
-save('/home/jmg1030/Documents/spikingModel/data/refractorySynapse/refractorySynapseIzhikevich','-v7.3')
+save('/home/jmg1030/Documents/spikingModel/data/refractorySynapse/LognormalESynapses','-v7.3')
