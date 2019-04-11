@@ -607,7 +607,6 @@ SimValues.IcellIDX        = Icells;
 %% Figure
 if SHOWFIG
  
-    
 exneuron = randi(PopNum,1);
 exspiketimes = spikes(spikes(:,2)==exneuron,1);
 
@@ -619,6 +618,7 @@ poprate.dt = 1;   overlap = 6;   winsize = poprate.dt.*overlap;
 poprate.E = sum(spikemat(:,SimValues.EcellIDX),2)./(winsize./1000)./length(SimValues.EcellIDX);
 poprate.I = sum(spikemat(:,SimValues.IcellIDX),2)./(winsize./1000)./length(SimValues.IcellIDX);
 
+figure
 plot(Espikes(:,1),Espikes(:,2),'.b','markersize',1)
 hold on
 plot(Ispikes(:,1),Ispikes(:,2),'.r','markersize',1)
