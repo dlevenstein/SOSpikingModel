@@ -102,7 +102,7 @@ W(diag(diag(true(size(W)))))=0;
 PopParams.W = W;
 
 %%
-SimTime = 3e5;
+SimTime = 1e5;
 RecordTime = 1e4;
 
 TimeParams.SimTime = SimTime+RecordTime;
