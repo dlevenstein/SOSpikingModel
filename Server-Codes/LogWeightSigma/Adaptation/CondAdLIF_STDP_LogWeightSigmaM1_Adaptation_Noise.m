@@ -19,14 +19,14 @@ TimeParams.dt      = 0.05;
 
 TimeParams.SimTime = 1e4;
 
-Ivals = linspace(100,300,41);
+Ivals = linspace(100,300,11);
 bvals = 0:10:100;
 
-for II = 1:451
+for II = 1:121
     
 if mod(II,4)+1 == index
-ii = mod(II,41)+1;
-bb = ceil(II/41);
+ii = mod(II,11)+1;
+bb = ceil(II/11);
     
 ii
 bb 
