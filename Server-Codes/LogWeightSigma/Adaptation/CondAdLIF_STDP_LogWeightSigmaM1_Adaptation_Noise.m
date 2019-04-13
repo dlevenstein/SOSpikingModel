@@ -39,8 +39,6 @@ PopParamsAnalysis.b = b;
 SimValuesArray = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',SimTime,'save_dt',SimTime,'useGPU',true);
 
-spikes = SimValuesArray.spikes;
-
-save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'SimValuesArray.spikes','-v7.3') 
 
 end
