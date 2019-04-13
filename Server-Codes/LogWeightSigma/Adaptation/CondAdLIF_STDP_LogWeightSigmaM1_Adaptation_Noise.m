@@ -9,7 +9,7 @@ PopParams_in = PopParams;
 PopParams_in.tau_w = 300;
 PopParams_in.LearningRate = 0;
 PopParams_in.sigma = 10;
-PopParams_in.W = SimValues.WeightMat(:,:,end);
+PopParams_in.W = gather(SimValues.WeightMat(:,:,end));
 PopParams_in.gwnorm = PopParams_in.g_L(1);
 PopParams_in.t_syn = 0;
 
