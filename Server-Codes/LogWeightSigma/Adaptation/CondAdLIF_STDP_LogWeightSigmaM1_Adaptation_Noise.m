@@ -17,13 +17,16 @@ PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_
 
 TimeParams.dt      = 0.05;
 
-TimeParams.SimTime = 3e4;
+TimeParams.SimTime = 1e4;
 
 Ivals = linspace(100,300,41);
 bvals = 0:10:100;
 
-ii = mod(index,41)+1;
-bb = ceil(index/41);
+for II = 1:451
+    
+if mod(II,4)+1 == index
+ii = mod(II,41)+1;
+bb = ceil(II/41);
     
 ii
 bb 
@@ -40,5 +43,8 @@ SimValuesArray = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',t
     'save_weights',SimTime,'save_dt',SimTime,'useGPU',true);
 
 save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'SimValuesArray.spikes','-v7.3') 
+end
+
+end
 
 end
