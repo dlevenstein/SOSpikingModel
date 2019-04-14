@@ -505,7 +505,7 @@ for tt=1:SimTimeLength
         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
         %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
         %PreIspikes = intersect(spikeneurons,Icells);
-        PreIspikes = activatedsynapses(spikeneurons > EPopNum);
+        PreIspikes = spikeneurons(spikeneurons > EPopNum);
         EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
         %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
