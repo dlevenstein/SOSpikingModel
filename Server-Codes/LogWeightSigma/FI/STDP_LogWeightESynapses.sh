@@ -9,6 +9,7 @@
 #SBATCH --output=LogWeightESynapses_%j.out
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
+#SBATCH --gres=gpu:1
 
 n=${SLURM_ARRAY_TASK_ID}
 
