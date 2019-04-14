@@ -4,7 +4,7 @@
 #SBATCH --array=1-4
 #SBATCH --cpus-per-task=10
 #SBATCH --time=100:00:00
-#SBATCH --mem=10GB
+#SBATCH --mem=40GB
 #SBATCH --job-name=LogWeightESynapses
 #SBATCH --output=LogWeightESynapses_%j.out
 #SBATCH --mail-type=END
