@@ -83,14 +83,14 @@ try
     gpuArray();
     if useGPU
         gpuAvail = true;
-        warning('code is moving to GPU');
+        disp('code is moving to GPU');
     else
         gpuAvail = false;
-        warning('code is moving to CPU');
+        disp('code is moving to CPU');
     end
 catch
     gpuAvail = false;
-    warning('code is moving to CPU');
+    disp('code is moving to CPU');
 end
 
 %%
@@ -181,7 +181,7 @@ V_th        = PopParams.V_th;    %spike threshhold (mV)
 V_reset     = PopParams.V_reset; %reset value (mV)
 
 t_ref       = PopParams.t_ref;   %refractory period (ms)
-t_syn       = PopParams.t_syn;   %refractory period (ms)
+% t_syn       = PopParams.t_syn;   %refractory period (ms)
 
 sigma       = PopParams.sigma;   %Standard deviation of noise
 theta       = PopParams.theta;   %Strength to mean (time scale of noise, ms^-1)
@@ -232,7 +232,7 @@ s            = zeros(PopNum,1); %synapse
 w            = zeros(PopNum,1); %adaptation
 X_t          = zeros(PopNum,1); %OU noise
 t_r = zeros(PopNum,1);
-t_s = -dt.*ones(PopNum,1);
+% t_s = -dt.*ones(PopNum,1);
 
 x            = zeros(PopNum,1); %Synaptic trace
 
@@ -285,11 +285,11 @@ t_ref       = transpose([t_ref(1).*ones(1,EPopNum),   t_ref(2).*ones(1,IPopNum)]
 elseif length(t_ref) == 1
 t_ref       = transpose([t_ref.*ones(1,EPopNum),   t_ref.*ones(1,IPopNum)]);
 end
-if length(t_syn) == 2 
-t_syn       = transpose([t_syn(1).*ones(1,EPopNum),   t_syn(2).*ones(1,IPopNum)]);
-elseif length(t_syn) == 1
-t_syn       = transpose([t_syn.*ones(1,EPopNum),   t_syn.*ones(1,IPopNum)]);
-end
+% if length(t_syn) == 2 
+% t_syn       = transpose([t_syn(1).*ones(1,EPopNum),   t_syn(2).*ones(1,IPopNum)]);
+% elseif length(t_syn) == 1
+% t_syn       = transpose([t_syn.*ones(1,EPopNum),   t_syn.*ones(1,IPopNum)]);
+% end
 if length(sigma) == 2 
 sigma       = transpose([sigma(1).*ones(1,EPopNum),   sigma(2).*ones(1,IPopNum)]);
 end
@@ -374,7 +374,7 @@ if gpuAvail
     %Spike Parameters
     V_th = gpuArray(V_th);
     t_r  = gpuArray(t_r);
-    t_s  = gpuArray(t_s);
+%     t_s  = gpuArray(t_s);
     V_reset = gpuArray(V_reset);
     
     %Adaptation Parameters
@@ -430,7 +430,7 @@ tic
 for tt=1:SimTimeLength
     %% Time Counter
     if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
-        display([num2str(round(100.*tt./SimTimeLength)),'% Done!']) %clearly, this needs improvement
+        disp([num2str(round(100.*tt./SimTimeLength)),'% Done!']) %clearly, this needs improvement
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     
@@ -487,48 +487,70 @@ for tt=1:SimTimeLength
         
         spikecounter = spikecounter+numspikers;
         
-
         %Set spiking neurons refractory period and synaptic delay counters
         t_r(spikeneurons) = t_ref(spikeneurons);
-        t_s(spikeneurons) = t_syn(spikeneurons);
+%         t_s(spikeneurons) = t_syn(spikeneurons);
         %Jump the adaptation
         w(spikeneurons) = w(spikeneurons) + b(spikeneurons); 
         
+        %------------------------------------------------------------------
+        
+        %Jump the postsynaptic conductance
+        s(spikeneurons) = 1; %Do this later... after delay
+        %Jump the postsynaptic trace
+        x(spikeneurons) = x(spikeneurons) + 1;  %Do this later... after delay
+        
+        %------------------------------------------------------------------
+        
+        %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
+        %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
+        %PreIspikes = intersect(spikeneurons,Icells);
+        PreIspikes = activatedsynapses(spikeneurons > EPopNum);
+        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
+        %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
+        %PostEspikes = intersect(spikeneurons,Ecells);
+        PostEspikes = activatedsynapses(spikeneurons <= EPopNum);
+        EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
+        
+        EI_mat = EI_mat.*isconnected; %Keep only connected pairs
+        EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
+
     end
 
     %%  Refractory period Countdowns
-    if any(t_r > 0) || any(t_s >= 0)
+    if any(t_r > 0) %|| any(t_s >= 0)
         refractoryneurons = t_r > 0;
-        delayneurons = t_s >= 0;
+%         delayneurons = t_s >= 0;
         
         %Count down the refractory periods
         t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
-        t_s(delayneurons) = t_s(delayneurons) - dt;
+%         t_s(delayneurons) = t_s(delayneurons) - dt;
         
         %Hold voltage, synaptic/adaptation rates at spike levels
         V(refractoryneurons) = V_reset(refractoryneurons);
         
+        %------------------------------------------------------------------
         
-        activatedsynapses = delayneurons & (t_s < 0);
+%         activatedsynapses = delayneurons & (t_s < 0);
             
         %Jump the postsynaptic conductance
-        s(activatedsynapses) = 1; %Do this later... after delay
-        %Jump the postsynaptic trace
-        x(activatedsynapses) = x(activatedsynapses) + 1;  %Do this later... after delay
+%         s(activatedsynapses) = 1; %Do this later... after delay
+%         %Jump the postsynaptic trace
+%         x(activatedsynapses) = x(activatedsynapses) + 1;  %Do this later... after delay
         
         
         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
         %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
         %PreIspikes = intersect(spikeneurons,Icells);
-        PreIspikes = activatedsynapses(activatedsynapses > EPopNum);
-        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
+%         PreIspikes = activatedsynapses(activatedsynapses > EPopNum);
+%         EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
         %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
-        PostEspikes = activatedsynapses(activatedsynapses <= EPopNum);
-        EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
+%         PostEspikes = activatedsynapses(activatedsynapses <= EPopNum);
+%         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
-        EI_mat = EI_mat.*isconnected; %Keep only connected pairs
-        EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
+%         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
+%         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
         
     end
         
@@ -582,6 +604,23 @@ for tt=1:SimTimeLength
 end
 toc
 
+%move back to CPU
+if gpuAvail
+    
+    SimValues.V               = gather(SimValues.V);
+    SimValues.g_w             = gather(SimValues.g_w);
+    SimValues.g_e             = gather(SimValues.g_e);
+    SimValues.g_i             = gather(SimValues.g_i);
+    SimValues.s               = gather(SimValues.s);
+    SimValues.w               = gather(SimValues.w);
+    SimValues.x               = gather(SimValues.x);
+    SimValues.a_w             = gather(SimValues.a_w);
+    SimValues.Input           = gather(SimValues.Input);
+
+    SimValues.t_weight        = gather(SimValues.t_weight);
+    SimValues.WeightMat       = gather(SimValues.WeightMat);
+    
+end
 %%
 %Catch for no spiking in simulation error
 spikes(spikecounter+1:end,:)=[];
