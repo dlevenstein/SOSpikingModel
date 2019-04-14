@@ -509,7 +509,7 @@ for tt=1:SimTimeLength
         EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
         %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
-        PostEspikes = activatedsynapses(spikeneurons <= EPopNum);
+        PostEspikes = spikeneurons(spikeneurons <= EPopNum);
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
