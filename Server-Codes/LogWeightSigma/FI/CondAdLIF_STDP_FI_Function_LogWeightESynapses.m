@@ -13,7 +13,7 @@ load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/LognormalESyna
 
 for simnum = 1:100
     
-if mod(simnum,4)+1 == index
+if mod(simnum,5)+1 == index
     
 rng(simnum,'twister');
 

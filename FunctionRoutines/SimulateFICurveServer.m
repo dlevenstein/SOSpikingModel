@@ -44,7 +44,7 @@ parfor ii = 1:numI
     end
     
     SimValuesArray(ii) = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-        'save_weights',SimTime,'save_dt',SimTime,'useGPU',true)
+        'save_weights',SimTime,'save_dt',SimTime,'useGPU',false)
 
 end
 
