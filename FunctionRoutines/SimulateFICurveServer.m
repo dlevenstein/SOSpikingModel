@@ -29,7 +29,7 @@ end
 
 clear SimValues
 
-for ii = 1:numI
+parfor ii = 1:numI
     
     ii
     
@@ -44,7 +44,7 @@ for ii = 1:numI
     end
     
     SimValuesArray(ii) = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-        'save_weights',SimTime,'save_dt',SimTime,'useGPU',false)
+        'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false)
 
 end
 
