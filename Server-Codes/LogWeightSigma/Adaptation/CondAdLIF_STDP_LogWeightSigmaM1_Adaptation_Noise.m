@@ -8,7 +8,7 @@ load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/LognormalESyna
 PopParams_in = PopParams;
 PopParams_in.tau_w = 300;
 PopParams_in.LearningRate = 0;
-PopParams_in.sigma = 10;
+PopParams_in.sigma = 25;
 PopParams_in.W = gather(SimValues.WeightMat(:,:,end));
 PopParams_in.gwnorm = PopParams_in.g_L(1);
 PopParams_in.t_syn = 0;
@@ -19,10 +19,10 @@ TimeParams.dt      = 0.05;
 
 TimeParams.SimTime = 1e4;
 
-Ivals = linspace(100,300,11);
+Ivals = linspace(100,300,21);
 bvals = 0:10:100;
 
-for II = 1:121
+for II = 1:(length(Ivals)*length(bvals))
     
 if mod(II,4)+1 == index
 ii = mod(II,11)+1;
