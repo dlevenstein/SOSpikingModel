@@ -395,7 +395,8 @@ if gpuAvail
     %Plasticity Parameters
     tauSTDP = gpuArray(tauSTDP);
     LearningRate = gpuArray(LearningRate);
-    alpha = gpuArray(alpha);
+    alphaI = gpuArray(alphaI);
+    alphaE = gpuArray(alphaE);
     
     %Variables
     X_t = gpuArray(X_t);
