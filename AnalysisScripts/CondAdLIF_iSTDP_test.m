@@ -2,7 +2,7 @@
 %Path of the SOSpikingModel repository
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel';
-repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel';
+repopath = '/home/jmg1030/Documents/GitHub/SOSpikingModel';
 %repopath = '/scratch/jmg1030/LogWeightSigma/SOSpikingModel';
 addpath(genpath(repopath))
 
@@ -37,24 +37,24 @@ PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.a       = 0;   %adaptation decay timescale (1/ms)
 PopParams.b       = 0;    %adaptation activation rate (1/ms)
-PopParams.tau_w   = 100;     %subthreshold adaptation steepness
+PopParams.tau_w   = 300;     %subthreshold adaptation steepness
 PopParams.gwnorm  = 0;       %magnitude of adaptation
 
 %Network Properties
-PopParams.Wee   = 3;        %E->E weight (nS)
-PopParams.Wii   = 3;        %I->I weight
-PopParams.Wie   = 3;        %E->I weight
-PopParams.Wei   = 3;        %I->E weight
+PopParams.Wee   = 1;        %E->E weight (nS)
+PopParams.Wii   = 1;        %I->I weight
+PopParams.Wie   = 1;        %E->I weight
+PopParams.Wei   = 1;        %I->E weight
 PopParams.Kee   = 250;        %Expected E->E In Degree
 PopParams.Kii   = 250;        %Expected I->I In Degree
 PopParams.Kie   = 250;        %Expected E->I In Degree
 PopParams.Kei   = 250;        %Expected I->E In Degree
 
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 1e4;
+TimeParams.SimTime = 1e3;
 
 PopParams.LearningRate = 1e-2;
 PopParams.TargetRate = 2; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
-SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'save_dt',1,'save_weight',TimeParams.SimTime);
+SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'save_dt',1,'save_weight',100);
