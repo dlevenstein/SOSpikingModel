@@ -22,9 +22,9 @@ TimeParams.SimTime = 1e4;
 Ivals = linspace(100,300,21);
 bvals = 0:10:100;
 
-parfor II = 1:(length(Ivals)*length(bvals))
+for II = 1:(length(Ivals)*length(bvals))
     
-if mod(II,4)+1 == index
+if mod(II,10)+1 == index
 ii = mod(II,length(Ivals))+1;
 bb = ceil(II/length(Ivals));
     
