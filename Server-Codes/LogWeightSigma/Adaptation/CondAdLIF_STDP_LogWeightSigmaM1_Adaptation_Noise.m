@@ -24,7 +24,7 @@ bvals = 0:10:100;
 
 for II = 1:(length(Ivals)*length(bvals))
     
-if mod(II,10)+1 == index
+if mod(II,4)+1 == index
 ii = mod(II,length(Ivals))+1;
 bb = ceil(II/length(Ivals));
     
@@ -40,7 +40,7 @@ PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
 SimValuesArray = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false);
+    'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',true);
 
 spikes = SimValuesArray.spikes;
 
