@@ -40,7 +40,7 @@ PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
 SimValuesArray = AdLIFfunction_STDP_GPU(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',SimTime,'save_dt',SimTime,'useGPU',false);
+    'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false);
 
 spikes = SimValuesArray.spikes;
 
