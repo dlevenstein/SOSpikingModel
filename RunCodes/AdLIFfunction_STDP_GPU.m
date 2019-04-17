@@ -525,7 +525,7 @@ for tt=1:SimTimeLength
         %PostEspikes = intersect(spikeneurons,Ecells);
         PostEspikes = spikeneurons(spikeneurons <= EPopNum);
         PostIspikes = spikeneurons(spikeneurons > EPopNum);
-        II_mat(PostEspikes,IcellIDX) = II_mat(PostIspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
+        II_mat(PostIspikes,IcellIDX) = II_mat(PostIspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
         II_mat = II_mat.*isconnected; %Keep only connected pairs
