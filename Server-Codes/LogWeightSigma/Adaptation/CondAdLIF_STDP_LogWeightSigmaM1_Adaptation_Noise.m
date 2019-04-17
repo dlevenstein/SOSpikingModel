@@ -25,8 +25,8 @@ bvals = 0:10:100;
 for II = 1:(length(Ivals)*length(bvals))
     
 if mod(II,4)+1 == index
-ii = mod(II,11)+1;
-bb = ceil(II/11);
+ii = mod(II,length(Ivals))+1;
+bb = ceil(II/length(Ivals));
     
 ii
 bb 
