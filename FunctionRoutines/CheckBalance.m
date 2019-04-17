@@ -33,7 +33,7 @@ ISIdist.I = ISIdist.I./sum(ISIdist.I);
 
 ISIdist.all = cellfun(@(X) hist(log10(X),ISIdist.bins),ISIs,'uniformoutput',false);
 ISIdist.all = cat(1,ISIdist.all{:});
-ISIdist.allscaled = bsxfun(@(X,Y) X./Y,ISIdist.all,max(ISIdist.all,[],2));
+ISIdist.allscaled = bsxfun(@(X,Y) X./Y,ISIdist.all,sum(ISIdist.all,[],2));
 
 
 %ISI statistics

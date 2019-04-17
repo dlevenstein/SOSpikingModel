@@ -66,6 +66,7 @@ addParameter(p,'save_weights',10,@isnumeric)
 addParameter(p,'cellout',false,@islogical)
 addParameter(p,'recordInterval',[],@isnumeric)
 addParameter(p,'useGPU',true,@islogical)
+addParameter(p,'train',true,@islogical)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
@@ -75,6 +76,7 @@ save_weights = p.Results.save_weights;
 cellout = p.Results.cellout;
 recordIntervals = p.Results.recordInterval;
 useGPU = p.Results.useGPU;
+train = p.Results.train;
 
 recordVALs = createRecorder(recordIntervals,TimeParams);
 
@@ -91,6 +93,12 @@ try
 catch
     gpuAvail = false;
     disp('code is moving to CPU');
+end
+
+if train
+    disp('Network is PLASTIC');
+else
+    disp('Network is STATIC');
 end
 
 %%
@@ -206,10 +214,12 @@ tau_s       = PopParams.tau_s;     %Synaptic decay (ms)
 
 %STDP parameters
 LearningRate = PopParams.LearningRate;
-TargetRate   = PopParams.TargetRate; %Target Rate for Excitatory cells (units of Hz)
+TargetRateE   = PopParams.TargetRate; %Target Rate for Excitatory cells (units of Hz)
+TargetRateI   = PopParams.TargetRate; %Target Rate for Inhibitory cells (units of Hz)
 tauSTDP      = PopParams.tauSTDP;    %Time Constant for the STDP curve (Units of ms)
 
-alpha = 2.*(TargetRate./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
+alphaE = 2.*(TargetRateE./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
+alphaI = 2.*(TargetRateI./1000).*tauSTDP; %Alpha parameter from Vogels eqn5
 %Note target rate is converted to spks/ms
 
 %% Input: convert into function of t
@@ -499,22 +509,33 @@ for tt=1:SimTimeLength
         s(spikeneurons) = 1; %Do this later... after delay
         %Jump the postsynaptic trace
         x(spikeneurons) = x(spikeneurons) + 1;  %Do this later... after delay
-        
+      
         %------------------------------------------------------------------
         
+        if train
         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
         %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
         %PreIspikes = intersect(spikeneurons,Icells);
         PreIspikes = spikeneurons(spikeneurons > EPopNum);
-        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
+        II_mat(EcellIDX,PreIspikes) = II_mat(EcellIDX,PreIspikes) + LearningRate.*(x(IcellIDX)-alphaI);
+        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alphaE);
+        
         %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
         PostEspikes = spikeneurons(spikeneurons <= EPopNum);
+        PostIspikes = spikeneurons(spikeneurons > EPopNum);
+        II_mat(PostEspikes,IcellIDX) = II_mat(PostIspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
+        
+        II_mat = II_mat.*isconnected; %Keep only connected pairs
+        II_mat(II_mat<=0) = 0; %Get rid of any negative synapses...
+        II_mat(II_mat>=30) = 30; %Get rid of any high synapses
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
-
+        EI_mat(EI_mat>=30) = 30; %Get rid of any negative synapses...
+        end
+        
     end
 
     %%  Refractory period Countdowns
