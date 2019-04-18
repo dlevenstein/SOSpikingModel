@@ -66,7 +66,7 @@ addParameter(p,'save_weights',10,@isnumeric)
 addParameter(p,'cellout',false,@islogical)
 addParameter(p,'recordInterval',[],@isnumeric)
 addParameter(p,'useGPU',true,@islogical)
-addParameter(p,'train',true,@islogical)
+addParameter(p,'train',false,@islogical)
 parse(p,varargin{:})
 SHOWFIG = p.Results.showfig;
 SHOWPROGRESS = p.Results.showprogress;
@@ -97,6 +97,9 @@ end
 
 if train && PopParams.LearningRate > 0
 train = true;
+disp('Network is training and PLASTIC');
+elseif PopParams.LearningRate > 0
+train = false;
 disp('Network is PLASTIC');
 else
 train = false;
