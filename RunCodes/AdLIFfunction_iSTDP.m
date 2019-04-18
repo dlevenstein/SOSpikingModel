@@ -264,7 +264,6 @@ SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
 SimValues.WeightChange    = nan(1,SaveTimeLength);
 
 if length(recordIntervals) == 0
-recordIntervals = [0 SimTime];
 recordVALs = ones(1,SimTimeLength);
 spikes = nan(PopNum.*(SimTime+onsettime).*20,2,'single'); %assume mean rate 20Hz
 else
