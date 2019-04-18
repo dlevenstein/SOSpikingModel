@@ -102,15 +102,16 @@ W(diag(diag(true(size(W)))))=0;
 PopParams.W = W;
 
 %%
-SimTime = 1e2;
-RecordTime = 0;
+SimTime = 1e5;
+RecordTime = 1e4;
 
 TimeParams.SimTime = SimTime+RecordTime;
 
 %%
 
 PopParams.LearningRate = 1e-2;
-PopParams.TargetRate = 2; %Target E rate 1Hz
+PopParams.TargetRateI = 8; %Target E rate 1Hz
+PopParams.TargetRateE = 2; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%
@@ -121,4 +122,4 @@ SimValues = AdLIFfunction_STDP_GPU(PopParams,TimeParams,'cellout',true,'showprog
 SimValues.t_syn = PopParams.t_syn;
 
 %%
-save('/home/jmg1030/Documents/spikingModel/data/refractorySynapse/LognormalESynapses','-v7.3')
+save('/home/jmg1030/Documents/spikingModel/data/refractorySynapse/LognormalE_iSTDPI','-v7.3')
