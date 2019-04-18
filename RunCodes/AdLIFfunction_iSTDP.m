@@ -516,7 +516,7 @@ for tt=1:SimTimeLength
         
         %------------------------------------------------------------------
         
-        if train && LearningRate ~= 0
+        if LearningRate ~= 0
         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
         %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
         %PreIspikes = intersect(spikeneurons,Icells);
@@ -627,7 +627,8 @@ for tt=1:SimTimeLength
     end
     
     if mod(timecounter,save_dt)==0 && timecounter>=0 && train
-        SimValues.WeightChange(weightcounter)        = mean(II_mat(isconnected(Icells,Icells)))./2+mean(EI_mat(isconnected(Ecells,Icells)))./2; % 
+        SimValues.WeightChange(savecounter)        = mean(II_mat(II_mat>0))./2+mean(EI_mat(EI_mat>0))./2; % 
+        savecounter = savecounter+1;
     end
      
     %%Idea: add a catch for silent network or excessive firing network?
