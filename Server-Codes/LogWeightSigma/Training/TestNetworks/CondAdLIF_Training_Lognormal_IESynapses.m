@@ -97,12 +97,14 @@ W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 W(EcellidX,EcellidX) = lognrnd(mu,sigma,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
 W(IcellidX,EcellidX) = lognrnd(mu,sigma,[IPopNum,EPopNum]).*W(IcellidX,EcellidX);
 
+W(W > 30) = 30;
+
 W(diag(diag(true(size(W)))))=0;
 
 PopParams.W = W;
 
 %%
-SimTime = 1e5;
+SimTime = 5e5;
 RecordTime = 1e4;
 
 TimeParams.SimTime = SimTime+RecordTime;
@@ -111,7 +113,7 @@ TimeParams.SimTime = SimTime+RecordTime;
 
 PopParams.LearningRate = 1e-2;
 PopParams.TargetRateI = 8; %Target E rate 1Hz
-PopParams.TargetRateE = 2; %Target E rate 1Hz
+PopParams.TargetRateE = 2; %Target I rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%

@@ -49,9 +49,6 @@ for ii = 1:length(SimValuesArray)
     
     bins = linspace(0,4,50);
     
-    ISImapE = hist(log10(ISI_E),bins);
-    ISImapI = hist(log10(ISI_I),bins);
-    
     rateDistE = hist(log10(1000./ISI_E),bins);
     rateDistI = hist(log10(1000./ISI_I),bins);
     
@@ -76,6 +73,9 @@ for ii = 1:length(SimValuesArray)
     ISIstats.CVdist.E = hist(ISIstats.CV(SimValuesArray(ii).EcellIDX),ISIstats.CVdist.bins);
     ISIstats.CVdist.I = hist(ISIstats.CV(SimValuesArray(ii).IcellIDX),ISIstats.CVdist.bins);
 
+    ISImapE = mean(ISIdist.all(SimValuesArray(ii).EcellIDX,:));
+    ISImapI = mean(ISIdist.all(SimValuesArray(ii).IcellIDX,:));
+    
     Espikes = cat(1,SimValuesArray(ii).spikesbycell{SimValuesArray(ii).EcellIDX});
     Ispikes = cat(1,SimValuesArray(ii).spikesbycell{SimValuesArray(ii).IcellIDX});
     [ccg,t_ccg] = CCG({double(Espikes./1000),double(Ispikes./1000)},[],'binSize',0.001,'duration',0.1,'norm','rate');
