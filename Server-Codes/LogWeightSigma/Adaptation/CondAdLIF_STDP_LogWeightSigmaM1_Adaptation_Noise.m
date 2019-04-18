@@ -3,7 +3,7 @@ function CondAdLIF_STDP_LogWeightSigmaM1_Adaptation_Noise(index)
 repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
-load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/LognormalESynapses.mat');
+load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/LognormalE_iSTDPI.mat');
 
 PopParams_in = PopParams;
 PopParams_in.tau_w = 300;
@@ -20,7 +20,7 @@ TimeParams.dt      = 0.05;
 TimeParams.SimTime = 1e4;
 
 Ivals = linspace(100,300,21);
-bvals = 0:10:100;
+bvals = logspace(-2,2,11);
 
 for II = 1:(length(Ivals)*length(bvals))
     
