@@ -1,7 +1,7 @@
 %Conductance-Based Adapting LIF Model, Euler Mayurama   implementation 
 %with Conductance-based Jump-decay STDP synapses
 %by Jonathan Gornet and DLevenstein
-%Last update: 3/29/2019
+%Last update: 4/17/2019
 
 %INPUTS
 %   PopParams       a structure that gives all the parameters of the population
@@ -259,6 +259,7 @@ SimValues.a_w             = nan(PopNum,SaveTimeLength);
 SimValues.Input           = nan(PopNum,SaveTimeLength);
 SimValues.t_weight        = nan(1,WeightSaveLength);
 SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
+SimValues.WeightChange    = nan(1,SaveTimeLength);
 
 if length(recordIntervals) == 0
 recordIntervals = [0 SimTime];
@@ -429,6 +430,7 @@ if gpuAvail
     
     SimValues.t_weight        = gpuArray(SimValues.t_weight);
     SimValues.WeightMat       = gpuArray(SimValues.WeightMat);
+    SimValues.WeightChange    = gpuArray(SimValues.WeightChange);
     
 end
 
@@ -513,7 +515,7 @@ for tt=1:SimTimeLength
         
         %------------------------------------------------------------------
         
-        if train
+        if train && LearningRate ~= 0
         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
         %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
         %PreIspikes = intersect(spikeneurons,Icells);
@@ -523,13 +525,17 @@ for tt=1:SimTimeLength
         %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
         PostEspikes = spikeneurons(spikeneurons <= EPopNum);
+        PostIspikes = PreIspikes;
+        II_mat(PostIspikes,IcellIDX) = II_mat(PostIspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
         II_mat = II_mat.*isconnected; %Keep only connected pairs
         II_mat(II_mat<=0) = 0; %Get rid of any negative synapses...
+        II_mat(II_mat>30) = 30; %Cap at 30 nS
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
+        EI_mat(EI_mat>30) = 30; %Cap at 30 nS
         end
         
     end
@@ -585,6 +591,7 @@ for tt=1:SimTimeLength
         warning('Numerical Error');
     end
     
+    if ~train
     if mod(timecounter,save_dt)==0 && timecounter>=0
         if recordVALs(tt)
             
@@ -616,10 +623,19 @@ for tt=1:SimTimeLength
     	weightcounter = weightcounter+1;
         end
     end
-            
+    end
+    
+    if mod(timecounter,save_dt)==0 && timecounter>=0 && train
+        SimValues.WeightChange(weightcounter)        = mean(II_mat(isconnected(Icells,Icells)))./2+mean(EI_mat(isconnected(Ecells,Icells)))./2; % 
+    end
+     
     %%Idea: add a catch for silent network or excessive firing network?
 end
 toc
+
+if train
+    SimValues.WeightMat = EE_mat+II_mat+EI_mat+IE_mat;
+end
 
 %move back to CPU
 if gpuAvail
@@ -636,6 +652,7 @@ if gpuAvail
 
     SimValues.t_weight        = gather(SimValues.t_weight);
     SimValues.WeightMat       = gather(SimValues.WeightMat);
+    SimValues.WeightChange    = gather(SimValues.WeightChange);
     
 end
 %%
