@@ -520,8 +520,8 @@ for tt=1:SimTimeLength
         %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
         %PreIspikes = intersect(spikeneurons,Icells);
         PreIspikes = spikeneurons(spikeneurons > EPopNum);
-        II_mat(IcellIDX,PreIspikes) = II_mat(IcellIDX,PreIspikes) + LearningRate.*(x(IcellIDX)-alpha);
-        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
+        II_mat(IcellIDX,PreIspikes) = II_mat(IcellIDX,PreIspikes) + LearningRate.*(x(IcellIDX)-alphaI);
+        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alphaE);
         %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
         PostEspikes = spikeneurons(spikeneurons <= EPopNum);
