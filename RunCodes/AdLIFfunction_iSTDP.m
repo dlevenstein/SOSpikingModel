@@ -95,9 +95,11 @@ catch
     disp('code is moving to CPU');
 end
 
-if train
+if train && PopParams.TargetRateE > 0 && PopParams.TargetRateI > 0
+train = true;
 disp('Network is PLASTIC');
 else
+train = false;
 disp('Network is STATIC');
 end
 
