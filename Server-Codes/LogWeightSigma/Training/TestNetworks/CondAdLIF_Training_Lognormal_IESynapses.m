@@ -119,7 +119,7 @@ PopParams.tauSTDP = 20;
 %%
 SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',SimTime,'save_dt',SimTime,...
-    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime]);
+    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime],'train',true);
 
 SimValues.t_syn = PopParams.t_syn;
 
