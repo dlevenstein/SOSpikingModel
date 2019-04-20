@@ -5,12 +5,12 @@ defaulttimeparms.simtime = 2000; %ms, time to simulate each "trial"
 defaulttimeparms.onsettransient = 0; %ms, onsiet transient time to ignore
 
 p = inputParser;
-addParameter(p,'up',true,@islogical)
+addParameter(p,'bistability',true,@islogical)
 addParameter(p,'SaveALL',false,@islogical)
 addParameter(p,'timeparms',defaulttimeparms,@isstruct)
 parse(p,varargin{:})
 
-UP = p.Results.up;
+bistable = p.Results.up;
 SaveALL = p.Results.SaveALL;
 timeparms = p.Results.timeparms;
 
@@ -21,7 +21,7 @@ timeparms.simtime = timeparms.simtime;
 
 TimeParams.dt      = 0.05;
 
-if UP
+if ~bistable
 TimeParams.SimTime = timeparms.simtime;
 else
 TimeParams.SimTime = timeparms.simtime+500;
@@ -35,12 +35,12 @@ parfor ii = 1:numI
     
     PopParamsAnalysis = PopParams_in;
      
-    if UP
+    if ~bistable
     PopParamsAnalysis.I_e = Ivals(ii).*heaviside(t - 500);
     end
     
-    if UP == false
-    PopParamsAnalysis.I_e = @(t) (300 - Ivals(ii)).*heaviside(500 - t)+Ivals(ii);
+    if bistable
+    PopParamsAnalysis.I_e = @(t) (250 - Ivals(ii)).*heaviside(500 - t)+Ivals(ii);
     end
     
     SimValuesArray(ii) = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
