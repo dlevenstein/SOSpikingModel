@@ -4,12 +4,11 @@
 #SBATCH --array=1-4
 #SBATCH --cpus-per-task=10
 #SBATCH --time=100:00:00
-#SBATCH --mem=40GB
+#SBATCH --mem=20GB
 #SBATCH --job-name=LogWeightESynapses
 #SBATCH --output=LogWeightESynapses_%j.out
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
-#SBATCH --gres=gpu:1
 
 n=${SLURM_ARRAY_TASK_ID}
 
