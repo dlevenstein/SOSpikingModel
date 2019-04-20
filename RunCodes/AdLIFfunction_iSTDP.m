@@ -414,7 +414,7 @@ if gpuAvail
     g_e = gpuArray(g_e);
     g_i = gpuArray(g_i);
     
-    I_e = gpuArray(I_e(-onsettime:dt:SimTime));
+    I_e = gpuArray(I_e(gather(-onsettime:dt:SimTime)));
     if length(I_e) == 1
         I_e = I_e.*ones(length(-onsettime:dt:SimTime),1);
     end

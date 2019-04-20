@@ -9,7 +9,7 @@ addpath(genpath(repopath))
 
 %%
 
-load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/LognormalESynapses.mat');
+load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/LognormalE_iSTDPI.mat');
 
 for simnum = 1:100
     
