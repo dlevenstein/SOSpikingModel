@@ -15,6 +15,9 @@ for simnum = 1:100
     
 if mod(simnum,4)+1 == index
     
+mod(simnum,4)+1
+index
+
 rng(simnum,'twister');
 
 PopParamsAnalysis = PopParams;
