@@ -1,4 +1,4 @@
-function [] = CondAdLIF_STDP_FI_Function_LogWeightESynapses(index)
+function [] = CondAdLIF_STDP_FI_Function_LogWeightESynapses(modnum)
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
@@ -12,11 +12,11 @@ addpath(genpath(repopath))
 load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/LognormalE_iSTDPI.mat');
 
 for simnum = 1:100
-    
-if mod(simnum,4)+1 == index
+   
+if mod(simnum,4)+1 == modnum
     
 mod(simnum,4)+1
-index
+modnum
 
 rng(simnum,'twister');
 
