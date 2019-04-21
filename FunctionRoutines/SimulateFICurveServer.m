@@ -43,7 +43,7 @@ parfor ii = 1:numI
     PopParamsAnalysis.I_e = @(t) (250 - Ivals(ii)).*heaviside(500 - t)+Ivals(ii);
     end
     
-    SimValuesArray(ii) = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
+    SimValuesArray(ii) = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,...
         'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false);
 
 end
