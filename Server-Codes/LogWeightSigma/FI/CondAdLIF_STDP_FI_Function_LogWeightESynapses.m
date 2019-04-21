@@ -32,7 +32,7 @@ dataname = ['logSigmaWeightESynapses_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
 
-SimulateFICurveServer(PopParamsAnalysis,[100 300],11,datafolder,dataname,'up',false);
+SimulateFICurveServer(PopParamsAnalysis,[100 300],11,datafolder,dataname,'bistability',true);
 
 end
 end
