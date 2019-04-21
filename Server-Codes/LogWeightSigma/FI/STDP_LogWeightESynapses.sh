@@ -15,6 +15,21 @@ n=${SLURM_ARRAY_TASK_ID}
 module purge
 module load matlab/2018a
 
-echo "parpool('local',10);CondAdLIF_STDP_FI_Function_LogWeightESynapses(${n})" | matlab
+if [ "$SLURM_JOBTMP" == "" ]; then
+    export SLURM_JOBTMP=/state/partition1/$USER/$$
+    mkdir -p $SLURM_JOBTMP
+fi
 
-echo "done"
+export MATLAB_PREFDIR=$(mktemp -d $SLURM_JOBTMP/matlab-XXXX)
+
+echo
+echo "Hostname: $(hostname)"
+echo
+
+cat<<EOF | srun matlab -nodisplay
+parpool('local', $SLURM_CPUS_PER_TASK)
+CondAdLIF_STDP_FI_Function_LogWeightESynapses(${n})
+exit
+EOF
+
+rm -rf $SLURM_JOBTMP/*
