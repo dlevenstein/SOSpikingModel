@@ -29,7 +29,7 @@ end
 
 clear SimValues
 
-for ii = 1:numI
+parfor ii = 1:numI
     
     ii
     
