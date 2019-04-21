@@ -10,7 +10,7 @@ addParameter(p,'SaveALL',false,@islogical)
 addParameter(p,'timeparms',defaulttimeparms,@isstruct)
 parse(p,varargin{:})
 
-bistable = p.Results.up;
+bistable = p.Results.bistability;
 SaveALL = p.Results.SaveALL;
 timeparms = p.Results.timeparms;
 
