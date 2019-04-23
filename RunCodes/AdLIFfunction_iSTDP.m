@@ -266,6 +266,10 @@ SimValues.t_weight        = nan(1,WeightSaveLength);
 SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
 SimValues.WeightChange    = nan(2,SaveTimeLength);
 
+if train
+    SimValues.spikeRate   = nan(1,SaveTimeLength);
+end
+
 if length(recordIntervals) == 0
 recordVALs = ones(1,SimTimeLength);
 spikes = nan(PopNum.*(SimTime+onsettime).*20,2,'single'); %assume mean rate 20Hz
@@ -633,6 +637,10 @@ for tt=1:SimTimeLength
         SimValues.t(savecounter)                   = timecounter;
         SimValues.WeightChange(1,savecounter)      = mean(II_mat(II_mat>0));
         SimValues.WeightChange(2,savecounter)      = mean(EI_mat(EI_mat>0));
+        
+        numspikers = length(find(V > V_th));
+        SimValues.spikeRate(savecounter)           = numspikers./PopNum;
+        
         savecounter = savecounter+1;
     end
      
@@ -714,6 +722,18 @@ text(0.8705.*TimeParams.SimTime, 510,'10 Hz','FontSize',16)
 xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
 xlim([-onsettime SimTime]);ylim([0 PopNum+1]);
     
+if train
+    
+    figure
+    subplot(2,1,1)
+    plot(SimValues.t,SimValues.WeightChange(1,:),'r','LineWidth',2)
+    hold on
+    plot(SimValues.t,SimValues.WeightChange(2,:),'b','LineWidth',2)
+    subplot(2,1,2)
+    plot(SimValues.t,movmean(SimValues.spikeRate,25),'k','LineWidth',2)
+    
+end
+
 end
 
 end
