@@ -54,15 +54,15 @@ W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 
 if index == 1 %U(1)
 
-W(EcellidX,EcellidX) = lognrnd(mu,sigma,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
-W(IcellidX,EcellidX) = lognrnd(mu,sigma,[IPopNum,EPopNum]).*W(IcellidX,EcellidX);
+W(EcellidX,EcellidX) = W(EcellidX,EcellidX);
+W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 
 filename = 'Uniform_w_1_iSTDP';
 
 elseif index == 2 %U(10)
 
-W(EcellidX,EcellidX) = lognrnd(mu,sigma,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
-W(IcellidX,EcellidX) = lognrnd(mu,sigma,[IPopNum,EPopNum]).*W(IcellidX,EcellidX);
+W(EcellidX,EcellidX) = 10.*W(EcellidX,EcellidX);
+W(IcellidX,EcellidX) = 10.*W(IcellidX,EcellidX);
 
 filename = 'Uniform_w_10_iSTDP';
 
