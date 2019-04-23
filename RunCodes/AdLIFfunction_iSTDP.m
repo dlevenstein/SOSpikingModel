@@ -668,7 +668,7 @@ if gpuAvail
     SimValues.t_weight        = gather(SimValues.t_weight);
     SimValues.WeightMat       = gather(SimValues.WeightMat);
     SimValues.WeightChange    = gather(SimValues.WeightChange);
-    
+    SimValues.spikeRate       = gather(SimValues.spikeRate);
 end
 %%
 %Catch for no spiking in simulation error
