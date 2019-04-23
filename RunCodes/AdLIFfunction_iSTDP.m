@@ -268,6 +268,8 @@ SimValues.WeightChange    = nan(2,SaveTimeLength);
 
 if train
     SimValues.spikeRate   = zeros(2,SaveTimeLength);
+    numEspikes = 0;
+    numIspikes = 0;
 end
 
 if length(recordIntervals) == 0
@@ -442,6 +444,8 @@ if gpuAvail
     
     if train
     SimValues.spikeRate       = gpuArray(SimValues.spikeRate);
+    numEspikes = gpuArray(numEspikes);
+    numIspikes = gpuArray(numIspikes);
     end
 
 end
@@ -548,6 +552,12 @@ for tt=1:SimTimeLength
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
         %EI_mat(EI_mat>30) = 30; %Cap at 30 nS
+        
+        if train
+            numEspikes=numEspikes+length(PostEspikes);
+            numIspikes=numIspikes+length(PostIspikes);
+        end
+        
         end
         
     end
@@ -642,10 +652,11 @@ for tt=1:SimTimeLength
         SimValues.WeightChange(1,savecounter)      = mean(EI_mat(EI_mat>0));
         SimValues.WeightChange(2,savecounter)      = mean(II_mat(II_mat>0));
         
-        if exist('spikeneurons','var')
-        SimValues.spikeRate(1,savecounter)           = sum(spikeneurons<=EPopNum)./EPopNum.*1e3;
-        SimValues.spikeRate(2,savecounter)           = sum(spikeneurons>EPopNum)./IPopNum.*1e3;
-        end
+        SimValues.spikeRate(1,savecounter)         = numEspikes./EPopNum.*1e3;
+        SimValues.spikeRate(2,savecounter)         = numIspikes./IPopNum.*1e3;
+        
+        numEspikes=0;
+        numIspikes=0;
         
         savecounter = savecounter+1;
     end
@@ -674,7 +685,9 @@ if gpuAvail
     SimValues.t_weight        = gather(SimValues.t_weight);
     SimValues.WeightMat       = gather(SimValues.WeightMat);
     SimValues.WeightChange    = gather(SimValues.WeightChange);
+    if train
     SimValues.spikeRate       = gather(SimValues.spikeRate);
+    end
     
 end
 %%
@@ -722,9 +735,9 @@ plot(t_rate,50.*poprate.E,'b','linewidth',2)
 hold on
 plot(t_rate,50.*poprate.I,'r','linewidth',2)
 hold on
-plot([0.8650.*TimeParams.SimTime 0.8700.*TimeParams.SimTime],[500 500],'k','LineWidth',2) 
+plot([0.8650.*TimeParams.SimTime TimeParams.SimTime],[500 500],'k','LineWidth',2) 
 hold on
-text(0.8705.*TimeParams.SimTime, 510,'10 Hz','FontSize',16)
+text(TimeParams.SimTime+0.05, 510,'10 Hz','FontSize',16)
 
 xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
 xlim([-onsettime SimTime]);ylim([0 PopNum+1]);
