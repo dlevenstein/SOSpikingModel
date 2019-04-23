@@ -267,7 +267,7 @@ SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
 SimValues.WeightChange    = nan(2,SaveTimeLength);
 
 if train
-    SimValues.spikeRate   = nan(2,SaveTimeLength);
+    SimValues.spikeRate   = zeros(2,SaveTimeLength);
 end
 
 if length(recordIntervals) == 0
@@ -737,11 +737,13 @@ if train
     hold on
     plot(SimValues.t,SimValues.WeightChange(2,:),'r','LineWidth',2)
     xlabel('Time (ms)');ylabel('Weight (nS)')
+    xlim([0 TimeParams.SimTime])
     subplot(2,1,2)
     plot(SimValues.t,movmean(SimValues.spikeRate(1,:),25),'b','LineWidth',2)
     hold on
     plot(SimValues.t,movmean(SimValues.spikeRate(2,:),25),'r','LineWidth',2)
     xlabel('Time (ms)');ylabel('Rate (Hz)')
+    xlim([0 TimeParams.SimTime])
     
 end
 
