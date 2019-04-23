@@ -738,12 +738,14 @@ if train
     plot(SimValues.t,SimValues.WeightChange(2,:),'r','LineWidth',2)
     xlabel('Time (ms)');ylabel('Weight (nS)')
     xlim([0 TimeParams.SimTime])
+    legend('I->I','I->E')
     subplot(2,1,2)
     plot(SimValues.t,movmean(SimValues.spikeRate(1,:),25),'b','LineWidth',2)
     hold on
     plot(SimValues.t,movmean(SimValues.spikeRate(2,:),25),'r','LineWidth',2)
     xlabel('Time (ms)');ylabel('Rate (Hz)')
     xlim([0 TimeParams.SimTime])
+    legend('Excitatory','Inhibitory')
     
 end
 
