@@ -118,6 +118,7 @@ SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogres
     'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime],'train',true);
 
 %%
-save(['/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/' filename],'SimValues','-v7.3')
+disp(['/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/' filename])
+%save(['/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/' filename],'SimValues','-v7.3')
 
 end
