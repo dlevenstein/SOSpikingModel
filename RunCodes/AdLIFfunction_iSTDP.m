@@ -635,11 +635,12 @@ for tt=1:SimTimeLength
     
     if mod(timecounter,save_dt)==0 && timecounter>=0 && train
         SimValues.t(savecounter)                   = timecounter;
-        SimValues.WeightChange(1,savecounter)      = mean(II_mat(II_mat>0));
-        SimValues.WeightChange(2,savecounter)      = mean(EI_mat(EI_mat>0));
+        SimValues.WeightChange(1,savecounter)      = mean(EI_mat(EI_mat>0));
+        SimValues.WeightChange(2,savecounter)      = mean(II_mat(II_mat>0));
         
-        if exist('numspikers','var')
-        SimValues.spikeRate(savecounter)           = numspikers./PopNum;
+        if exist('spikeneurons','var')
+        SimValues.spikeRate(1,savecounter)           = sum(spikeneurons<=EPopNum)./EPopNum.*1e3;
+        SimValues.spikeRate(1,savecounter)           = sum(spikeneurons>EPopNum)./IPopNum.*1e3;
         end
         
         savecounter = savecounter+1;
@@ -728,9 +729,9 @@ if train
     
     figure
     subplot(2,1,1)
-    plot(SimValues.t,SimValues.WeightChange(1,:),'r','LineWidth',2)
+    plot(SimValues.t,SimValues.WeightChange(1,:),'b','LineWidth',2)
     hold on
-    plot(SimValues.t,SimValues.WeightChange(2,:),'b','LineWidth',2)
+    plot(SimValues.t,SimValues.WeightChange(2,:),'r','LineWidth',2)
     subplot(2,1,2)
     plot(SimValues.t,movmean(SimValues.spikeRate,25),'k','LineWidth',2)
     
