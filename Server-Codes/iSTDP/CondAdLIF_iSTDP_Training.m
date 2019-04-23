@@ -3,7 +3,7 @@ function CondAdLIF_iSTDP_Training(index)
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
+%repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 repopath = '/home/jmg1030/Documents/GitHub/SOSpikingModel';
 
 addpath(genpath(repopath))
