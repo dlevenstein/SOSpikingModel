@@ -103,10 +103,6 @@ if defaultNeuronParams
     PopParams.sigma = 50;        %niose magnitude: variance
     PopParams.theta = 0.1;        %noise time scale (1/ms)
 
-    % One neuron
-    PopParams.EPopNum = 2000;
-    PopParams.IPopNum = 500;
-
     %Neuron properties
     PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
     PopParams.g_L     = [182/18 119/8];     %leak conductance (nS)
