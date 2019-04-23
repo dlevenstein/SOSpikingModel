@@ -71,11 +71,11 @@ elseif index == 3 %L(1,10)
 m = 1;
 s = 10;
 
-mu = log((m^2)/sqrt(s+m^2));
-sigma = sqrt(log((s/m^2)+1));
+M = log((m^2)/sqrt(s+m^2));
+S = sqrt(log((s/m^2)+1));
 
-W(EcellidX,EcellidX) = lognrnd(mu,sigma,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
-W(IcellidX,EcellidX) = lognrnd(mu,sigma,[IPopNum,EPopNum]).*W(IcellidX,EcellidX);
+W(EcellidX,EcellidX) = lognrnd(M,S,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
+W(IcellidX,EcellidX) = lognrnd(M,S,[IPopNum,EPopNum]).*W(IcellidX,EcellidX);
 
 filename = 'Lognormal_m_1_s_10_iSTDP';
 
@@ -84,11 +84,11 @@ elseif index == 4 %L(10,10)
 m = 10;
 s = 10;
 
-mu = log((m^2)/sqrt(s+m^2));
-sigma = sqrt(log((s/m^2)+1));
+M = log((m^2)/sqrt(s+m^2));
+S = sqrt(log((s/m^2)+1));
 
-W(EcellidX,EcellidX) = lognrnd(mu,sigma,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
-W(IcellidX,EcellidX) = lognrnd(mu,sigma,[IPopNum,EPopNum]).*W(IcellidX,EcellidX);
+W(EcellidX,EcellidX) = lognrnd(M,S,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
+W(IcellidX,EcellidX) = lognrnd(M,S,[IPopNum,EPopNum]).*W(IcellidX,EcellidX);
 
 filename = 'Lognormal_m_10_s_10_iSTDP';
 
