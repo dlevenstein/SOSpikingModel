@@ -440,6 +440,10 @@ if gpuAvail
     SimValues.WeightMat       = gpuArray(SimValues.WeightMat);
     SimValues.WeightChange    = gpuArray(SimValues.WeightChange);
     
+    if train
+    SimValues.spikeRate       = gpuArray(SimValues.spikeRate);
+    end
+
 end
 
 %% Time Loop
@@ -640,7 +644,7 @@ for tt=1:SimTimeLength
         
         if exist('spikeneurons','var')
         SimValues.spikeRate(1,savecounter)           = sum(spikeneurons<=EPopNum)./EPopNum.*1e3;
-        SimValues.spikeRate(1,savecounter)           = sum(spikeneurons>EPopNum)./IPopNum.*1e3;
+        SimValues.spikeRate(2,savecounter)           = sum(spikeneurons>EPopNum)./IPopNum.*1e3;
         end
         
         savecounter = savecounter+1;
