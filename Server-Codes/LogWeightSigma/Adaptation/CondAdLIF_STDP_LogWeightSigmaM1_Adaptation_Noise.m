@@ -1,4 +1,4 @@
-function CondAdLIF_STDP_LogWeightSigmaM1_Adaptation_Noise(index)
+function CondAdLIF_STDP_LogWeightSigmaM1_Adaptation_Noise(modnum)
 
 repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
@@ -24,7 +24,7 @@ bvals = logspace(-2,2,11);
 
 for II = 1:(length(Ivals)*length(bvals))
     
-if mod(II,4)+1 == index
+if mod(II,4)+1 == modnum
 ii = mod(II,length(Ivals))+1;
 bb = ceil(II/length(Ivals));
     
