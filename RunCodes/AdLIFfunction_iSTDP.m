@@ -638,8 +638,9 @@ for tt=1:SimTimeLength
         SimValues.WeightChange(1,savecounter)      = mean(II_mat(II_mat>0));
         SimValues.WeightChange(2,savecounter)      = mean(EI_mat(EI_mat>0));
         
-        numspikers = length(find(V > V_th));
+        if exist numspikers 
         SimValues.spikeRate(savecounter)           = numspikers./PopNum;
+        end
         
         savecounter = savecounter+1;
     end
@@ -669,6 +670,7 @@ if gpuAvail
     SimValues.WeightMat       = gather(SimValues.WeightMat);
     SimValues.WeightChange    = gather(SimValues.WeightChange);
     SimValues.spikeRate       = gather(SimValues.spikeRate);
+    
 end
 %%
 %Catch for no spiking in simulation error
