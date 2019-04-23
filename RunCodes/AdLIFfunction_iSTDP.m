@@ -710,7 +710,7 @@ end
 
 %move back to CPU
 if gpuAvail
-    
+    if ~train
     SimValues.V               = gather(SimValues.V);
     SimValues.g_w             = gather(SimValues.g_w);
     SimValues.g_e             = gather(SimValues.g_e);
@@ -724,7 +724,8 @@ if gpuAvail
     SimValues.t_weight        = gather(SimValues.t_weight);
     SimValues.WeightMat       = gather(SimValues.WeightMat);
     SimValues.WeightChange    = gather(SimValues.WeightChange);
-    if train
+    elseif train
+    SimValues.WeightChange    = gather(SimValues.WeightChange);
     SimValues.spikeRate       = gather(SimValues.spikeRate);
     end
     
