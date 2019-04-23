@@ -1,4 +1,6 @@
-function CondAdLIF_iSTDP_Training(index)
+%function CondAdLIF_iSTDP_Training(index)
+
+index = 1;
 
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
@@ -99,8 +101,8 @@ W(diag(diag(true(size(W)))))=0;
 PopParams.W = W;
 
 %%
-SimTime = 1e6;
-RecordTime = 1e4;
+SimTime = 1e2;
+RecordTime = 0;
 
 TimeParams.dt   = 0.05;
 TimeParams.SimTime = SimTime+RecordTime;
@@ -114,11 +116,11 @@ PopParams.tauSTDP = 20;
 
 %%
 SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',SimTime,'save_dt',SimTime,...
+    'save_weights',SimTime,'save_dt',10,...
     'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime],'train',true);
 
 %%
 disp(['/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/' filename])
 %save(['/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/' filename],'SimValues','-v7.3')
 
-end
+%end
