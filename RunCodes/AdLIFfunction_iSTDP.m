@@ -286,6 +286,7 @@ t_r = zeros(PopNum,1);
 
 x            = zeros(PopNum,1); %Synaptic trace
 
+if ~train
 %Saved Variables
 SimValues.t               = nan(1,SaveTimeLength);
 SimValues.V               = nan(PopNum,SaveTimeLength);
@@ -301,8 +302,9 @@ SimValues.t_weight        = nan(1,WeightSaveLength);
 SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
 SimValues.WeightChange    = nan(2,SaveTimeLength);
 
-if train
-    SimValues.spikeRate   = zeros(2,SaveTimeLength);
+elseif train
+    SimValues.WeightChange    = nan(2,SaveTimeLength);
+    SimValues.spikeRate       = zeros(2,SaveTimeLength);
     numEspikes = 0;
     numIspikes = 0;
 end
@@ -463,6 +465,7 @@ if gpuAvail
     % Random Numbers
     gpurng(0, 'Philox4x32-10');
     
+    if ~train
     SimValues.V               = gpuArray(SimValues.V);
     SimValues.g_w             = gpuArray(SimValues.g_w);
     SimValues.g_e             = gpuArray(SimValues.g_e);
@@ -477,7 +480,8 @@ if gpuAvail
     SimValues.WeightMat       = gpuArray(SimValues.WeightMat);
     SimValues.WeightChange    = gpuArray(SimValues.WeightChange);
     
-    if train
+    elseif train
+    SimValues.WeightChange    = gpuArray(SimValues.WeightChange);
     SimValues.spikeRate       = gpuArray(SimValues.spikeRate);
     numEspikes = gpuArray(numEspikes);
     numIspikes = gpuArray(numIspikes);
