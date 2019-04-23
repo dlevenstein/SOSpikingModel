@@ -638,7 +638,7 @@ for tt=1:SimTimeLength
         SimValues.WeightChange(1,savecounter)      = mean(II_mat(II_mat>0));
         SimValues.WeightChange(2,savecounter)      = mean(EI_mat(EI_mat>0));
         
-        if exist numspikers 
+        if exist('numspikers','var')
         SimValues.spikeRate(savecounter)           = numspikers./PopNum;
         end
         
