@@ -652,8 +652,8 @@ for tt=1:SimTimeLength
         SimValues.WeightChange(1,savecounter)      = mean(EI_mat(EI_mat>0));
         SimValues.WeightChange(2,savecounter)      = mean(II_mat(II_mat>0));
         
-        SimValues.spikeRate(1,savecounter)         = numEspikes./EPopNum.*1e3;
-        SimValues.spikeRate(2,savecounter)         = numIspikes./IPopNum.*1e3;
+        SimValues.spikeRate(1,savecounter)         = numEspikes./EPopNum.*1e3./save_dt;
+        SimValues.spikeRate(2,savecounter)         = numIspikes./IPopNum.*1e3./save_dt;
         
         numEspikes=0;
         numIspikes=0;
