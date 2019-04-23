@@ -97,7 +97,7 @@ W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 W(EcellidX,EcellidX) = lognrnd(mu,sigma,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
 W(IcellidX,EcellidX) = lognrnd(mu,sigma,[IPopNum,EPopNum]).*W(IcellidX,EcellidX);
 
-W(W > 50) = 50;
+%W(W > 50) = 50;
 
 W(diag(diag(true(size(W)))))=0;
 

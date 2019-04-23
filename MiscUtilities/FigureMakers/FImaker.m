@@ -25,7 +25,7 @@ for ff = 1:length(folders)
             
         [rate,peakwidth,peakheight,lastspikes,S] = FIfigures(II,path);
         
-%         FIspikes{ff,II} = S;
+        FIspikes{ff,II} = S;
 
         Erate(ff,II) = rate.E;
         Irate(ff,II) = rate.I;

@@ -264,7 +264,7 @@ SimValues.a_w             = nan(PopNum,SaveTimeLength);
 SimValues.Input           = nan(PopNum,SaveTimeLength);
 SimValues.t_weight        = nan(1,WeightSaveLength);
 SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
-SimValues.WeightChange    = nan(1,SaveTimeLength);
+SimValues.WeightChange    = nan(2,SaveTimeLength);
 
 if length(recordIntervals) == 0
 recordVALs = ones(1,SimTimeLength);
@@ -535,11 +535,11 @@ for tt=1:SimTimeLength
         
         II_mat = II_mat.*isconnected; %Keep only connected pairs
         II_mat(II_mat<=0) = 0; %Get rid of any negative synapses...
-        II_mat(II_mat>30) = 30; %Cap at 30 nS
+        %II_mat(II_mat>30) = 30; %Cap at 30 nS
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
-        EI_mat(EI_mat>30) = 30; %Cap at 30 nS
+        %EI_mat(EI_mat>30) = 30; %Cap at 30 nS
         end
         
     end
@@ -630,7 +630,9 @@ for tt=1:SimTimeLength
     end
     
     if mod(timecounter,save_dt)==0 && timecounter>=0 && train
-        SimValues.WeightChange(savecounter)        = mean(II_mat(II_mat>0))./2+mean(EI_mat(EI_mat>0))./2; % 
+        SimValues.t(savecounter)                   = timecounter;
+        SimValues.WeightChange(1,savecounter)      = mean(II_mat(II_mat>0));
+        SimValues.WeightChange(2,savecounter)      = mean(EI_mat(EI_mat>0));
         savecounter = savecounter+1;
     end
      
