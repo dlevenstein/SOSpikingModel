@@ -47,13 +47,13 @@ for ii = 1:length(SimValuesArray)
         
     end
     
-    bins = linspace(0,4,50);
+    bins = linspace(0,3.5,30);
     
     rateDistE = hist(log10(1000./ISI_E),bins);
     rateDistI = hist(log10(1000./ISI_I),bins);
     
     %ISI distirbutions
-    ISIdist.bins = linspace(0,3.5,50);
+    ISIdist.bins = linspace(0,3.5,30);
     ISIs = cellfun(@diff,SimValuesArray(ii).spikesbycell,'uniformoutput',false);
     ISIdist.E = hist(log10(cat(1,ISIs{SimValuesArray(ii).EcellIDX})),ISIdist.bins);
     ISIdist.E = ISIdist.E./sum(ISIdist.E);
@@ -101,6 +101,7 @@ for ii = 1:length(SimValuesArray)
     dynamicVals(ii).ccg = ccg;
     
     dynamicVals(ii).ISIdist = ISIdist;
+    dynamicVals(ii).ISIstats = ISIstats;
     
     dynamicVals(ii).bins = bins;
     dynamicVals(ii).ISImapE = ISImapE;
