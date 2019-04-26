@@ -214,7 +214,9 @@ else
 
     EI_mat(Ecells,Icells) = rand(EPopNum,IPopNum)<=Pei;
     EI_mat = EI_mat.*Wei;
-
+    
+    PopParams.W = EE_mat+II_mat+EI_mat+IE_mat;
+    
 end
 isconnected = (EE_mat+II_mat+EI_mat+IE_mat)>0;
 
@@ -303,6 +305,7 @@ SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
 SimValues.WeightChange    = nan(2,SaveTimeLength);
 
 elseif train
+    SimValues.WeightMat       = nan(PopNum,PopNum,2);
     SimValues.WeightChange    = nan(2,SaveTimeLength);
     SimValues.spikeRate       = zeros(2,SaveTimeLength);
     numEspikes = 0;
@@ -575,22 +578,28 @@ for tt=1:SimTimeLength
         %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
         %PreIspikes = intersect(spikeneurons,Icells);
         PreIspikes = spikeneurons(spikeneurons > EPopNum);
-        II_mat(IcellIDX,PreIspikes) = II_mat(IcellIDX,PreIspikes) + LearningRate.*(x(IcellIDX)-alphaI);
-        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alphaE);
         %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
         PostEspikes = spikeneurons(spikeneurons <= EPopNum);
         PostIspikes = PreIspikes;
-        II_mat(PostIspikes,IcellIDX) = II_mat(PostIspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
-        EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
-        II_mat = II_mat.*isconnected; %Keep only connected pairs
-        II_mat(II_mat<=0) = 0; %Get rid of any negative synapses...
-        %II_mat(II_mat>30) = 30; %Cap at 30 nS
+        if ~all(isnan(alphaE))
+        EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alphaE);
+        EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
         %EI_mat(EI_mat>30) = 30; %Cap at 30 nS
+        end
+        
+        if ~all(isnan(alphaI))
+        II_mat(IcellIDX,PreIspikes) = II_mat(IcellIDX,PreIspikes) + LearningRate.*(x(IcellIDX)-alphaI);
+        II_mat(PostIspikes,IcellIDX) = II_mat(PostIspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
+        
+        II_mat = II_mat.*isconnected; %Keep only connected pairs
+        II_mat(II_mat<=0) = 0; %Get rid of any negative synapses...
+        %II_mat(II_mat>30) = 30; %Cap at 30 nS
+        end
         
         if train
             numEspikes=numEspikes+length(PostEspikes);
@@ -705,7 +714,10 @@ end
 toc
 
 if train
-    SimValues.WeightMat = EE_mat+II_mat+EI_mat+IE_mat;
+    SimValues.WeightMat(:,:,1) = PopParams.W;
+    SimValues.WeightMat(:,:,2) = EE_mat+II_mat+EI_mat+IE_mat;
+    SimValues.TargetRateE = TargetRateE;
+    SimValues.TargetRateI = TargetRateI;
 end
 
 %move back to CPU
@@ -725,6 +737,7 @@ if gpuAvail
     SimValues.WeightMat       = gather(SimValues.WeightMat);
     SimValues.WeightChange    = gather(SimValues.WeightChange);
     elseif train
+    SimValues.WeightMat       = gather(SimValues.WeightMat);
     SimValues.WeightChange    = gather(SimValues.WeightChange);
     SimValues.spikeRate       = gather(SimValues.spikeRate);
     end
