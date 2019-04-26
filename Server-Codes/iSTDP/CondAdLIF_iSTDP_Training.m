@@ -50,8 +50,10 @@ W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
 W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 
 %% Weights
-W(EcellidX,EcellidX) = W(EcellidX,EcellidX);
-W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
+w = 1
+
+W(EcellidX,EcellidX) = w.*W(EcellidX,EcellidX);
+W(IcellidX,EcellidX) = w.*W(IcellidX,EcellidX);
 
 PopParams.LearningRate = 1e-2;
 PopParams.TargetRateI = 8; %Target I rate 8Hz
@@ -104,8 +106,10 @@ W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
 W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 
 %% Weights
-W(EcellidX,EcellidX) = 10.*W(EcellidX,EcellidX);
-W(IcellidX,EcellidX) = 10.*W(IcellidX,EcellidX);
+w = 10
+
+W(EcellidX,EcellidX) = w.*W(EcellidX,EcellidX);
+W(IcellidX,EcellidX) = w.*W(IcellidX,EcellidX);
 
 PopParams.LearningRate = 1e-2;
 PopParams.TargetRateI = 8; %Target I rate 8Hz
@@ -158,8 +162,8 @@ W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
 W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 
 %% Weights
-m = 1;
-s = 10;
+m = 1
+s = 10
 
 M = log((m^2)/sqrt(s+m^2));
 S = sqrt(log((s/m^2)+1));
@@ -218,8 +222,8 @@ W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
 W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 
 %% Weights
-m = 10;
-s = 10;
+m = 10
+s = 10
 
 M = log((m^2)/sqrt(s+m^2));
 S = sqrt(log((s/m^2)+1));
@@ -278,8 +282,10 @@ W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
 W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 
 %% Weights
-W(EcellidX,EcellidX) = W(EcellidX,EcellidX);
-W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
+w = 1
+
+W(EcellidX,EcellidX) = w.*W(EcellidX,EcellidX);
+W(IcellidX,EcellidX) = w.*W(IcellidX,EcellidX);
 
 PopParams.LearningRate = 1e-2;
 PopParams.TargetRateI = nan; %static I->I
@@ -332,8 +338,8 @@ W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
 W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 
 %% Weights
-m = 1;
-s = 10;
+m = 1
+s = 10
 
 M = log((m^2)/sqrt(s+m^2));
 S = sqrt(log((s/m^2)+1));
@@ -392,8 +398,8 @@ W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
 W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 
 %% Weights
-m = 1;
-s = 10;
+m = 1
+s = 10
 
 M = log((m^2)/sqrt(s+m^2));
 S = sqrt(log((s/m^2)+1));
@@ -452,8 +458,8 @@ W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
 W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
 
 %% Weights
-m = 1;
-s = 10;
+m = 1
+s = 10
 
 M = log((m^2)/sqrt(s+m^2));
 S = sqrt(log((s/m^2)+1));
@@ -463,8 +469,8 @@ W(IcellidX,EcellidX) = lognrnd(M,S,[IPopNum,EPopNum]).*W(IcellidX,EcellidX);
 
 numcells = 2000;
  
-mTR = -0.1;
-sigmaTR = 0.8;
+mTR = -0.1
+sigmaTR = 0.8
  
 %draw the log firing rates from a normal distribution with mean mTR and std sigmaTR
 logTRs = mTR + sigmaTR.*(randn(numcells,1));  
