@@ -484,6 +484,7 @@ if gpuAvail
     SimValues.WeightChange    = gpuArray(SimValues.WeightChange);
     
     elseif train
+    SimValues.WeightMat       = gpuArray(SimValues.WeightMat);
     SimValues.WeightChange    = gpuArray(SimValues.WeightChange);
     SimValues.spikeRate       = gpuArray(SimValues.spikeRate);
     numEspikes = gpuArray(numEspikes);
