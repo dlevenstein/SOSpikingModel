@@ -306,7 +306,7 @@ SimValues.WeightChange    = nan(2,SaveTimeLength);
 
 elseif train
     SimValues.WeightMat       = nan(PopNum,PopNum,2);
-    SimValues.WeightChange    = nan(2,SaveTimeLength);
+    SimValues.WeightChange    = nan(4,SaveTimeLength);
     SimValues.spikeRate       = zeros(2,SaveTimeLength);
     numEspikes = 0;
     numIspikes = 0;
@@ -700,6 +700,9 @@ for tt=1:SimTimeLength
         SimValues.t(savecounter)                   = timecounter;
         SimValues.WeightChange(1,savecounter)      = mean(EI_mat(EI_mat>0));
         SimValues.WeightChange(2,savecounter)      = mean(II_mat(II_mat>0));
+        
+        SimValues.WeightChange(3,savecounter)      = std(EI_mat(EI_mat>0));
+        SimValues.WeightChange(4,savecounter)      = std(II_mat(II_mat>0));
         
         SimValues.spikeRate(1,savecounter)         = numEspikes./EPopNum.*1e3./save_dt;
         SimValues.spikeRate(2,savecounter)         = numIspikes./IPopNum.*1e3./save_dt;
