@@ -10,6 +10,9 @@ addpath(genpath(repopath))
 
 %%
 
+PopParams.EPopNum = 2000;
+PopParams.IPopNum = 500;
+
 PopParams.I_e  = 0;       %External input
 PopParams.sigma = 0;        %niose magnitude: variance
 PopParams.theta = 0.1;        %noise time scale (1/ms)
