@@ -3,7 +3,8 @@ function [] = CondAdLIF_STDP_FI_Function_iSTDP(modnum)
 %% Add the approprate folders to the path
 %Path of the SOSpikingModel repository
 
-repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
+%repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
+repopath = '/home/jmg1030/Documents/GitHub/SOSpikingModel';
 
 addpath(genpath(repopath))
 
@@ -36,8 +37,8 @@ PopParams.gwnorm  = 0;       %magnitude of adaptation
 PopParams.t_syn = 0;
 
 PopParams.LearningRate = 0;
-PopParams.TargetRateI = 8; %Target E rate 1Hz
-PopParams.TargetRateE = 2; %Target I rate 1Hz
+PopParams.TargetRateI = nan; %Target E rate 1Hz
+PopParams.TargetRateE = nan; %Target I rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%
@@ -65,7 +66,7 @@ dataname = ['iSTDP_Lognormal_m_1_s_10_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
 
-SimulateFICurveServer(PopParamsAnalysis,[0 400],21,datafolder,dataname,'bistability',true);
+%SimulateFICurveServer(PopParamsAnalysis,[0 400],21,datafolder,dataname,'bistability',true);
 
 end
 end

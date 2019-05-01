@@ -1,6 +1,8 @@
 function CondAdLIF_iSTDP_Adaptation_Current(modnum)
 
-repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
+%repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
+repopath = '/home/jmg1030/Documents/GitHub/SOSpikingModel';
+
 addpath(genpath(repopath))
 
 %%
@@ -38,7 +40,7 @@ PopParams.tauSTDP = 20;
 
 %%
 
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_iSTDP.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Uniform_w_1_iSTDP_IE_indegree_500.mat');
 
 PopParams_in = PopParams;
 PopParams_in.tau_w = 300;
@@ -52,7 +54,7 @@ PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_
 
 TimeParams.dt      = 0.05;
 
-TimeParams.SimTime = 3e4;
+TimeParams.SimTime = 1e2;
 
 Ivals = linspace(100,300,21);
 bvals = logspace(-2,2,11);
@@ -79,7 +81,9 @@ SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true
 
 spikes = SimValuesArray.spikes;
 
-save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/iSTDPLognormal/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+%save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/Uniform_w_1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+disp(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/Uniform_w_1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat']) 
+
 end
 
 end
