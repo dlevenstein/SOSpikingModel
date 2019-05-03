@@ -43,7 +43,7 @@ PopParams.tauSTDP = 20;
 
 %%
 
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Uniform_w_1_iSTDP_IE_indegree_500.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_IE.mat.mat');
 
 PopParams_in = PopParams;
 PopParams_in.tau_w = 300;
@@ -84,7 +84,7 @@ SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true
 
 spikes = SimValuesArray.spikes;
 
-save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/Uniform_w_1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_IE/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
 %disp(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/Uniform_w_1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat']) 
 
 end
