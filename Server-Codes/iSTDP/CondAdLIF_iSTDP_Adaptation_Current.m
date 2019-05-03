@@ -43,7 +43,7 @@ PopParams.tauSTDP = 20;
 
 %%
 
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_IE.mat.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_IE.mat');
 
 PopParams_in = PopParams;
 PopParams_in.tau_w = 300;
