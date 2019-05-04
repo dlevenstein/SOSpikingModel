@@ -46,7 +46,7 @@ PopParams.tauSTDP = 20;
 
 %%
 
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_IE.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_iSTDP_IE_indegree_500.mat');
 
 for simnum = 1:100
    
@@ -64,8 +64,8 @@ PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
 PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LognormalEE_IE/';
-dataname = ['Lognormal_m_1_s_10_EE_IE_sim_' char(num2str(simnum))];
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LognormalEE_IE_KIE_500/';
+dataname = ['Lognormal_m_1_s_10_EE_IE_KIE_500_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
 
