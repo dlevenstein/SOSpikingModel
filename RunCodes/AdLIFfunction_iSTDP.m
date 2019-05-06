@@ -563,7 +563,8 @@ for tt=1:SimTimeLength
         t_r(spikeneurons) = t_ref(spikeneurons);
 %         t_s(spikeneurons) = t_syn(spikeneurons);
         %Jump the adaptation
-        w(spikeneurons) = w(spikeneurons) + b(spikeneurons); 
+        %w(spikeneurons) = w(spikeneurons) + b(spikeneurons); 
+        w(spikeneurons) = b(spikeneurons); 
         
         %------------------------------------------------------------------
         

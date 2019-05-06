@@ -12,7 +12,7 @@ SAVESIM = true;
 clear PopParams
 
 %Input
-PopParams.I_e   = 250;       %External input
+PopParams.I_e   = 0;       %External input
 PopParams.sigma = 0;        %niose magnitude: variance
 PopParams.theta = 0.1;        %noise time scale (1/ms)
 
@@ -56,7 +56,8 @@ TimeParams.dt      = 0.05;
 TimeParams.SimTime = 1e3;
 
 PopParams.LearningRate = 0;
-PopParams.TargetRate = 2; %Target E rate 1Hz
+PopParams.TargetRateI = nan; %Target E rate 1Hz
+PopParams.TargetRateE = nan; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%
@@ -69,7 +70,7 @@ PopParams.I_e = @(t) 250.*(heaviside(t-5e2)-heaviside(t-(TimeParams.SimTime-5e2)
 PopParams.b = 0;
 PopParams.a = 0.03;
 
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
+SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt,'defaultNeuronParams',false);
 
 %%
 figure
@@ -137,7 +138,7 @@ PopParams.I_e = @(t) 250.*(heaviside(t-5e2)-heaviside(t-(TimeParams.SimTime-5e2)
 PopParams.b = 0.1;
 PopParams.a = 0;
 
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
+SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt,'defaultNeuronParams',false);
 
 %%
 figure
@@ -198,7 +199,7 @@ NiceSave('Spike-Based_AdaptationExample','/Users/jonathangornet/Google Drive/Com
 %%
 TimeParams.SimTime = 1e4;
 
-Ivals = linspace(0,400,51);
+Ivals = linspace(0,400,11);
 bvals = [0 logspace(-1,2,10)];
 
 Rate = zeros(length(bvals),length(Ivals));
@@ -212,7 +213,7 @@ PopParams.I_e = Ivals(ii);
 PopParams.b = bvals(bb);
 PopParams.a = 0;
 
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
+SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt,'defaultNeuronParams',false);
 
 if length(SimValues.spikes(:,1)) > 1
     
@@ -285,9 +286,9 @@ box OFF
 
 subplot(2,2,4)
 
-plot(log10(bvals),CurrentAdaptation(:,40),'.-k','LineWidth',2,'MarkerSize',10)
+plot(log10(bvals),CurrentAdaptation(:,7),'.-k','LineWidth',2,'MarkerSize',10)
 hold on
-text(-0.8,50,['Current: ' num2str(Ivals(40)) ' pA'],'FontSize',18)
+text(-0.8,50,['Current: ' num2str(Ivals(7)) ' pA'],'FontSize',18)
 
 LogScale('x',10)
 
