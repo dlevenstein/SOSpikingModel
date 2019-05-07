@@ -744,7 +744,7 @@ disp('L(1,10),Plastic I->E (Experimental Targets), Indegree 250 E->E, 250 I->I, 
 
 PopParams
 
-elseif index == 1 %U(1)
+elseif index == 13 %U(1)
 
 clear PopParams
 
