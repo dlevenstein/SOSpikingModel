@@ -37,8 +37,8 @@ PopParams.gwnorm  = 0;       %magnitude of adaptation
 PopParams.t_syn = 0;
 
 PopParams.LearningRate = 0;
-PopParams.TargetRateI = 8; %Target E rate 1Hz
-PopParams.TargetRateE = 2; %Target I rate 1Hz
+PopParams.TargetRateI = nan; %Target E rate 1Hz
+PopParams.TargetRateE = nan; %Target I rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%
@@ -59,8 +59,8 @@ TimeParams.dt      = 0.05;
 
 TimeParams.SimTime = 1e4;
 
-Ivals = linspace(100,300,21);
-bvals = 10.^(-2:0.5:2);
+Ivals = linspace(150,250,51);
+bvals = 10.^(-2:0.1:2);
 
 for II = 1:(length(Ivals)*length(bvals))
     

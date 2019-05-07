@@ -199,22 +199,28 @@ NiceSave('Spike-Based_AdaptationExample','/Users/jonathangornet/Google Drive/Com
 %%
 TimeParams.SimTime = 1e4;
 
-Ivals = linspace(0,400,11);
-bvals = [0 logspace(-1,2,10)];
+Ivals = linspace(0,400,41);
+bvals = 10.^(-2:1:2);
 
 Rate = zeros(length(bvals),length(Ivals));
 Adaptation = zeros(length(bvals),length(Ivals));
 CurrentAdaptation = zeros(length(bvals),length(Ivals));
 
 for bb = 1:length(bvals)
-for ii = 1:length(Ivals)
-
-PopParams.I_e = Ivals(ii);
 PopParams.b = bvals(bb);
-PopParams.a = 0;
+PopParams_in.a = 0;
 
-SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt,'defaultNeuronParams',false);
+parfor ii = 1:length(Ivals)
 
+PopParams_in = PopParams;
+PopParams_in.I_e = Ivals(ii);
+
+SimValuesArray(ii) = AdLIFfunction_iSTDP(PopParams_in,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt,'defaultNeuronParams',false);
+
+end
+
+for ii = 1:length(Ivals)
+    SimValues = SimValuesArray(ii);
 if length(SimValues.spikes(:,1)) > 1
     
     Rate(bb,ii) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
@@ -224,10 +230,9 @@ if length(SimValues.spikes(:,1)) > 1
     
     Adaptation(bb,ii) = mean(SimValues.g_w(t0:t1));
     CurrentAdaptation(bb,ii) = mean(SimValues.g_w(t0:t1).*(SimValues.V(t0:t1)-PopParams.E_w));
-
+end
 end
 
-end    
 end
 
 %%
@@ -286,9 +291,9 @@ box OFF
 
 subplot(2,2,4)
 
-plot(log10(bvals),CurrentAdaptation(:,7),'.-k','LineWidth',2,'MarkerSize',10)
+plot(log10(bvals),CurrentAdaptation(:,31),'.-k','LineWidth',2,'MarkerSize',10)
 hold on
-text(-0.8,50,['Current: ' num2str(Ivals(7)) ' pA'],'FontSize',18)
+text(-0.8,50,['Current: ' num2str(Ivals(31)) ' pA'],'FontSize',18)
 
 LogScale('x',10)
 
@@ -332,7 +337,7 @@ PopParams.I_e = Ivals(ii);
 PopParams.b = 0;
 PopParams.a = avals(aa);
 
-SimValues = AdLIFfunction_STDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
+SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt);
 
 if length(SimValues.spikes(:,1)) > 1
     
