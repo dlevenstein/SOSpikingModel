@@ -64,7 +64,7 @@ bvals = 10.^(-2:0.1:2);
 
 for II = 1:(length(Ivals)*length(bvals))
     
-if mod(II,4)+1 == modnum
+if mod(II,10)+1 == modnum
 ii = mod(II,length(Ivals))+1;
 bb = ceil(II/length(Ivals));
     

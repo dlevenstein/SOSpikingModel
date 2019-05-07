@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --array=1-4
-#SBATCH --cpus-per-task=25
+#SBATCH --array=1-10
+#SBATCH --cpus-per-task=10
 #SBATCH --time=100:00:00
 #SBATCH --mem=62GB
 #SBATCH --job-name=iSTDP_Adaptation_Current
