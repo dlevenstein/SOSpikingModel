@@ -1,14 +1,13 @@
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --array=1-4
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=25
 #SBATCH --time=100:00:00
 #SBATCH --mem=62GB
 #SBATCH --job-name=iSTDP_Adaptation_Current
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
 #SBATCH --output=iSTDP_Adaptation_Current_%j.out
-#SBATCH --gres=gpu:1
 
 n=${SLURM_ARRAY_TASK_ID}
 
