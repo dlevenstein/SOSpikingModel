@@ -37,40 +37,40 @@ for dd = 1:length(dinfo)
     SimValues.EcellIDX = 1:2000;
     SimValues.IcellIDX = 2001:2500;
     
-    [Espikes,Ispikes] = RasterSorter(SimValues);
+%     [Espikes,Ispikes] = RasterSorter(SimValues);
     
-    if numfig < 10
-    t = 0:0.5:3000;
-
-    figure
-
-    pos = [0.1,0.55,0.8,0.2];
-    subplot('position',pos)
-
-    plot(Espikes(:,1),Espikes(:,2),'.b','markersize',1)
-    hold on
-    plot(Ispikes(:,1),Ispikes(:,2),'.r','markersize',1)
-    xlim([250 750]);ylim([0 2500])
-
-    set(gca,'Xtick',[]);set(gca,'Ytick',[])
-
-    pos = [0.1,0.3,0.8,0.2];
-    subplot('position',pos)
-
-    plot(t,(250 - Ivals(II)).*heaviside(500 - t)+Ivals(II),'k','LineWidth',2)
-
-    set(gca,'Ytick',[])
-    xlabel('Time (ms)','FontSize',14)
-
-    xlim([250 750]);ylim([0 400])
-    
-    NiceSave(['Bistability_Raster_II_' num2str(II) '_num_' num2str(numfig)],[path '/Rasters'],[]);
-    close all
-    numfig = numfig+1;
-    
-    else
-        break
-    end
+%     if numfig < 10
+%     t = 0:0.5:3000;
+% 
+%     figure
+% 
+%     pos = [0.1,0.55,0.8,0.2];
+%     subplot('position',pos)
+% 
+%     plot(Espikes(:,1),Espikes(:,2),'.b','markersize',1)
+%     hold on
+%     plot(Ispikes(:,1),Ispikes(:,2),'.r','markersize',1)
+%     xlim([250 750]);ylim([0 2500])
+% 
+%     set(gca,'Xtick',[]);set(gca,'Ytick',[])
+% 
+%     pos = [0.1,0.3,0.8,0.2];
+%     subplot('position',pos)
+% 
+%     plot(t,(250 - Ivals(II)).*heaviside(500 - t)+Ivals(II),'k','LineWidth',2)
+% 
+%     set(gca,'Ytick',[])
+%     xlabel('Time (ms)','FontSize',14)
+% 
+%     xlim([250 750]);ylim([0 400])
+%     
+%     NiceSave(['Bistability_Raster_II_' num2str(II) '_num_' num2str(numfig)],[path '/Rasters'],[]);
+%     close all
+%     numfig = numfig+1;
+%     
+%     else
+%         break
+%     end
     
     if isempty(id) == false
     lastspikes(sim) = spikes(end,1) - (500);

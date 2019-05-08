@@ -199,8 +199,8 @@ NiceSave('Spike-Based_AdaptationExample','/Users/jonathangornet/Google Drive/Com
 %%
 TimeParams.SimTime = 1e4;
 
-Ivals = linspace(0,400,41);
-bvals = 10.^(-2:1:2);
+Ivals = linspace(150,250,51);
+bvals = 10.^(-2:0.1:2);
 
 Rate = zeros(length(bvals),length(Ivals));
 Adaptation = zeros(length(bvals),length(Ivals));
@@ -223,7 +223,7 @@ for ii = 1:length(Ivals)
     SimValues = SimValuesArray(ii);
 if length(SimValues.spikes(:,1)) > 1
     
-    Rate(bb,ii) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
+    %Rate(bb,ii) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
 
     t0 = find(single(SimValues.t) == SimValues.spikes(end-1,1));
     t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
