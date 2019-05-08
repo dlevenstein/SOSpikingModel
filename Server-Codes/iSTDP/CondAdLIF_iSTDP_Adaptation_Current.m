@@ -7,6 +7,12 @@ addpath(genpath(repopath))
 
 %%
 
+%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_iSTDP_IE_indegree_500.mat');
+load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/logWeight_m_1_s_10.mat');
+
+%%
+clear PopParams
+
 PopParams.EPopNum = 2000;
 PopParams.IPopNum = 500;
 
@@ -42,9 +48,6 @@ PopParams.TargetRateE = nan; %Target I rate 1Hz
 PopParams.tauSTDP = 20;
 
 %%
-
-%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_iSTDP_IE_indegree_500.mat');
-load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/logWeight_m_1_s_10.mat');
 
 PopParams_in = PopParams;
 PopParams_in.tau_w = 300;
