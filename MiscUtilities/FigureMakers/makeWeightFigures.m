@@ -29,6 +29,12 @@ id1 = find(weightVals(indices(1)).EEDist./sum(weightVals(indices(1)).EEDist) > 0
 id2 = find(weightVals(indices(2)).EEDist./sum(weightVals(indices(2)).EEDist) > 0.001);
 id3 = find(weightVals(indices(3)).EEDist./sum(weightVals(indices(3)).EEDist) > 0.001);
 
+P1 = max(weightVals(indices(1)).EEDist./sum(weightVals(indices(1)).EEDist));
+P2 = max(weightVals(indices(2)).EEDist./sum(weightVals(indices(2)).EEDist));
+P3 = max(weightVals(indices(3)).EEDist./sum(weightVals(indices(3)).EEDist));
+
+P = max([P1 P2 P3]);
+
 B1min = weightVals(indices(1)).Ebins(min(id1));
 B2min = weightVals(indices(2)).Ebins(min(id2));
 B3min = weightVals(indices(3)).Ebins(min(id3));
@@ -40,7 +46,7 @@ B3max = weightVals(indices(3)).Ebins(max(id3));
 Bmin = min([B1min, B2min, B3min]);
 Bmax = max([B1max, B2max, B3max]);
 
-xlim([Bmin Bmax]);
+xlim([Bmin Bmax]);ylim([0 2.*P])
 
 AX = get(gca,'XAxis');
 set(AX,'FontSize', 16)
@@ -85,6 +91,12 @@ id1 = find(weightVals(indices(1)).EIDist./sum(weightVals(indices(1)).EIDist) > 0
 id2 = find(weightVals(indices(2)).EIDist./sum(weightVals(indices(2)).EIDist) > 0.005);
 id3 = find(weightVals(indices(3)).EIDist./sum(weightVals(indices(3)).EIDist) > 0.005);
 
+P1 = max(weightVals(indices(1)).EIDist./sum(weightVals(indices(1)).EIDist));
+P2 = max(weightVals(indices(2)).EIDist./sum(weightVals(indices(2)).EIDist));
+P3 = max(weightVals(indices(3)).EIDist./sum(weightVals(indices(3)).EIDist));
+
+P = max([P1 P2 P3]);
+
 B1min = weightVals(indices(1)).Ibins(min(id1));
 B2min = weightVals(indices(2)).Ibins(min(id2));
 B3min = weightVals(indices(3)).Ibins(min(id3));
@@ -96,7 +108,7 @@ B3max = weightVals(indices(3)).Ibins(max(id3));
 Bmin = min([B1min, B2min, B3min]);
 Bmax = max([B1max, B2max, B3max]);
 
-xlim([Bmin Bmax]);
+xlim([Bmin Bmax]);ylim([0 2.*P])
 
 LogScale('x',10);
 

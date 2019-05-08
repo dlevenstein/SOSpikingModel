@@ -43,7 +43,8 @@ PopParams.tauSTDP = 20;
 
 %%
 
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_iSTDP_IE_indegree_500.mat');
+%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_iSTDP_IE_indegree_500.mat');
+load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/logWeight_m_1_s_10.mat');
 
 PopParams_in = PopParams;
 PopParams_in.tau_w = 300;
@@ -59,8 +60,8 @@ TimeParams.dt      = 0.05;
 
 TimeParams.SimTime = 1e4;
 
-Ivals = linspace(150,250,51);
-bvals = 10.^(-2:0.1:2);
+Ivals = linspace(150,250,21);
+bvals = 10.^(-2:0.5:2);
 
 for II = 1:(length(Ivals)*length(bvals))
     
@@ -84,7 +85,7 @@ SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true
 
 spikes = SimValuesArray.spikes;
 
-save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_IE_KIE_500/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
 %disp(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/Uniform_w_1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat']) 
 
 end
