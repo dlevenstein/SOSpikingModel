@@ -803,6 +803,76 @@ disp('U(1),Plastic I->E, Indegree 250 E->E, 250 I->I, 250 E->I, 250 I->E')
 
 PopParams
 
+elseif index == 14 %L(1,10) Experimental Rates
+
+clear PopParams
+
+% One neuron
+PopParams.EPopNum = 2000;
+PopParams.IPopNum = 500;
+
+PopParams.Kee   = 250;        %Expected E->E In Degree
+PopParams.Kii   = 250;        %Expected I->I In Degree
+PopParams.Kie   = 250;        %Expected E->I In Degree
+PopParams.Kei   = 250;        %Expected I->E In Degrees
+
+EPopNum = PopParams.EPopNum;
+IPopNum = PopParams.IPopNum;
+PopNum = EPopNum + IPopNum;
+
+EcellidX = 1:EPopNum;
+IcellidX = EPopNum+1:PopNum;
+
+W = zeros(PopNum,PopNum);
+
+Pee = PopParams.Kee/(EPopNum-1);
+Pii = PopParams.Kii/(IPopNum-1);
+Pie = PopParams.Kie/EPopNum;
+Pei = PopParams.Kei/IPopNum;
+
+W(IcellidX,IcellidX) = rand(IPopNum,IPopNum) <= Pii;
+W(IcellidX,IcellidX) = W(IcellidX,IcellidX);
+
+W(EcellidX,IcellidX) = rand(EPopNum,IPopNum) <= Pei;
+W(EcellidX,IcellidX) = W(EcellidX,IcellidX);
+
+W(EcellidX,EcellidX) = rand(EPopNum,EPopNum) <= Pee;
+W(EcellidX,EcellidX) = W(EcellidX,EcellidX);
+
+W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
+W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
+
+%% Weights
+m = 1
+s = 10
+
+M = log((m^2)/sqrt(s+m^2));
+S = sqrt(log((s/m^2)+1));
+
+W(EcellidX,EcellidX) = lognrnd(M,S,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
+
+numcells = 2000;
+ 
+mTR = -0.1
+sigmaTR = 0.8
+ 
+%draw the log firing rates from a normal distribution with mean mTR and std sigmaTR
+logTRs = mTR + sigmaTR.*(randn(numcells,1));  
+TRs = exp(logTRs); %convert log rate to rate
+TRs = sort(TRs); %sort the target rates so the neurons will be sorted by target rate
+meanTR = mean(TRs) %mean target rate. units: Hz!
+
+PopParams.LearningRate = 1e-2;
+PopParams.TargetRateI = nan; %Target I rate 8Hz
+PopParams.TargetRateE = TRs; %Target E rate 2Hz
+PopParams.tauSTDP = 20;
+
+filename = 'Lognormal_m_1_s_10_EE_ExperimentalRates';
+
+disp('L(1,10),Plastic I->E (Experimental Targets), Indegree 250 E->E, 250 I->I, 250 E->I, 250 I->E')
+
+PopParams
+
 end   
 
 W(diag(diag(true(size(W)))))=0;
