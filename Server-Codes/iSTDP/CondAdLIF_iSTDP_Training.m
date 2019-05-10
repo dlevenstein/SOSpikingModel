@@ -880,7 +880,7 @@ W(diag(diag(true(size(W)))))=0;
 PopParams.W = W;
 
 %%
-SimTime = 5e5;
+SimTime = 1e6;
 RecordTime = 1e4;
 
 TimeParams.dt   = 0.05;
