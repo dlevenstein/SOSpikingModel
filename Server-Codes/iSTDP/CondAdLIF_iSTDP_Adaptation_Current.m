@@ -84,7 +84,7 @@ PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
 SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false);
+    'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',true,'defaultNeuronParams',false);
 
 spikes = SimValuesArray.spikes;
 
