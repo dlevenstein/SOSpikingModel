@@ -61,14 +61,14 @@ PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_
 
 TimeParams.dt      = 0.05;
 
-TimeParams.SimTime = 1e4;
+TimeParams.SimTime = 3e4;
 
-Ivals = linspace(150,250,21);
-bvals = 10.^(-2:0.5:2);
+Ivals = linspace(150,250,51);
+bvals = 10.^(-2:0.1:2);
 
 for II = 1:(length(Ivals)*length(bvals))
     
-if mod(II,10)+1 == modnum
+if mod(II,4)+1 == modnum
 ii = mod(II,length(Ivals))+1;
 bb = ceil(II/length(Ivals));
     
