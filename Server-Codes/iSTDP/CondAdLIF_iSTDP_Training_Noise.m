@@ -78,8 +78,6 @@ PopParams.tauSTDP = 20;
 
 if index == 1 %L(1,10) Experimental Rates
 
-clear PopParams
-
 PopParams.I_e  = 250;       %External input
 PopParams.sigma = 50;        %niose magnitude: variance
 PopParams.theta = 1/100;        %noise time scale (1/ms)
@@ -92,8 +90,6 @@ PopParams
 
 elseif index == 2 %L(1,10) Experimental Rates
 
-clear PopParams
-
 PopParams.I_e  = 250;       %External input
 PopParams.sigma = 100;        %niose magnitude: variance
 PopParams.theta = 1/10;        %noise time scale (1/ms)
@@ -105,8 +101,6 @@ disp('L(1,10),Plastic I->E (Experimental Targets), Indegree 250 E->E, 250 I->I, 
 PopParams
 
 elseif index == 3 %L(1,10) Experimental Rates
-
-clear PopParams
 
 PopParams.I_e  = 250;       %External input
 PopParams.sigma = 100;        %niose magnitude: variance
