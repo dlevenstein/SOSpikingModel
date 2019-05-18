@@ -15,6 +15,6 @@ n=${SLURM_ARRAY_TASK_ID}
 module purge
 module load matlab/2018a
 
-echo "CondAdLIF_iSTDP_Training_Clusters(${n})" | matlab
+echo "CondAdLIF_iSTDP_Training_Clusters" | matlab
 
 echo "done"
