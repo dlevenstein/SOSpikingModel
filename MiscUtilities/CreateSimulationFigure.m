@@ -22,14 +22,6 @@ Kii = sum(W(PopParams.IcellidX,PopParams.IcellidX)>0,2);
 Kie = sum(W(PopParams.IcellidX,PopParams.EcellidX)>0,2);
 Kei = sum(W(PopParams.EcellidX,PopParams.IcellidX)>0,2);
 
-figure
-subplot(2,2,1)
-plot(Kee,Kei,'.b','MarkerSize',1)
-xlabel('K_{EE}','FontSize',16);ylabel('K_{EI}','FontSize',16)
-subplot(2,2,2)
-plot(Kii,Kie,'.r','MarkerSize',1)
-xlabel('K_{II}','FontSize',16);ylabel('K_{IE}','FontSize',16)
-
 %%
 
 bins = linspace(-4,2,100);
@@ -113,22 +105,6 @@ if isnan(PopParams.TargetRateI)
 targetMapI = nan;
 targetBinsI = nan;    
 end
-
-figure
-subplot(2,2,1)
-plot(targetBinsE,targetMapE,'b')
-hold on
-plot([meanTR_E meanTR_E],[0 0],'.k','MarkerSize',25)
-LogScale('x',10)
-xlabel('Rate (Hz)','FontSize',16);ylabel('Probability','FontSize',16)
-legend('Distribution','Mean Target Rate','Location','northwest')
-subplot(2,2,2)
-plot(targetBinsI,targetMapI,'r')
-hold on
-plot([meanTR_I meanTR_I],[0 0],'.k','MarkerSize',25)
-LogScale('x',10)
-xlabel('Rate (Hz)','FontSize',16);ylabel('Probability','FontSize',16)
-legend('Distribution','Mean Target Rate','Location','northwest')
 
 %%
 
