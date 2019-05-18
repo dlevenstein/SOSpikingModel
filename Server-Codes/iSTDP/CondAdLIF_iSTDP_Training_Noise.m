@@ -23,41 +23,27 @@ PopParams.Kii   = 250;        %Expected I->I In Degree
 PopParams.Kie   = 250;        %Expected E->I In Degree
 PopParams.Kei   = 250;        %Expected I->E In Degrees
 
-EPopNum = PopParams.EPopNum;
-IPopNum = PopParams.IPopNum;
-PopNum = EPopNum + IPopNum;
+PopParams.EPopNum = 2000;
+PopParams.IPopNum = 500;
 
-EcellidX = 1:EPopNum;
-IcellidX = EPopNum+1:PopNum;
+PopParams.Kee   = 250;        %Expected E->E In Degree
+PopParams.Kii   = 250;        %Expected I->I In Degree
+PopParams.Kie   = 250;        %Expected E->I In Degree
+PopParams.Kei   = 250;        %Expected I->E In Degrees
 
-W = zeros(PopNum,PopNum);
+PopParams.Wee   = 1;        %Expected E->E In Degree
+PopParams.Wii   = 1;        %Expected I->I In Degree
+PopParams.Wie   = 1;        %Expected E->I In Degree
+PopParams.Wei   = 1;        %Expected I->E In Degrees
 
-Pee = PopParams.Kee/(EPopNum-1);
-Pii = PopParams.Kii/(IPopNum-1);
-Pie = PopParams.Kie/EPopNum;
-Pei = PopParams.Kei/IPopNum;
-
-W(IcellidX,IcellidX) = rand(IPopNum,IPopNum) <= Pii;
-W(IcellidX,IcellidX) = W(IcellidX,IcellidX);
-
-W(EcellidX,IcellidX) = rand(EPopNum,IPopNum) <= Pei;
-W(EcellidX,IcellidX) = W(EcellidX,IcellidX);
-
-W(EcellidX,EcellidX) = rand(EPopNum,EPopNum) <= Pee;
-W(EcellidX,EcellidX) = W(EcellidX,EcellidX);
-
-W(IcellidX,EcellidX) = rand(IPopNum,EPopNum) <= Pie;
-W(IcellidX,EcellidX) = W(IcellidX,EcellidX);
+PopParams.m = 1;
+PopParams.s = 10;
 
 %% Weights
-m = 1
-s = 10
 
-M = log((m^2)/sqrt(s+m^2));
-S = sqrt(log((s/m^2)+1));
+[W,PopParams] = CreateNetwork(PopParams,'EE_type','lognormal');
 
-W(EcellidX,EcellidX) = lognrnd(M,S,[EPopNum,EPopNum]).*W(EcellidX,EcellidX);
-
+%% Target Rates
 numcells = 2000;
  
 mTR = -0.1
@@ -129,6 +115,8 @@ TimeParams.SimTime = SimTime+RecordTime;
 SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',SimTime,'save_dt',5e2,...
     'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime],'train',true,'useGPU',true);
+
+SimValues.PopParams = PopParams;
 
 %%
 %disp(['/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/' filename])
