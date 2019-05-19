@@ -40,8 +40,8 @@ PopParams.m = 1;
 PopParams.s = 10;
 
 PopParams.numClusters = 25;
-PopParams.ClusterK = (PopParams.EPopNum/PopParams.numClusters)*(2.5*(PopParams.Kee/PopParams.EPopNum));
-PopParams.CrossClusterK = (PopParams.EPopNum/PopParams.numClusters)*(PopParams.Kee/PopParams.EPopNum);
+PopParams.ClusterK = (2.5/(1920/79))*(250/(2.5/(1920/79)+1));
+PopParams.CrossClusterK = (250/(2.5/(1920/79)+1));
 
 %% Weights
 

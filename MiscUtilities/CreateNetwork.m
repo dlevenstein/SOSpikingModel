@@ -73,7 +73,7 @@ for cReceiver = 1:PopParams.numClusters
 
     if cSender ~= cReceiver
     KCrossCluster = PopParams.CrossClusterK;
-    Pcluster = KCrossCluster./(length(ClustersIDx{cSender})-1); %-1 to account for self-connections (which are then removed)
+    Pcluster = KCrossCluster./(EPopNum-length(ClustersIDx{cSender})); %-1 to account for self-connections (which are then removed)
 
     EE_mat(ClustersIDx{cReceiver},ClustersIDx{cSender}) = rand(length(ClustersIDx{cReceiver}),length(ClustersIDx{cSender}))<=Pcluster;
     end
