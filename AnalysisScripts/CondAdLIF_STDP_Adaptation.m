@@ -223,7 +223,7 @@ for ii = 1:length(Ivals)
     SimValues = SimValuesArray(ii);
 if length(SimValues.spikes(:,1)) > 1
     
-    %Rate(bb,ii) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
+    Rate(bb,ii) = 1000./(SimValues.spikes(end,1) - SimValues.spikes(end-1,1));
 
     t0 = find(single(SimValues.t) == SimValues.spikes(end-1,1));
     t1 = find(single(SimValues.t) == SimValues.spikes(end,1));
