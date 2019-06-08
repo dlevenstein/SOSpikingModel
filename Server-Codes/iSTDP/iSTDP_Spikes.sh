@@ -8,7 +8,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
 #SBATCH --output=iSTDPSpikes_%j.out
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 
 n=${SLURM_ARRAY_TASK_ID}
 
