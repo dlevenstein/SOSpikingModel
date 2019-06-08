@@ -56,7 +56,7 @@ elseif index == 2
 end
 
 %%
-SimTime = 1e5;
+SimTime = 5e4;
 
 TimeParams.dt   = 0.05;
 TimeParams.SimTime = SimTime;
