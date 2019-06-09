@@ -8,7 +8,7 @@ addpath(genpath(repopath))
 %%
 
 %load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_iSTDP_IE_indegree_500.mat');
-load('/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigma/logWeight_m_1_s_10.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
 
 %%
 clear PopParams
@@ -68,7 +68,7 @@ bvals = 10.^(-2:0.1:2);
 
 for II = 1:(length(Ivals)*length(bvals))
     
-if mod(II,4)+1 == modnum
+if mod(II,10)+1 == modnum
 ii = mod(II,length(Ivals))+1;
 bb = ceil(II/length(Ivals));
     
@@ -84,11 +84,11 @@ PopParamsAnalysis.I_e = I_e;
 PopParamsAnalysis.b = b;
 
 SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',true,'defaultNeuronParams',false);
+    'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false);
 
 spikes = SimValuesArray.spikes;
 
-save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LogWeightSigmaM1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_LognormalRates/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
 %disp(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/Uniform_w_1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat']) 
 
 end
