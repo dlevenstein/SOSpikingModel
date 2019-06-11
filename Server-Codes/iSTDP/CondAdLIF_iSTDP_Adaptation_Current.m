@@ -8,7 +8,7 @@ addpath(genpath(repopath))
 %%
 
 %load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_iSTDP_IE_indegree_500.mat');
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
 
 %%
 clear PopParams
@@ -61,10 +61,10 @@ PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_
 
 TimeParams.dt      = 0.05;
 
-TimeParams.SimTime = 1e4;
+TimeParams.SimTime = 3e4;
 
-Ivals = linspace(150,250,51);
-bvals = 10.^(-2:0.1:2);
+Ivals = linspace(150,250,31);
+bvals = 10.^(-2:0.2:2);
 
 for II = 1:(length(Ivals)*length(bvals))
     

@@ -643,6 +643,9 @@ for tt=1:SimTimeLength
 %         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
         
     end
+       
+    %Error catch
+    V(V < E_w) = E_w;
         
     %% Synaptic,Adaptaion Conductances for the next time step
         g_w = gwnorm.*w;

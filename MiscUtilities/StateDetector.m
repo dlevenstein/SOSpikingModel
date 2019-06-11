@@ -82,26 +82,26 @@ UP_std = std(UP_lengths);
 DOWN_CV = std(DOWN_lengths)/mean(DOWN_lengths);
 UP_CV = std(UP_lengths)/mean(UP_lengths);
 
-% figure
-% plot(bins,DOWNmap,'r')
-% hold on
-% plot(bins,UPmap,'k')
+figure
+plot(bins,DOWNmap,'r')
+hold on
+plot(bins,UPmap,'k')
 % hold on
 % plot([DOWN_mean DOWN_mean],[0 max(DOWNmap)],'r','LineWidth',2)
 % hold on
 % plot([UP_mean UP_mean],[0 max(UPmap)],'k','LineWidth',2)
-%        
-% figure
+       
+figure
 % subplot(2,2,1)
 % plot(DOWNrate(2,:),DOWNrate(1,:),'.k','MarkerSize',10)
 % hold on
 % plot(mean(DOWNrate(2,:)),mean(DOWNrate(1,:)),'.r','MarkerSize',25)
 % xlabel('Rate (Hz)','FontSize',16);ylabel('Duration (ms)','FontSize',16)
-% subplot(2,2,3)
-% plot(UPrate(2,:),UPrate(1,:),'.k','MarkerSize',10)
-% hold on
-% plot(mean(UPrate(2,:)),mean(UPrate(1,:)),'.r','MarkerSize',25)
-% xlabel('Rate (Hz)','FontSize',16);ylabel('Duration (ms)','FontSize',16)
+subplot(2,2,1)
+plot(UPrate(2,:),UPrate(1,:),'.k','MarkerSize',10)
+hold on
+plot(mean(UPrate(2,:)),mean(UPrate(1,:)),'.r','MarkerSize',25)
+xlabel('Rate (Hz)','FontSize',16);ylabel('Duration (ms)','FontSize',16)
    
 %%
 states.mean_rate = mean_rate;
@@ -118,4 +118,6 @@ states.DOWN_std = DOWN_std;
 states.DOWN_CV = DOWN_CV;
 states.DOWN_lengths = DOWN_lengths;
    
+%states.DOWN_prob = DOWN_lengths./
+
 end
