@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=iSTDP_FI_Curve
 #SBATCH --nodes=1
-#SBATCH --array=1-4
-#SBATCH --cpus-per-task=21
+#SBATCH --array=1-5
+#SBATCH --cpus-per-task=20
 #SBATCH --time=100:00:00
 #SBATCH --mem=20GB
 #SBATCH --job-name=iSTDP_FI_Curve
