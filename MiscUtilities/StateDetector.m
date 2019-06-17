@@ -1,10 +1,17 @@
-function states = StateDetector(spikes)
+function states = StateDetector(spikes,endtime,varargin)
 
-mean_rate = length(spikes(:,1)).*(1e3/1e4).*(1/2500);
+p = inputParser;
+addParameter(p,'showfig',false,@islogical)
+parse(p,varargin{:})
+SHOWFIG = p.Results.showfig;
+
+%%
+
+mean_rate = length(spikes(:,1)).*(1e3/endtime).*(1/2500);
 
 dt_rate = 5;
 overlap = 5;
-t_rate = dt_rate:dt_rate:1e4;
+t_rate = dt_rate:dt_rate:endtime;
 rate = hist(spikes(:,1),t_rate);
 rate = rate.*(1e3/dt_rate).*(1/2500);
 rate = movmean(rate,overlap);
@@ -82,27 +89,33 @@ UP_std = std(UP_lengths);
 DOWN_CV = std(DOWN_lengths)/mean(DOWN_lengths);
 UP_CV = std(UP_lengths)/mean(UP_lengths);
 
-% figure
-% plot(bins,DOWNmap,'r')
-% hold on
-% plot(bins,UPmap,'k')
-% hold on
-% plot([DOWN_mean DOWN_mean],[0 max(DOWNmap)],'r','LineWidth',2)
-% hold on
-% plot([UP_mean UP_mean],[0 max(UPmap)],'k','LineWidth',2)
+[thresh,cross,bihist,diptest] = bz_BimodalThresh(rate);
+
+if SHOWFIG
+    
+figure
+plot(bins,DOWNmap,'r')
+hold on
+plot(bins,UPmap,'k')
+hold on
+plot([DOWN_mean DOWN_mean],[0 max(DOWNmap)],'r','LineWidth',2)
+hold on
+plot([UP_mean UP_mean],[0 max(UPmap)],'k','LineWidth',2)
        
-% figure
-% subplot(2,2,1)
-% plot(DOWNrate(2,:),DOWNrate(1,:),'.k','MarkerSize',10)
-% hold on
-% plot(mean(DOWNrate(2,:)),mean(DOWNrate(1,:)),'.r','MarkerSize',25)
-% xlabel('Rate (Hz)','FontSize',16);ylabel('Duration (ms)','FontSize',16)
-% subplot(2,2,1)
-% plot(UPrate(2,:),UPrate(1,:),'.k','MarkerSize',10)
-% hold on
-% plot(mean(UPrate(2,:)),mean(UPrate(1,:)),'.r','MarkerSize',25)
-% xlabel('Rate (Hz)','FontSize',16);ylabel('Duration (ms)','FontSize',16)
-   
+figure
+subplot(2,2,1)
+plot(DOWNrate(2,:),DOWNrate(1,:),'.k','MarkerSize',10)
+hold on
+plot(mean(DOWNrate(2,:)),mean(DOWNrate(1,:)),'.r','MarkerSize',25)
+xlabel('Rate (Hz)','FontSize',16);ylabel('Duration (ms)','FontSize',16)
+subplot(2,2,1)
+plot(UPrate(2,:),UPrate(1,:),'.k','MarkerSize',10)
+hold on
+plot(mean(UPrate(2,:)),mean(UPrate(1,:)),'.r','MarkerSize',25)
+xlabel('Rate (Hz)','FontSize',16);ylabel('Duration (ms)','FontSize',16)
+
+end
+
 %%
 states.mean_rate = mean_rate;
 states.rate = rate;
@@ -112,12 +125,16 @@ states.UP_mean = UP_mean;
 states.UP_std = UP_std;
 states.UP_CV = UP_CV;
 states.UP_lengths = UP_lengths;
+states.UP_prob = mean(UP_lengths)./endtime;
+states.UP_rate = mean(meanUPrate);
 
 states.DOWN_mean = DOWN_mean;
 states.DOWN_std = DOWN_std;
 states.DOWN_CV = DOWN_CV;
 states.DOWN_lengths = DOWN_lengths;
-   
-%states.DOWN_prob = DOWN_lengths./
+states.DOWN_prob = mean(DOWN_lengths)./endtime;
+
+states.dip = diptest.dip;
+states.p = diptest.p_value;
 
 end
