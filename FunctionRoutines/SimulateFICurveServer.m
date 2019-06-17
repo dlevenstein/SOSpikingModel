@@ -36,7 +36,7 @@ parfor ii = 1:numI
     PopParamsAnalysis = PopParams_in;
      
     if ~bistable
-    PopParamsAnalysis.I_e = Ivals(ii).*heaviside(t - 500);
+    PopParamsAnalysis.I_e = @(t) Ivals(ii).*heaviside(t - 500);
     end
     
     if bistable
