@@ -1,5 +1,13 @@
-function FImakerSingleFigure(startpath,figurepath,indices,folder)
+function FImakerSingleFigure(startpath,figurepath,indices,folder,varargin)
 
+p = inputParser;
+addParameter(p,'showfig',false,@islogical)
+addParameter(p,'bistable',true,@islogical)
+parse(p,varargin{:})
+SHOWFIG = p.Results.showfig;
+bistable = p.Results.bistable;
+
+%%
 Erate = zeros(1,21);
 Irate = zeros(1,21);
 
@@ -21,7 +29,7 @@ for II = 1:21
 
     path = [figurepath char(folder)];
 
-    [rate,peakwidth,peakheight,lastspikes,S] = FIfigures(II,path);
+    [rate,peakwidth,peakheight,lastspikes,S] = FIfigures(II,path,'showfig',SHOWFIG,'bistable',bistable);
 
     FIspikes{II} = S;
 

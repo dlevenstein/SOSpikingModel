@@ -60,11 +60,10 @@ PopParams_in.t_syn = 0;
 PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_in.E_L)).*rand(PopParams_in.EPopNum + PopParams_in.IPopNum,1);
 
 TimeParams.dt      = 0.05;
-
 TimeParams.SimTime = 3e4;
 
-Ivals = linspace(150,250,31);
-bvals = 10.^(-2:0.2:2);
+Ivals = linspace(150,300,46);
+bvals = 10.^(-2:0.2:4);
 
 for II = 1:(length(Ivals)*length(bvals))
     
@@ -74,7 +73,14 @@ bb = ceil(II/length(Ivals));
     
 ii
 bb 
-    
+
+if ii < 31 && bb < 21 
+    skip = true;
+else
+    skip = false;
+end
+
+if ~skip
 PopParamsAnalysis = PopParams_in;
 
 I_e = Ivals(ii);
@@ -90,6 +96,7 @@ spikes = SimValuesArray.spikes;
 
 save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_LognormalRates/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
 %disp(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/Uniform_w_1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat']) 
+end
 
 end
 

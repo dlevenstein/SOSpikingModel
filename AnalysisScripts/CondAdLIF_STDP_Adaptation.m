@@ -194,7 +194,7 @@ xlabel('Time (sec)','FontSize',16);
 
 box OFF
 
-NiceSave('Spike-Based_AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+%NiceSave('Spike-Based_AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
 %%
 TimeParams.SimTime = 1e4;

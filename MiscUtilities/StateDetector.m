@@ -1,4 +1,4 @@
-function states = StateDetector(spikes,endtime,varargin)
+function states = StateDetector(spikes,endtime,bval,figindex,path,varargin)
 
 p = inputParser;
 addParameter(p,'showfig',false,@islogical)
@@ -43,14 +43,18 @@ UPrate = [];
 meanDOWNrate = [];
 meanUPrate = [];
 
+DOWNrateMean = [];
+UPrateMean = [];
+
 for dd = 1:length(DOWNstates)
     
     if DOWNstates(dd)
-        DOWN_num = DOWN_num + dt_rate.*overlap;
+        DOWN_num = DOWN_num + dt_rate;
         meanDOWNrate = [meanDOWNrate rate(dd)];
     else
         DOWN_lengths = [DOWN_lengths DOWN_num];
         DOWNrate = [DOWNrate,[DOWN_num;mean(meanDOWNrate)]];
+        DOWNrateMean = [DOWNrateMean,mean(DOWNrateMean)];
         DOWN_num = 0;
         meanDOWNrate = [];
     end
@@ -61,11 +65,12 @@ DOWNrate(:,DOWN_id) = [];
 
 for uu = 1:length(UPstates)
     if UPstates(uu)
-        UP_num = UP_num + dt_rate.*overlap;
+        UP_num = UP_num + dt_rate;
         meanUPrate = [meanUPrate rate(uu)];
     else
         UP_lengths = [UP_lengths UP_num];
         UPrate = [UPrate,[UP_num;mean(meanUPrate)]];
+        UPrateMean = [UPrateMean,mean(meanUPrate)];
         UP_num = 0;
         meanUPrate = [];
     end
@@ -74,9 +79,9 @@ UP_id = UP_lengths==0;
 UP_lengths(UP_id) = [];
 UPrate(:,UP_id) = [];
 
-bins = linspace(0,1e3,25);
-DOWNmap = hist(DOWN_lengths,bins);
-UPmap = hist(UP_lengths,bins);
+bins = linspace(-1,4,50);
+DOWNmap = hist(log10(DOWN_lengths),bins);
+UPmap = hist(log10(UP_lengths),bins);
 DOWNmap = DOWNmap./sum(DOWNmap);
 UPmap = UPmap./sum(UPmap);
 
@@ -91,28 +96,36 @@ UP_CV = std(UP_lengths)/mean(UP_lengths);
 
 [thresh,cross,bihist,diptest] = bz_BimodalThresh(rate);
 
+adaptation = conv(rate,bval.*exp(-t_rate./300));
+adaptation = adaptation(1:length(t_rate));
+meanAdaptation = mean(adaptation);
+
 if SHOWFIG
-    
+
 figure
 plot(bins,DOWNmap,'r')
 hold on
 plot(bins,UPmap,'k')
-hold on
-plot([DOWN_mean DOWN_mean],[0 max(DOWNmap)],'r','LineWidth',2)
-hold on
-plot([UP_mean UP_mean],[0 max(UPmap)],'k','LineWidth',2)
-       
+% hold on
+% plot([DOWN_mean DOWN_mean],[0 max(DOWNmap)],'r','LineWidth',2)
+% hold on
+% plot([UP_mean UP_mean],[0 max(UPmap)],'k','LineWidth',2)
+xlabel('Duration (ms)','FontSize',16);ylabel('Probability','FontSize',16);legend('DOWN Duration','UP Duration')
+LogScale('x',10)
+
+%NiceSave(['DurationDist' figindex],path,[])
+%close all
+
+if ~isempty(UPrate)
 figure
 subplot(2,2,1)
-plot(DOWNrate(2,:),DOWNrate(1,:),'.k','MarkerSize',10)
-hold on
-plot(mean(DOWNrate(2,:)),mean(DOWNrate(1,:)),'.r','MarkerSize',25)
+plot(UPrate(2,:),log10(UPrate(1,:)),'.k','MarkerSize',10)
 xlabel('Rate (Hz)','FontSize',16);ylabel('Duration (ms)','FontSize',16)
-subplot(2,2,1)
-plot(UPrate(2,:),UPrate(1,:),'.k','MarkerSize',10)
-hold on
-plot(mean(UPrate(2,:)),mean(UPrate(1,:)),'.r','MarkerSize',25)
-xlabel('Rate (Hz)','FontSize',16);ylabel('Duration (ms)','FontSize',16)
+LogScale('y',10)
+
+%NiceSave(['DurationVRate' figindex],path,[])
+%close all
+end
 
 end
 
@@ -120,21 +133,31 @@ end
 states.mean_rate = mean_rate;
 states.rate = rate;
 states.cut_rate = 10^cut_rate;
+states.bins = bins;
 
 states.UP_mean = UP_mean;
 states.UP_std = UP_std;
 states.UP_CV = UP_CV;
 states.UP_lengths = UP_lengths;
 states.UP_prob = mean(UP_lengths)./endtime;
-states.UP_rate = mean(meanUPrate);
+states.UP_rate = nanmean(UPrateMean);
+states.UPmap = UPmap;
+states.UPrate = UPrate;
 
 states.DOWN_mean = DOWN_mean;
 states.DOWN_std = DOWN_std;
 states.DOWN_CV = DOWN_CV;
 states.DOWN_lengths = DOWN_lengths;
 states.DOWN_prob = mean(DOWN_lengths)./endtime;
+states.DOWNmap = DOWNmap;
+states.DOWNrate = DOWNrate;
 
 states.dip = diptest.dip;
 states.p = diptest.p_value;
+
+states.adaptation = adaptation;
+states.meanAdaptation = meanAdaptation;
+
+states.t_rate = t_rate;
 
 end
