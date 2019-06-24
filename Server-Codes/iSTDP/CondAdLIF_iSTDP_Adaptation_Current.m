@@ -8,7 +8,8 @@ addpath(genpath(repopath))
 %%
 
 %load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_iSTDP_IE_indegree_500.mat');
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
+%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
 
 %%
 clear PopParams
@@ -74,13 +75,6 @@ bb = ceil(II/length(Ivals));
 ii
 bb 
 
-if ii < 31 && bb < 21 
-    skip = true;
-else
-    skip = false;
-end
-
-if ~skip
 PopParamsAnalysis = PopParams_in;
 
 I_e = Ivals(ii);
@@ -94,9 +88,9 @@ SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true
 
 spikes = SimValuesArray.spikes;
 
-save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_LognormalRates/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_UniformRates/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+%save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_LognormalRates/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
 %disp(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/Uniform_w_1/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat']) 
-end
 
 end
 

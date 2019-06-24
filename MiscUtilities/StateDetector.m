@@ -16,6 +16,8 @@ rate = hist(spikes(:,1),t_rate);
 rate = rate.*(1e3/dt_rate).*(1/2500);
 rate = movmean(rate,overlap);
 
+ISI = diff(spikes(:,1));
+
 bins = -2:0.5:3;
 map = hist(log10(rate),bins);
 map = map./sum(map);
@@ -95,6 +97,7 @@ DOWN_CV = std(DOWN_lengths)/mean(DOWN_lengths);
 UP_CV = std(UP_lengths)/mean(UP_lengths);
 
 [thresh,cross,bihist,diptest] = bz_BimodalThresh(rate);
+[thresh,cross,bihist,ISIdiptest] = bz_BimodalThresh(ISI);
 
 adaptation = conv(rate,bval.*exp(-t_rate./300));
 adaptation = adaptation(1:length(t_rate));
@@ -154,6 +157,9 @@ states.DOWNrate = DOWNrate;
 
 states.dip = diptest.dip;
 states.p = diptest.p_value;
+
+states.ISIdip = ISIdiptest.dip;
+states.ISIp = ISIdiptest.p_value;
 
 states.adaptation = adaptation;
 states.meanAdaptation = meanAdaptation;
