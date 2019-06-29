@@ -65,8 +65,8 @@ PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
 PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L);
 
-%datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_UniformRates/';
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_LognormalRates/';
+%datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_LognormalRates/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_UniformRates/';
 dataname = ['Lognormal_m_1_s_10_EE_IE_KIE_250_UP_Transition_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
