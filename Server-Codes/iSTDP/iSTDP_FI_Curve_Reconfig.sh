@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=iSTDP_FI_Curve
+#SBATCH --job-name=iSTDP_FI_Curve_Reconfig
 #SBATCH --nodes=1
 #SBATCH --array=1-5
 #SBATCH --cpus-per-task=20
 #SBATCH --time=100:00:00
 #SBATCH --mem=20GB
-#SBATCH --job-name=iSTDP_FI_Curve
-#SBATCH --output=iSTDP_FI_Curve_%j.out
+#SBATCH --job-name=iSTDP_FI_Curve_Reconfig
+#SBATCH --output=iSTDP_FI_Curve_Reconfig_%j.out
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
 
