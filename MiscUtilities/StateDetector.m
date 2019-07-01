@@ -9,7 +9,7 @@ SHOWFIG = p.Results.showfig;
 
 mean_rate = length(spikes(:,1)).*(1e3/endtime).*(1/2500);
 
-dt_rate = 5;
+dt_rate = 10;
 overlap = 5;
 t_rate = dt_rate:dt_rate:endtime;
 rate = hist(spikes(:,1),t_rate);
@@ -47,6 +47,9 @@ meanUPrate = [];
 
 DOWNrateMean = [];
 UPrateMean = [];
+
+[thresh,cross,bihist,diptest] = bz_BimodalThresh(rate);
+[thresh,cross,bihist,ISIdiptest] = bz_BimodalThresh(ISI);
 
 for dd = 1:length(DOWNstates)
     
@@ -95,9 +98,6 @@ UP_std = std(UP_lengths);
 
 DOWN_CV = std(DOWN_lengths)/mean(DOWN_lengths);
 UP_CV = std(UP_lengths)/mean(UP_lengths);
-
-[thresh,cross,bihist,diptest] = bz_BimodalThresh(rate);
-[thresh,cross,bihist,ISIdiptest] = bz_BimodalThresh(ISI);
 
 adaptation = conv(rate,bval.*exp(-t_rate./300));
 adaptation = adaptation(1:length(t_rate));

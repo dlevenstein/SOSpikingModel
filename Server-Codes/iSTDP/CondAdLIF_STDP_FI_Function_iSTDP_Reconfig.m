@@ -46,8 +46,8 @@ PopParams.tauSTDP = 20;
 
 %% Scrambled High -> Low
 
-%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
+%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
 
 % Scramble network weights
 W = SimValues.WeightMat(:,:,end);
@@ -73,8 +73,8 @@ PopParamsAnalysis.W = W;
 
 PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
-%datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LognormalEE_LognormalRates_Scrambled/';
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LognormalEE_UniformRates_Scrambled/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LognormalEE_LognormalRates_Scrambled/';
+%datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LognormalEE_UniformRates_Scrambled/';
 dataname = ['Scrambled_Lognormal_m_1_s_10_EE_IE_KIE_250_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
@@ -86,8 +86,8 @@ end
 
 %% Scrambled Low -> High
 
-%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
+%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
 
 % Scramble network weights
 W = SimValues.WeightMat(:,:,end);
@@ -113,8 +113,8 @@ PopParamsAnalysis.W = W;
 
 PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
-%datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_LognormalRates_Scrambled/';
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_UniformRates_Scrambled/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_LognormalRates_Scrambled/';
+%datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_UniformRates_Scrambled/';
 dataname = ['Scrambled_Lognormal_m_1_s_10_EE_IE_KIE_250_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
@@ -126,8 +126,8 @@ end
 
 %% Mean Matched High -> Low
 
-%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
+%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
 
 W_EI = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,end);
 connections = find(W_EI > 0);
@@ -150,8 +150,8 @@ PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
 PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
-%datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LognormalEE_LognormalRates_Mean/';
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LognormalEE_UniformRates_Mean/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LognormalEE_LognormalRates_Mean/';
+%datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LognormalEE_UniformRates_Mean/';
 dataname = ['Mean_Lognormal_m_1_s_10_EE_IE_KIE_250_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
@@ -163,15 +163,15 @@ end
 
 %% Mean Matched Low -> High
 
-%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
+%load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
 
 W_EI = SimValues.WeightMat(SimValues.EcellIDX,SimValues.IcellIDX,end);
 connections = find(W_EI > 0);
 W_EI(connections) = mean(W_EI(connections));
 W(SimValues.EcellIDX,SimValues.IcellIDX) = W_EI;
 
-for simnum = 1:100
+for simnum = 1:25
    
 if mod(simnum,5)+1 == modnum
     
@@ -187,8 +187,8 @@ PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
 PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
-%datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_LognormalRates_Mean/';
-datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_UniformRates_Mean/';
+datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_LognormalRates_Mean/';
+%datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/UP/LognormalEE_UniformRates_Mean/';
 dataname = ['Mean_Lognormal_m_1_s_10_EE_IE_KIE_250_sim_' char(num2str(simnum))];
 
 disp([datafolder dataname]);
