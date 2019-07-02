@@ -401,6 +401,9 @@ else
     V0range = [min(E_L) min(V_th)]; %make this neuron vector
     V(:,1) = V0range(1) + (1+p0spike).*diff(V0range).*rand(PopNum,1);
 end
+if isfield(PopParams,'w0')
+    w(:,1) = PopParams.w0;
+end
 
 %%
 if gpuAvail

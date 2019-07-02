@@ -42,28 +42,34 @@ UPstates = rate > 10.^cut_rate;
 DOWNrate = [];
 UPrate = [];
 
-meanDOWNrate = [];
 meanUPrate = [];
 
-DOWNrateMean = [];
 UPrateMean = [];
 
 [thresh,cross,bihist,diptest] = bz_BimodalThresh(rate);
 [thresh,cross,bihist,ISIdiptest] = bz_BimodalThresh(ISI);
 
+correctedDOWNstates = zeros(1,length(DOWNstates));
+DOWN_index = 1;
+
 for dd = 1:length(DOWNstates)
     
     if DOWNstates(dd)
         DOWN_num = DOWN_num + dt_rate;
-        meanDOWNrate = [meanDOWNrate rate(dd)];
     else
-        DOWN_lengths = [DOWN_lengths DOWN_num];
-        DOWNrate = [DOWNrate,[DOWN_num;mean(meanDOWNrate)]];
-        DOWNrateMean = [DOWNrateMean,mean(DOWNrateMean)];
-        DOWN_num = 0;
-        meanDOWNrate = [];
+        if DOWN_num > thresh
+            correctedDOWNstates(DOWN_index:dd) = 1;
+            DOWN_lengths = [DOWN_lengths DOWN_num];
+            DOWN_num = 0;
+            meanDOWNrate = [];
+        else
+            DOWN_num = 0;
+            meanDOWNrate = [];
+        end
+        DOWN_index = dd;
     end
 end
+
 DOWN_id = DOWN_lengths==0;
 DOWN_lengths(DOWN_id) = [];
 DOWNrate(:,DOWN_id) = [];
@@ -147,6 +153,7 @@ states.UP_rate = nanmean(UPrateMean);
 states.UPmap = UPmap;
 states.UPrate = UPrate;
 
+states.DOWNstates = correctedDOWNstates;
 states.DOWN_mean = DOWN_mean;
 states.DOWN_std = DOWN_std;
 states.DOWN_CV = DOWN_CV;
