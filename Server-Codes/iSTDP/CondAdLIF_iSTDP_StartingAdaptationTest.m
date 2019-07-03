@@ -62,7 +62,7 @@ PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_
 
 adaptationMagnitudes = [1,3,10,30,100];
 
-PopParams_in.w0 = adaptationMagnitudes(wnum).*rand(2000,1);
+PopParams_in.w0 = adaptationMagnitudes(wnum).*rand(2500,1);
 
 TimeParams.dt      = 0.05;
 TimeParams.SimTime = 3e4;
