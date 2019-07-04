@@ -1,4 +1,4 @@
-function states = StateDetector(spikes,endtime,bval,figindex,path,varargin)
+function states = StateDetector(spikes,endtime,bval,varargin)
 
 p = inputParser;
 addParameter(p,'showfig',false,@islogical)
@@ -16,94 +16,138 @@ rate = hist(spikes(:,1),t_rate);
 rate = rate.*(1e3/dt_rate).*(1/2500);
 rate = movmean(rate,overlap);
 
-ISI = diff(spikes(:,1));
+ISI = [diff(spikes(:,1));0];
 
-bins = -2:0.5:3;
-map = hist(log10(rate),bins);
-map = map./sum(map);
+% bins = -2:0.5:3;
+% map = hist(log10(rate),bins);
+% map = map./sum(map);
+% 
+% search_map = map(bins <= log10(mean_rate));
+% search_space = bins(bins<=log10(mean_rate));
+% 
+% [c,id] = min(search_map);
+% if ~isempty(id)
+% cut_rate = search_space(id);
+% end
 
-search_map = map(bins <= log10(mean_rate));
-search_space = bins(bins<=log10(mean_rate));
+% DOWN_lengths = [];
+% UP_lengths = [];
+% 
+% DOWN_num = 0;
+% UP_num = 0;
 
-[c,id] = min(search_map);
-if ~isempty(id)
-cut_rate = search_space(id);
-end
+% DOWNstates = rate <= 10.^cut_rate;
+% UPstates = rate > 10.^cut_rate;
 
-DOWN_lengths = [];
-UP_lengths = [];
+% DOWNrate = [];
+% UPrate = [];
+% 
+% meanUPrate = [];
+% 
+% UPrateMean = [];
 
-DOWN_num = 0;
-UP_num = 0;
-
-DOWNstates = rate <= 10.^cut_rate;
-UPstates = rate > 10.^cut_rate;
-
-DOWNrate = [];
-UPrate = [];
-
-meanUPrate = [];
-
-UPrateMean = [];
-
-[thresh,cross,bihist,diptest] = bz_BimodalThresh(rate);
+%[thresh,cross,bihist,diptest] = bz_BimodalThresh(rate);
 [thresh,cross,bihist,ISIdiptest] = bz_BimodalThresh(ISI);
 
-correctedDOWNstates = zeros(1,length(DOWNstates));
-DOWN_index = 1;
+DOWNstates = ISI > thresh;
 
 for dd = 1:length(DOWNstates)
     
     if DOWNstates(dd)
-        DOWN_num = DOWN_num + dt_rate;
-    else
-        if DOWN_num > thresh
-            correctedDOWNstates(DOWN_index:dd) = 1;
-            DOWN_lengths = [DOWN_lengths DOWN_num];
-            DOWN_num = 0;
-            meanDOWNrate = [];
-        else
-            DOWN_num = 0;
-            meanDOWNrate = [];
+        if dd+1 < length(DOWNstates) && dd-1 > 0
+            if DOWNstates(dd-1) == 0
+                DOWNstates(dd+1) = 1;
+            end
         end
-        DOWN_index = dd;
+    elseif dd+1 < length(DOWNstates) && dd-1 > 0
+        if DOWNstates(dd+1) && DOWNstates(dd-1)
+            DOWNstates(dd)=1;
+        end
     end
+    
 end
 
-DOWN_id = DOWN_lengths==0;
-DOWN_lengths(DOWN_id) = [];
-DOWNrate(:,DOWN_id) = [];
+DOWN_mean_duration = mean(ISI(DOWNstates));
+DOWN_std_duration = std(ISI(DOWNstates));
+DOWN_CV_duration = DOWN_std_duration./DOWN_mean_duration;
 
-for uu = 1:length(UPstates)
-    if UPstates(uu)
-        UP_num = UP_num + dt_rate;
-        meanUPrate = [meanUPrate rate(uu)];
-    else
-        UP_lengths = [UP_lengths UP_num];
-        UPrate = [UPrate,[UP_num;mean(meanUPrate)]];
-        UPrateMean = [UPrateMean,mean(meanUPrate)];
-        UP_num = 0;
-        meanUPrate = [];
+UPnum = 0;
+UPlengths = [];
+num_spikes = 0;
+UPrate = [];
+
+for uu = 1:length(DOWNstates)
+    
+    if ~DOWNstates(uu)
+        UPnum = UPnum + ISI(uu);
+        num_spikes = num_spikes + 1;
+    elseif UPnum ~= 0
+        UPlengths = [UPlengths UPnum];
+        UPrate = [UPrate num_spikes/UPnum];
+        num_spikes = 0;
+        UPnum = 0;
     end
+    
 end
-UP_id = UP_lengths==0;
-UP_lengths(UP_id) = [];
-UPrate(:,UP_id) = [];
 
-bins = linspace(-1,4,50);
-DOWNmap = hist(log10(DOWN_lengths),bins);
-UPmap = hist(log10(UP_lengths),bins);
-DOWNmap = DOWNmap./sum(DOWNmap);
-UPmap = UPmap./sum(UPmap);
+UP_mean_duration = mean(UPlengths);
+UP_std_duration = std(UPlengths);
+UP_CV_duration = UP_std_duration./UP_mean_duration;
 
-DOWN_mean = mean(DOWN_lengths);
-UP_mean = mean(UP_lengths);
+UP_mean_rate = mean(UPrate);
 
-DOWN_std = std(DOWN_lengths);
-UP_std = std(UP_lengths);
+% for dd = 1:length(DOWNstates)
+%     
+%     if DOWNstates(dd)
+%         DOWN_num = DOWN_num + dt_rate;
+%     else
+%         if DOWN_num > thresh
+%             correctedDOWNstates(DOWN_index:dd) = 1;
+%             DOWN_lengths = [DOWN_lengths DOWN_num];
+%             DOWN_num = 0;
+%             meanDOWNrate = [];
+%         else
+%             DOWN_num = 0;
+%             meanDOWNrate = [];
+%         end
+%         DOWN_index = dd;
+%     end
+% end
 
-DOWN_CV = std(DOWN_lengths)/mean(DOWN_lengths);
-UP_CV = std(UP_lengths)/mean(UP_lengths);
+% DOWN_id = DOWN_lengths==0;
+% DOWN_lengths(DOWN_id) = [];
+% DOWNrate(:,DOWN_id) = [];
+
+% for uu = 1:length(DOWNstates)
+%     if ~DOWNstates(uu)
+%         UP_num = UP_num + dt_rate;
+%         meanUPrate = [meanUPrate rate(uu)];
+%     else
+%         UP_lengths = [UP_lengths UP_num];
+%         UPrate = [UPrate,[UP_num;mean(meanUPrate)]];
+%         UPrateMean = [UPrateMean,mean(meanUPrate)];
+%         UP_num = 0;
+%         meanUPrate = [];
+%     end
+% end
+% UP_id = UP_lengths==0;
+% UP_lengths(UP_id) = [];
+% UPrate(:,UP_id) = [];
+
+% bins = linspace(-1,4,50);
+% DOWNmap = hist(log10(DOWN_lengths),bins);
+% UPmap = hist(log10(UP_lengths),bins);
+% DOWNmap = DOWNmap./sum(DOWNmap);
+% UPmap = UPmap./sum(UPmap);
+% 
+% DOWN_mean = mean(DOWN_lengths);
+% UP_mean = mean(UP_lengths);
+% 
+% DOWN_std = std(DOWN_lengths);
+% UP_std = std(UP_lengths);
+% 
+% DOWN_CV = std(DOWN_lengths)/mean(DOWN_lengths);
+% UP_CV = std(UP_lengths)/mean(UP_lengths);
 
 adaptation = conv(rate,bval.*exp(-t_rate./300));
 adaptation = adaptation(1:length(t_rate));
@@ -141,32 +185,31 @@ end
 %%
 states.mean_rate = mean_rate;
 states.rate = rate;
-states.cut_rate = 10^cut_rate;
-states.bins = bins;
+% states.cut_rate = 10^cut_rate;
+% states.bins = bins;
 
-states.UP_mean = UP_mean;
-states.UP_std = UP_std;
-states.UP_CV = UP_CV;
-states.UP_lengths = UP_lengths;
-states.UP_prob = mean(UP_lengths)./endtime;
-states.UP_rate = nanmean(UPrateMean);
-states.UPmap = UPmap;
-states.UPrate = UPrate;
+states.UP_mean_duration = UP_mean_duration;
+states.UP_std_duration = UP_std_duration;
+states.UP_CV_duration = UP_CV_duration;
+states.UP_prob = sum(UPlengths)./endtime;
+% states.UP_rate = nanmean(UPrateMean);
+% states.UPmap = UPmap;
+states.UP_mean_rate = UP_mean_rate;
 
-states.DOWNstates = correctedDOWNstates;
-states.DOWN_mean = DOWN_mean;
-states.DOWN_std = DOWN_std;
-states.DOWN_CV = DOWN_CV;
-states.DOWN_lengths = DOWN_lengths;
-states.DOWN_prob = mean(DOWN_lengths)./endtime;
-states.DOWNmap = DOWNmap;
-states.DOWNrate = DOWNrate;
+states.DOWNstates = DOWNstates;
+states.DOWN_mean_duration = DOWN_mean_duration;
+states.DOWN_std_duration = DOWN_std_duration;
+states.DOWN_CV_duration = DOWN_CV_duration;
+% states.DOWN_lengths = DOWN_lengths;
+states.DOWN_prob = sum(ISI(DOWNstates))./endtime;
+% states.DOWNmap = DOWNmap;
+% states.DOWNrate = DOWNrate;
 
-states.dip = diptest.dip;
-states.p = diptest.p_value;
+% states.dip = diptest.dip;
+% states.p = diptest.p_value;
 
-states.ISIdip = ISIdiptest.dip;
-states.ISIp = ISIdiptest.p_value;
+% states.ISIdip = ISIdiptest.dip;
+% states.ISIp = ISIdiptest.p_value;
 
 states.adaptation = adaptation;
 states.meanAdaptation = meanAdaptation;

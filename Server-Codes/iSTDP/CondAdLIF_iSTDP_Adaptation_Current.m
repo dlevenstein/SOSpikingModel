@@ -59,6 +59,7 @@ PopParams_in.gwnorm = PopParams_in.g_L(1);
 PopParams_in.t_syn = 0;
 
 PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_in.E_L)).*rand(PopParams_in.EPopNum + PopParams_in.IPopNum,1);
+PopParams_in.w0 = 100.*rand(2500,1);
 
 TimeParams.dt      = 0.05;
 TimeParams.SimTime = 3e4;
