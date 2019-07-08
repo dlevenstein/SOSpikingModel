@@ -45,9 +45,9 @@ rate = hist(spikes(:,1),t_rate);
 rate = rate.*(1e3/dt_rate).*(1/num_neurons);
 rate = movmean(rate,overlap);
 
-ISI = sort([diff(spikes(:,1));0]);
+ISI = [diff(spikes(:,1));0];
 
-thresh = bz_BimodalThresh(ISI);
+thresh = bz_BimodalThresh(sort(ISI));
 
 DOWNstates = ISI > thresh;
 
