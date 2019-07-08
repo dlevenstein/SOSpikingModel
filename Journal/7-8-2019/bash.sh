@@ -2,7 +2,7 @@
 #SBATCH --job-name=iSTDP_AdaptationAnalysis
 #SBATCH --nodes=1
 #SBATCH --array=1
-#SBATCH --cpus-per-task=100
+#SBATCH --cpus-per-task=20
 #SBATCH --time=100:00:00
 #SBATCH --mem=20GB
 #SBATCH --job-name=iSTDP_AdaptationAnalysis
