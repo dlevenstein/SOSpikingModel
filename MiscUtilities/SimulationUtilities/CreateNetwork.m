@@ -1,5 +1,29 @@
 function [W,PopParams] = CreateNetwork(PopParams,varargin)
 
+%[W,PopParams] = CreateNetwork(PopParams,varargin)
+%creates networks for simulations
+%
+%INPUTS
+%   PopParams       parameters for simulation with weight values index
+%
+%   (optional)      for optional inputs, use: ('inputoption', inputvalue)
+%       'EE_type'       type of network configuration of E->E synapses
+%                       (default:uniform)
+%       'IE_type'       type of network configuration of E->I synapses
+%                       (default:uniform)
+%       'CreateClusters'(true/false) create network clusters (default:
+%       true)
+%
+%OUTPUTS
+%   rate            mean rate of simulation
+%   peakwidth       width of ACG
+%   peakheight      height of ACG
+%   lastspikes      time of last spike (duration of spiking activity)
+%   S               Spikes across all simulations
+%JGornet Summer 2019
+
+%%
+
 p = inputParser;
 
 addParameter(p,'EE_type','uniform',@ischar)

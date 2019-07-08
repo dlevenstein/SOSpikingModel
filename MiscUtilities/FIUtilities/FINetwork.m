@@ -1,13 +1,5 @@
 function FINetwork(folderWeights,networkpath,name)
 
-repopath = '/Users/jonathangornet/Documents/GitHub/SOSpikingModel/';
-addpath(genpath(repopath));
-
-repopath = '/Users/jonathangornet/Documents/GitHub/buzcode';
-addpath(genpath(repopath));
-%%
-%folderWeights = ["001","01","1","10"];
-
 Ivals = linspace(0,400,21);
 
 %%

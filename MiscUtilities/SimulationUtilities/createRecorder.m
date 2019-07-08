@@ -1,5 +1,17 @@
 function [recordVALs] = createRecorder(recordIntervals,TimeParams)
 
+%[recordVALs] = createRecorder(recordIntervals,TimeParams)
+%creates intervals for recording simulation
+%
+%INPUTS
+%   recordIntervals intervals for recording
+%   TimeParams      Parameters for time
+%
+%OUTPUTS
+%   recordVALs      values for recording
+%JGornet Summer 2019
+
+%%
 dt = TimeParams.dt;
 tEND = TimeParams.SimTime;
 tSAVE = 0:dt:tEND;
