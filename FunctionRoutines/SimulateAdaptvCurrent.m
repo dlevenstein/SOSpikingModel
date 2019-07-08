@@ -1,101 +1,103 @@
-function [] = SimulateAdaptvCurrent(simfunction,PopParams_in,Irange,numI,brange,numb,ii,bb,varargin)
-%UNTITLED2 Summary of this function goes here
+function SimValuesArray = SimulateAdaptvCurrent(SimValues,PopParams_in,modnum,Irange,numI,Aarray,varargin)
+%SimulateFICurve Summary of this function goes here
 %   Detailed explanation goes here
 %
-%INPUTS
-%   simfunction     simulation function. function should be passed through 
-%                   as @SimFunctionName. And should have input/output:
-%                   SimValues = simfunction(PopParams,TimeParams)                   
-%   PopParams       population parameters structure to pass through to the
+%INPUTS                
+%   SimValues       Simulation values after a trained simulation
+%   PopParams_in    population parameters structure to pass through to the
 %                   simulation function
+%   modnum          When processing this function across different nodes,
+%                   using this variable to refer to which node this 
+%                   function is being used
 %   Irange          [min max] input current values
+%   numI            (number) number of I current values between Irange
+%   Aarray          [list] log10(values) for adaptation list
 %   (options)
-
-%   'datafolder'     name of folder to save the data
-%   'bistableramp'  (true/false) an option to calculate FI curve with
-%                   increasing and decreasing input ramps, to test for
-%                   bistability/histeresis (NOT YET FUNCTIONAL)
-%   'timeparms'     a structure giving timing params for the simulations
-%                 .simtime          Duration to simulate 
-%                 .onsettransient   Onset transient to ignore
-%
-%
-
-%% DEV
-% simfunction = @EMAdLIFfunction;
-% Irange = [150 500];
-% numI = 26;
-
-% POP PARMS 4 DEV
-% PopParams.EPopNum = 1;
-% PopParams.IPopNum = 1;
-% PopParams.E_L     = -65;
-% PopParams.g_L     = 30;
-% PopParams.C       = 281;
-% PopParams.V_th    = -55;
-% PopParams.V_reset = -85;
-% PopParams.E_e     = 0;
-% PopParams.E_i     = -80;
-% PopParams.E_w     = -70;
-% PopParams.b_w     = 0.1;
-% PopParams.b_s     = 1;
-% PopParams.dw      = 0.2;
-% PopParams.ds      = 0.5;
-% PopParams.a       = 0.5;
-% PopParams.b       = 0.1;
-% PopParams.t_ref   = 0.2;
-% PopParams.delta_T = 10;
-% PopParams.Wee   = 0;
-% PopParams.Wii   = 0;
-% PopParams.Wie   = 0;
-% PopParams.Wei   = 0; 
-% PopParams.Kee   = 0;
-% PopParams.Kii   = 0;
-% PopParams.Kie   = 0;
-% PopParams.Kei   = 0;
-% PopParams.theta = 1/10;
-% PopParams.gwnorm = 0;
-% PopParams.w_r = 0.1;
-%PopParams.sigma = 0;
-
-%varargin = {};
+%   'defaultparams' (true/false) default:true. Sets PopParams_in with 
+%                   default parameter values.
+%   'noise'         (number) default:10. Sets noise in simulation 
 
 %% Input options
-defaulttimeparms.simtime = 5e4; %ms, time to simulate each "trial"
-defaulttimeparms.onsettransient = 100; %ms, onsiet transient time to ignore
 
 p = inputParser;
-addParameter(p,'datafolder',[],@ischar)
-addParameter(p,'dataname',[],@ischar)
-addParameter(p,'timeparms',defaulttimeparms,@isstruct)
+addParameter(p,'defaultparams',true,@islogical)
 parse(p,varargin{:})
-datafolder = p.Results.datafolder;
-dataname = p.Results.dataname;
-timeparms = p.Results.timeparms;
 
-%% Set the parameters
-onsettransient = timeparms.onsettransient; %Onset transient to ignore
+defaultparams = p.Results.defaultparams;
+
+if defaultparams
+    PopParams_in.EPopNum = 2000;
+    PopParams_in.IPopNum = 500;
+
+    PopParams_in.I_e  = 0;       %External input
+    PopParams_in.sigma = 0;        %niose magnitude: variance
+    PopParams_in.theta = 0.1;        %noise time scale (1/ms)
+
+    %Neuron properties
+    PopParams_in.E_L     = [-65 -67];    %rev potential: leak (mV)
+    PopParams_in.g_L     = [182/18 119/8];     %leak conductance (nS)
+    PopParams_in.C       = [182 119];    %capacitance (pF)
+    PopParams_in.V_th    = [-45 -47];    %spike threshold (mV)
+    PopParams_in.V_reset = [-55 -55];    %reset potential (mV)
+    PopParams_in.t_ref   = 0.5;    %refractory period (ms)
+
+    %Synaptic Properties
+    PopParams_in.E_e     = 0;      %rev potential: E (mV)
+    PopParams_in.E_i     = -80;    %rev potential: I (mV)
+    PopParams_in.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
+
+    %Adaptation Properties (No adaptation)
+    PopParams_in.E_w     = -70;    %rev potential: adaptation (mV)
+    PopParams_in.a       = 0;   %adaptation decay timescale (1/ms)
+    PopParams_in.b       = 0;    %adaptation activation rate (1/ms)
+    PopParams_in.tau_w   = 300;     %subthreshold adaptation steepness
+    PopParams_in.gwnorm  = 0;       %magnitude of adaptation
+
+    PopParams_in.t_syn = 0;
+
+    PopParams_in.LearningRate = 0;
+    PopParams_in.TargetRateI = nan; %Target E rate 1Hz
+    PopParams_in.TargetRateE = nan; %Target I rate 1Hz
+    PopParams_in.tauSTDP = 20;
+end
+%%
+
+PopParams_in = PopParams_in;
+PopParams_in.LearningRate = 0;
+PopParams_in.sigma = 10;
+PopParams_in.W = SimValues.WeightMat(:,:,end);
+PopParams_in.gwnorm = PopParams_in.g_L(1);
+PopParams_in.t_syn = 0;
+
+PopParams_in.V0 = min(PopParams_in.E_L) + (min(PopParams_in.V_th)-min(PopParams_in.E_L)).*rand(PopParams_in.EPopNum + PopParams_in.IPopNum,1);
+PopParams_in.w0 = 100.*rand(2500,1);
+
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = timeparms.simtime;
-%% Run the simulations
+TimeParams.SimTime = 3e4;
 
-Ivals = linspace(Irange(1),Irange(2),numI);
-bvals = linspace(brange(1),brange(2),numb);
+Ivals = linspace(Irange(1),Irange(end),numI);
+bvals = 10.^(Aarray);
 
-clear SimValues
+for II = 1:(length(Ivals)*length(bvals))
+    
+if mod(II,10)+1 == modnum
+ii = mod(II,length(Ivals))+1;
+bb = ceil(II/length(Ivals));
+    
+ii
+bb 
 
-disp(['Ival Index: ' char(num2str(ii))])
-disp(['bval Index: ' char(num2str(bb))])
+PopParamsAnalysis = PopParams_in;
 
-PopParms = PopParams_in;
+I_e = Ivals(ii);
+b = bvals(bb);
 
-PopParms.I_e = Ivals(ii);
-PopParms.b   = bvals(bb);
+PopParamsAnalysis.I_e = I_e;
+PopParamsAnalysis.b = b;
 
-SimValues = simfunction(PopParms,TimeParams,...
-    'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime,'onsettime',onsettransient,...
-    'cellout',true,'showprogress',false);
+SimValuesArray(II) = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
+    'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false);
 
-save([datafolder dataname '_b_' char(num2str(bb)) '_I_' char(num2str(ii)) '.mat'],'SimValues','-v7.3');
+end
 
 end
