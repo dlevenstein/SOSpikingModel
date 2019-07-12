@@ -1,7 +1,7 @@
 %Conductance-Based Adapting LIF Model, Euler Mayurama   implementation 
 %with Conductance-based Jump-decay STDP synapses
 %by Jonathan Gornet and DLevenstein
-%Last update: 4/17/2019
+%Last update: 7/12/2019
 
 %INPUTS
 %   PopParams       a structure that gives all the parameters of the population
@@ -54,7 +54,7 @@
 %
 
 %--------------------------------------------------------------------------
-function [SimValues] = AdLIFfunction_STDP_GPU(PopParams,TimeParams,varargin)
+function [SimValues] = AdLIFfunction_iSTDP(PopParams,TimeParams,varargin)
 %--------------------------------------------------------------------------
 %Parse optional inputs
 p = inputParser;
@@ -275,7 +275,6 @@ V            = zeros(PopNum,1); %Membrane Potential
 g_e          = zeros(PopNum,1); %conductance of synapse 
 g_i          = zeros(PopNum,1); %conductance of synapse 
 g_w          = zeros(PopNum,1); %conductance of adaptation 
-a_w          = zeros(PopNum,1); %adaptation rise (1/ms)
 s            = zeros(PopNum,1); %synapse 
 w            = zeros(PopNum,1); %adaptation
 X_t          = zeros(PopNum,1); %OU noise
@@ -294,7 +293,6 @@ SimValues.g_i             = nan(PopNum,SaveTimeLength);
 SimValues.s               = nan(PopNum,SaveTimeLength);
 SimValues.w               = nan(PopNum,SaveTimeLength);
 SimValues.x               = nan(PopNum,SaveTimeLength);
-SimValues.a_w             = nan(PopNum,SaveTimeLength);
 SimValues.Input           = nan(PopNum,SaveTimeLength);
 SimValues.t_weight        = nan(1,WeightSaveLength);
 SimValues.WeightMat       = nan(PopNum,PopNum,WeightSaveLength);
@@ -370,11 +368,11 @@ a         = transpose([a(1).*ones(1,EPopNum),     a(2).*ones(1,IPopNum)]);
 elseif length(a)==1
 a         = transpose([a.*ones(1,EPopNum),     a.*ones(1,IPopNum)]);  
 end
-if length(b) == 2 
-b           = transpose([b(1).*ones(1,EPopNum),       b(2).*ones(1,IPopNum)]);
-elseif length(b) == 1
-b           = transpose([b.*ones(1,EPopNum),       0.*ones(1,IPopNum)]);
-end
+% if length(b) == 2 
+% b           = transpose([b(1).*ones(1,EPopNum),       b(2).*ones(1,IPopNum)]);
+% elseif length(b) == 1
+% b           = transpose([b.*ones(1,EPopNum),       0.*ones(1,IPopNum)]);
+% end
 if length(tau_s) == 2 
 tau_s         = transpose([tau_s(1).*ones(1,EPopNum),     tau_s(2).*ones(1,IPopNum)]);
 end
@@ -403,6 +401,9 @@ else
 end
 if isfield(PopParams,'w0')
     w(:,1) = PopParams.w0;
+end
+if isfield(PopParams,'s0')
+    s(:,1) = PopParams.s0;
 end
 
 %%
@@ -475,7 +476,6 @@ if gpuAvail
     SimValues.s               = gpuArray(SimValues.s);
     SimValues.w               = gpuArray(SimValues.w);
     SimValues.x               = gpuArray(SimValues.x);
-    SimValues.a_w             = gpuArray(SimValues.a_w);
     SimValues.Input           = gpuArray(SimValues.Input);
     
     SimValues.t_weight        = gpuArray(SimValues.t_weight);
@@ -514,7 +514,7 @@ for tt=1:SimTimeLength
 
         %V - Voltage Equation
         dVdt =  (- g_L.*(V-E_L) ...                      %Leak
-                 - g_w.*(V-E_w) ...                      %Adaptation
+                 - g_w.*g_L.*(V-E_w) ...                      %Adaptation
                  - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
                  + I_e(tt) + X_t)./C;           %External input
     else
@@ -524,7 +524,7 @@ for tt=1:SimTimeLength
 
         %V - Voltage Equation
         dVdt =  (- g_L.*(V-E_L) ...                      %Leak
-                 - g_w.*(V-E_w) ...                      %Adaptation
+                 - g_w.*g_L.*(V-E_w) ...                 %Adaptation
                  - g_e.*(V-E_e) - g_i.*(V-E_i) ...       %Synapses
                  + I_e(timecounter) + X_t)./C;           %External input
     end
@@ -562,7 +562,7 @@ for tt=1:SimTimeLength
         t_r(spikeneurons) = t_ref(spikeneurons);
 %         t_s(spikeneurons) = t_syn(spikeneurons);
         %Jump the adaptation
-        w(spikeneurons) = w(spikeneurons) + b(spikeneurons); 
+        w(spikeneurons) = w(spikeneurons) + 1; 
         
         %------------------------------------------------------------------
         
@@ -676,7 +676,6 @@ for tt=1:SimTimeLength
          SimValues.s(:,savecounter)               = s;
          SimValues.w(:,savecounter)               = w;
          SimValues.x(:,savecounter)               = x;
-         SimValues.a_w(:,savecounter)             = a_w;
          if gpuAvail
          SimValues.Input(:,savecounter)           = I_e(tt) + X_t;
          else
@@ -736,7 +735,6 @@ if gpuAvail
     SimValues.s               = gather(SimValues.s);
     SimValues.w               = gather(SimValues.w);
     SimValues.x               = gather(SimValues.x);
-    SimValues.a_w             = gather(SimValues.a_w);
     SimValues.Input           = gather(SimValues.Input);
 
     SimValues.t_weight        = gather(SimValues.t_weight);

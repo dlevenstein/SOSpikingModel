@@ -100,23 +100,34 @@ adaptation = conv(rate,bval.*exp(-t_rate./300));
 adaptation = adaptation(1:length(t_rate));
 meanAdaptation = mean(adaptation);
 
+bins = linspace(1,4,25);
+DOWNmap = hist(log10(ISI(DOWNstates)),bins);
+DOWNmap = DOWNmap./sum(DOWNmap);
+UPmap = hist(log10(UPlengths),bins);
+UPmap = UPmap./sum(UPmap);
+
 %%
 
 states.t_rate = t_rate;
 states.mean_rate = mean_rate;
 states.rate = rate;
+states.bins = bins;
 
 states.UP_mean_duration = UP_mean_duration;
 states.UP_std_duration = UP_std_duration;
 states.UP_CV_duration = UP_CV_duration;
 states.UP_prob = sum(UPlengths)./endtime;
 states.UP_mean_rate = UP_mean_rate;
+states.UPmap = UPmap;
+states.UPlengths = UPlengths;
+states.UPrate = UPrate;
 
 states.DOWNstates = DOWNstates;
 states.DOWN_mean_duration = DOWN_mean_duration;
 states.DOWN_std_duration = DOWN_std_duration;
 states.DOWN_CV_duration = DOWN_CV_duration;
 states.DOWN_prob = sum(ISI(DOWNstates))./endtime;
+states.DOWNmap = DOWNmap;
 
 states.adaptation = adaptation;
 states.meanAdaptation = meanAdaptation;
