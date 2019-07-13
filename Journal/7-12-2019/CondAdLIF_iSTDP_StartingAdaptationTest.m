@@ -58,7 +58,7 @@ PopParams_in.t_syn = 0;
 
 PopParams_in.V0 = SimValuesTest.V(:,end);
 PopParams_in.w0 = SimValuesTest.w(:,end);
-PopParams_in.s0 = SimValuesTest.s(:,end);
+%PopParams_in.s0 = SimValuesTest.s(:,end);
 
 TimeParams.dt      = 0.05;
 TimeParams.SimTime = 3e4;
@@ -82,6 +82,6 @@ SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true
 
 spikes = SimValuesArray.spikes;
 
-save('/scratch/jmg1030/FIcurve/data/testingFolder/Adaptation_w0_sim_Example.mat','spikes','-v7.3') 
+save('/scratch/jmg1030/FIcurve/data/testingFolder/Adaptation_w0_sim_Example_2.mat','spikes','-v7.3') 
 
 end
