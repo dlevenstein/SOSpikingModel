@@ -70,7 +70,7 @@ if simtype == 'cpu'
     
     for II = 1:(length(Ivals)*length(bvals))
 
-    if mod(II,9)+1 == modnum
+    if mod(II,13)+1 == modnum
     ii = mod(II,length(Ivals))+1;
     bb = ceil(II/length(Ivals));
 
@@ -99,7 +99,7 @@ elseif simtype == 'gpu'
 
     for II = 1:(length(Ivals)*length(bvals))
 
-    if mod(II,9)+1 == modnum
+    if mod(II,13)+1 == modnum
     ii = mod(II,length(Ivals))+1;
     bb = ceil(II/length(Ivals));
 
