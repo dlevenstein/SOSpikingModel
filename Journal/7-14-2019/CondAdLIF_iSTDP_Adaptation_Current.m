@@ -1,4 +1,4 @@
-function CondAdLIF_iSTDP_Adaptation_Current(modnum)
+function CondAdLIF_iSTDP_Adaptation_Current(modnum,simtype)
 
 repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 
@@ -66,30 +66,63 @@ TimeParams.SimTime = 3e4;
 Ivals = linspace(150,300,46);
 bvals = 10.^(-2:0.2:4);
 
-for II = 1:(length(Ivals)*length(bvals))
+if simtype == 'cpu'
     
-if mod(II,10)+1 == modnum
-ii = mod(II,length(Ivals))+1;
-bb = ceil(II/length(Ivals));
-    
-ii
-bb 
+    for II = 1:(length(Ivals)*length(bvals))
 
-PopParamsAnalysis = PopParams_in;
+    if mod(II,9)+1 == modnum
+    ii = mod(II,length(Ivals))+1;
+    bb = ceil(II/length(Ivals));
 
-I_e = Ivals(ii);
-b = bvals(bb);
+    ii
+    bb 
 
-PopParamsAnalysis.I_e       = I_e;
-PopParamsAnalysis.gwnorm    = b;
+    PopParamsAnalysis = PopParams_in;
 
-SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false);
+    I_e = Ivals(ii);
+    b = bvals(bb);
 
-spikes = SimValuesArray.spikes;
+    PopParamsAnalysis.I_e       = I_e;
+    PopParamsAnalysis.gwnorm    = b;
 
-save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_UniformRates/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+    SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
+        'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false);
 
-end
+    spikes = SimValuesArray.spikes;
+
+    save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_UniformRates/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+
+    end
+    end
+
+elseif simtype == 'gpu'
+
+    for II = 1:(length(Ivals)*length(bvals))
+
+    if mod(II,9)+1 == modnum
+    ii = mod(II,length(Ivals))+1;
+    bb = ceil(II/length(Ivals));
+
+    ii
+    bb 
+
+    PopParamsAnalysis = PopParams_in;
+
+    I_e = Ivals(ii);
+    b = bvals(bb);
+
+    PopParamsAnalysis.I_e       = I_e;
+    PopParamsAnalysis.gwnorm    = b;
+
+    SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
+        'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',true,'defaultNeuronParams',false);
+
+    spikes = SimValuesArray.spikes;
+
+    save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_UniformRates/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
+
+    end
+    end
+
 end
 end
