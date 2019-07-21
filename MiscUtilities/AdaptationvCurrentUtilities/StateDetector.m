@@ -47,7 +47,7 @@ rate = movmean(rate,overlap);
 
 ISI = [diff(spikes(:,1));0];
 
-thresh = bz_BimodalThresh(sort(ISI));
+thresh = 10.^1.3617;
 
 DOWNstates = ISI > thresh;
 
