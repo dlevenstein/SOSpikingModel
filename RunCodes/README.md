@@ -80,13 +80,13 @@ Each of these function are different models of a leaky integrate and fire neuron
 
 `train`: Sets simulation to training state (default: false)
 
-    * This only saves specific values for the simulation: 
+* This only saves specific values for the simulation: 
 
-        * `WeightMat`: weights of the network
-        
-        * `WeightChange`: mean and standard deviation of weights over simulation
+    * `WeightMat`: weights of the network
+    
+    * `WeightChange`: mean and standard deviation of weights over simulation
 
-        * `spikeRate`: spike rate of the network
+    * `spikeRate`: spike rate of the network
 
 `defaultNeuronParams`: Use the defaults parameters of the model (default: true)
 
