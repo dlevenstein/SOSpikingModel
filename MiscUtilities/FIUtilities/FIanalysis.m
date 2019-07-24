@@ -19,6 +19,9 @@ function [rate,peakwidth,peakheight,lastspikes,S] = FIanalysis(II,path,varargin)
 %   peakheight      height of ACG
 %   lastspikes      time of last spike (duration of spiking activity)
 %   S               Spikes across all simulations
+%Options
+%   'showfig'       show and save figure of a simulation
+%   'bistable'      set to true if moving from high to low current in simulation
 %JGornet Summer 2019
 
 %%

@@ -1,3 +1,6 @@
+%EPSP_IPSP.m
+%A script for illustrating the properties of the synapses
+
 %% Time Parameters
 dt      = 0.05;
 tEND    = 1e3;

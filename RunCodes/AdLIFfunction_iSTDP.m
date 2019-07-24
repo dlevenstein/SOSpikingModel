@@ -24,13 +24,9 @@
 %       .E_i        Reversal potential of inhibitory synapses
 %       .tau_s      Time of synaptic decay
 % 
-%       .tau_a      Adaptation time constant
 %       .t_ref      Refractory period
 %       .tau_w    Adaptation threshold softness
 %       .gwnorm     Adaptation normalizer
-%       .b          Adaptation activation strength
-%       .bw         Time of adaptative decay
-%       .w_r        Adaptation Rest
 %
 %                   SYNAPTIC WEIGHT (conductance jump: nS?)
 %       .Wee        E->E synapse weight
@@ -115,7 +111,6 @@ if defaultNeuronParams
     %Adaptation Properties (No adaptation)
     PopParams.E_w     = -70;    %rev potential: adaptation (mV)
     PopParams.a       = 0;   %adaptation decay timescale (1/ms)
-    PopParams.b       = 0;    %adaptation activation rate (1/ms)
     PopParams.tau_w   = 300;     %subthreshold adaptation steepness
     PopParams.gwnorm  = 0;       %magnitude of adaptation
 
@@ -235,13 +230,9 @@ theta       = PopParams.theta;   %Strength to mean (time scale of noise, ms^-1)
 %--------------------------------------------------------------------------
 %Adaptation
 E_w         = PopParams.E_w;     %Adaptation reversal potential, (mV)
-
 tau_w       = PopParams.tau_w;   %Adaptation Decay
-
 gwnorm      = PopParams.gwnorm;  %Adaptation norm (nS)
-
 a           = PopParams.a;       %Subthreshhold Adaptation (nS)
-b           = PopParams.b;       %Spike Adaptation (nS)
 
 %--------------------------------------------------------------------------
 % Synapse Parameters
@@ -440,7 +431,6 @@ if gpuAvail
     
     %Adaptation Parameters
     a = gpuArray(a);
-    b = gpuArray(b);
     tau_w = gpuArray(tau_w);
     
     %Plasticity Parameters

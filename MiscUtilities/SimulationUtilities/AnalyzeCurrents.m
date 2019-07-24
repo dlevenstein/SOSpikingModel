@@ -1,4 +1,16 @@
-function [EEcurrent,EIcurrent,Ecurrent] = AnalyzeCurrents(PopParams,SimValues,timewin);
+function [EEcurrent,EIcurrent,Ecurrent] = AnalyzeCurrents(PopParams,SimValues);
+%[EEcurrent,EIcurrent,Ecurrent] = AnalyzeCurrents(PopParams,SimValues)
+%Calculate the currents from the simulations
+%
+%INPUTS
+%   PopParams     parameters of used neuron model
+%   SimValues     Simulation values of a past simulation
+%
+%OUTPUTS
+%   EEcurrent     E->E  current
+%   EIcurrent     I->E  current
+%   Ecurrent      total excitatory current
+%JGornet Summer 2019
 
 %%
 EEcurrent = zeros(length(SimValues.EcellIDX),length(SimValues.t));

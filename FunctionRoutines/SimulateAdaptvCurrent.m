@@ -16,8 +16,8 @@ function SimValuesArray = SimulateAdaptvCurrent(SimValues,PopParams_in,modnum,Ir
 %   'defaultparams' (true/false) default:true. Sets PopParams_in with 
 %                   default parameter values.
 %   'noise'         (number) default:10. Sets noise in simulation 
-
-%% Input options
+%OUTPUTS
+%   SimValuesArray  Array of Simulation values from simulation
 
 p = inputParser;
 addParameter(p,'defaultparams',true,@islogical)

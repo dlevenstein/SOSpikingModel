@@ -1,4 +1,19 @@
 function FImaker(startpath,figurepath,indices,folders,legendnames)
+%FImaker(startpath,figurepath,indices,folders,legendnames)
+%Calculate the FI curves for a network
+%
+%INPUTS
+%   startpath     Location of where the folder of the Simulation Values
+%   figurepath    where to save the figures
+%   indices       what networks to show in the figure
+%   folders       all folder names within the startpath folder (network folder names)
+%   legendnames   names of networks
+%
+%OUTPUTS
+%
+% NOTE: This function is too specific to use for general audience, this is more specific for JGornet
+% 
+%JGornet Summer 2019
 
 Erate = zeros(length(folders),21);
 Irate = zeros(length(folders),21);

@@ -1,2 +1,2 @@
-# SOSpikingModel
-A repository for matlab implementation of the Slow Oscillation Spiking model
+# Journal
+This folder contains the experiments done on each date. 
