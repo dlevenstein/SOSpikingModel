@@ -2,7 +2,9 @@
 This folder contains the function routines for different experiments.
 
 ## Running CheckBalance
-```CheckBalance( SimValues,PopParams,timewin )```
+```
+CheckBalance( SimValues,PopParams,timewin )
+```
 ### Inputs
 * `SimValues`: Simulation values that are outputted in any of the RunCodes Functions
     
@@ -22,13 +24,16 @@ This folder contains the function routines for different experiments.
 
 ## Example: 
     
-    ``` [SimValues] = AdLIFfunction_iSTDP(PopParams,TimeParams,varargin)```
-
-    ``` CheckBalance( SimValues,PopParams,timewin ) ```
+``` 
+[SimValues] = AdLIFfunction_iSTDP(PopParams,TimeParams,varargin)
+CheckBalance( SimValues,PopParams,timewin ) 
+```
 
 ## Running GetSpikeStats
 
-```GetSpikeStats( SimValues,PopParams,timewin )```
+```
+GetSpikeStats( SimValues,PopParams,timewin )
+```
 
 ### Inputs
 
@@ -40,13 +45,16 @@ This folder contains the function routines for different experiments.
 
 ## Example: 
     
-    ``` [SimValues] = AdLIFfunction_iSTDP(PopParams,TimeParams,varargin)```
-
-    ``` GetSpikeStats( SimValues,PopParams,timewin ) ```
+``` 
+[SimValues] = AdLIFfunction_iSTDP(PopParams,TimeParams,varargin)
+GetSpikeStats( SimValues,PopParams,timewin ) 
+```
 
 ## Running SimulateFICurve
 
-```SimValuesArray = SimulateFICurve(PopParams_in,Irange,numI,varargin)```
+```
+SimValuesArray = SimulateFICurve(PopParams_in,Irange,numI,varargin)
+```
 
 ### Inputs
 
@@ -62,7 +70,9 @@ This folder contains the function routines for different experiments.
 
 ## Running SimulateFrozenNetwork
 
-```[SimValuesTest,PopParams_in] = SimulateFrozenNetwork(SimValues,PopParams_in)```
+```
+[SimValuesTest,PopParams_in] = SimulateFrozenNetwork(SimValues,PopParams_in)
+```
 
 ### Inputs
 
