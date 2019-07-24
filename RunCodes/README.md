@@ -15,44 +15,44 @@ Each of these function are different models of a leaky integrate and fire neuron
     
 | Dynamic State Variables |  |  | 
 | --- | --- | --- | 
-| V | mV | Membrane Potential | 
-| g_e | nS | Excitatory Conductance | 
-| g_i | nS | Inhibitory Conductance | 
-| g_w | nS | Adaptation Conductance | 
-| s | | Synaptic dynamic variable |
-| x | | Synaptic Trace | 
+| `V` | mV | Membrane Potential | 
+| `g_e` | nS | Excitatory Conductance | 
+| `g_i` | nS | Inhibitory Conductance | 
+| `g_w` | nS | Adaptation Conductance | 
+| `s` | | Synaptic dynamic variable |
+| `x` | | Synaptic Trace | 
 
 | Membrane Parameters |  |  | 
 | --- | --- | --- | 
-| C | pF | Membrane Capacitance | 
-| t_ref | ms | Refractory Period | 
-| V_reset | mV | Reset value after spike | 
-| E_L | mV | Leak reversal potential | 
-| g_L | nS | Leak conductance | 
-| V_th | mV | Spiking threshold | 
-| I_e | pA | External input current | 
-| sigma | pA | Standard deviation of noise | 
-| theta | 1/ms | Time filtration of noise |
+| `C` | pF | Membrane Capacitance | 
+| `t_ref` | ms | Refractory Period | 
+| `V_reset` | mV | Reset value after spike | 
+| `E_L` | mV | Leak reversal potential | 
+| `g_L` | nS | Leak conductance | 
+| `V_th` | mV | Spiking threshold | 
+| `I_e` | pA | External input current | 
+| `sigma` | pA | Standard deviation of noise | 
+| `theta` | 1/ms | Time filtration of noise |
 
 | Spike Adaptation Parameters |  |  | 
 | --- | --- | --- | 
-| gwnorm | nS | Adaptation weight | 
-| tau_w | ms | Adaptation decay | 
-| a |  | Subthreshold adaptation | 
+| `gwnorm` | nS | Adaptation weight | 
+| `tau_w` | ms | Adaptation decay | 
+| `a` |  | Subthreshold adaptation | 
 
 | Plasticity Parameters |  |  | 
 | --- | --- | --- | 
-| TargetRateE | Hz | Excitatory target rate | 
-| TargetRateI | Hz | Inhibitory target rate | 
-| tauSTDP | ms | Time constant for STDP curve | 
+| `TargetRateE` | Hz | Excitatory target rate | 
+| `TargetRateI` | Hz | Inhibitory target rate | 
+| `tauSTDP` | ms | Time constant for STDP curve | 
 
 > Note: change `TargetRateE` or `TargetRateI` to `NaN` to turn off the plasticity in that synaptic connection
 
 | Synaptic Parameters |  |  | 
 | --- | --- | --- | 
-| E_e | mV | Excitatory reversal potential | 
-| E_i | mV | Inhibitory reversal potential | 
-| tau_s | ms | Time constant for synapses | 
+| `E_e` | mV | Excitatory reversal potential | 
+| `E_i` | mV | Inhibitory reversal potential | 
+| `tau_s` | ms | Time constant for synapses | 
 
 ### Options
 
@@ -93,26 +93,26 @@ Each of these function are different models of a leaky integrate and fire neuron
 | Membrane Parameters |  |  | 
 | --- | --- | --- | 
 | --- | Exc | Inh | 
-| C | 182 | 119 | 
-| t_ref | 0.5 | 0.5 | 
-| V_reset | -55 | -55 | 
-| E_L | -65 | -67 | 
-| g_L | 182/18 | 119/8 | 
-| V_th | -45 | -47 | 
+| `C` | 182 | 119 | 
+| `t_ref` | 0.5 | 0.5 | 
+| `V_reset` | -55 | -55 | 
+| `E_L` | -65 | -67 | 
+| `g_L` | 182/18 | 119/8 | 
+| `V_th` | -45 | -47 | 
 
 | Spike Adaptation Parameters |  |  | 
 | --- | --- | --- | 
 | --- | Exc | Inh | 
-| gwnorm | 0 |  | 
-| tau_w | 300 |  | 
-| a | 0 |  | 
+| `gwnorm` | 0 |  | 
+| `tau_w` | 300 |  | 
+| `a` | 0 |  | 
 
 | Synaptic Parameters |  |  | 
 | --- | --- | --- | 
 | --- | Exc | Inh | 
-| E_e | 0 |  | 
-| E_i |  | -80 | 
-| tau_s | 5 | 5 | 
+| `E_e` | 0 |  | 
+| `E_i` |  | -80 | 
+| `tau_s` | 5 | 5 | 
 
 ### Initial Value Options
 
@@ -127,31 +127,31 @@ Each of these function are different models of a leaky integrate and fire neuron
     
 | Dynamic State Variables |  |  | 
 | --- | --- | --- | 
-| V | mV | Membrane Potential | 
-| g_e | nS | Excitatory Conductance | 
-| g_i | nS | Inhibitory Conductance | 
-| g_w | nS | Adaptation Conductance | 
+| `V` | mV | Membrane Potential | 
+| `g_e` | nS | Excitatory Conductance | 
+| `g_i` | nS | Inhibitory Conductance | 
+| `g_w` | nS | Adaptation Conductance | 
 
 | Membrane Parameters |  |  | 
 | --- | --- | --- | 
-| C | pF | Membrane Capacitance | 
-| t_ref | ms | Refractory Period | 
-| V_reset | mV | Reset value after spike | 
-| E_L | mV | Leak reversal potential | 
-| g_L | nS | Leak conductance | 
-| V_th | mV | Spiking threshold | 
-| I_e | pA | External input current | 
-| sigma | pA | Standard deviation of noise | 
-| theta | 1/ms | Time filtration of noise |
+| `C` | pF | Membrane Capacitance | 
+| `t_ref` | ms | Refractory Period | 
+| `V_reset` | mV | Reset value after spike | 
+| `E_L` | mV | Leak reversal potential | 
+| `g_L` | nS | Leak conductance | 
+| `V_th` | mV | Spiking threshold | 
+| `I_e` | pA | External input current | 
+| `sigma` | pA | Standard deviation of noise | 
+| `theta` | 1/ms | Time filtration of noise |
 
 | Spike Adaptation Parameters |  |  | 
 | --- | --- | --- | 
-| adapt | pA | Adaptation magnitude | 
-| tau_a | ms | Adaptation decay | 
+| `adapt` | pA | Adaptation magnitude | 
+| `tau_a` | ms | Adaptation decay | 
 
 | Synaptic Parameters |  |  | 
 | --- | --- | --- | 
-| E_e | mV | Excitatory reversal potential | 
-| E_i | mV | Inhibitory reversal potential | 
-| tau_e | ms | Time constant for excitatory synapses | 
-| tau_i | ms | Time constant for inhibitory synapses | 
+| `E_e` | mV | Excitatory reversal potential | 
+| `E_i` | mV | Inhibitory reversal potential | 
+| `tau_e` | ms | Time constant for excitatory synapses | 
+| `tau_i` | ms | Time constant for inhibitory synapses | 
