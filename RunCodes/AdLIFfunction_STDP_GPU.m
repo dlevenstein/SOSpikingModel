@@ -24,12 +24,10 @@
 %       .E_i        Reversal potential of inhibitory synapses
 %       .tau_s      Time of synaptic decay
 % 
-%       .tau_a      Adaptation time constant
 %       .t_ref      Refractory period
 %       .tau_w    Adaptation threshold softness
 %       .gwnorm     Adaptation normalizer
 %       .b          Adaptation activation strength
-%       .bw         Time of adaptative decay
 %       .w_r        Adaptation Rest
 %
 %                   SYNAPTIC WEIGHT (conductance jump: nS?)
