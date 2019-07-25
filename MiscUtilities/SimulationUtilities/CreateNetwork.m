@@ -15,11 +15,8 @@ function [W,PopParams] = CreateNetwork(PopParams,varargin)
 %       true)
 %
 %OUTPUTS
-%   rate            mean rate of simulation
-%   peakwidth       width of ACG
-%   peakheight      height of ACG
-%   lastspikes      time of last spike (duration of spiking activity)
-%   S               Spikes across all simulations
+%   W            	Weight Matrix
+%   PopParams       Update Parameter List
 %JGornet Summer 2019
 
 %%

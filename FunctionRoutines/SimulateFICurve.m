@@ -18,32 +18,53 @@ function SimValuesArray = SimulateFICurve(PopParams_in,Irange,numI,varargin)
 %                 .simtime          Duration to simulate 
 %                 .onsettransient   Onset transient to ignore
 
-%% Input options
-defaulttimeparms.simtime = 2000; %ms, time to simulate each "trial"
-defaulttimeparms.onsettransient = 0; %ms, onsiet transient time to ignore
+%% Default Parameters
+defaulttimeparms.dt         = 0.05; %ms, time step
+defaulttimeparms.SimTime    = 2000; %ms, time to simulate
+
+defaultinputparms.starting_I_e = 250;  %pA, mean input current
+defaultinputparms.sigma     = 0;   %pA, noise of input current
+defaultinputparms.theta     = 0; %time filtration of noise
+
+defaultlearningparms.LearningRate   = 0; %learning rate
+defaultlearningparms.TargetRateE    = nan;    %Hz, excitatory target rate
+defaultlearningparms.TargetRateI    = nan;  %Hz, inhibitory target rate
+defaultlearningparms.tauSTDP        = 20;   %ms, STDP curve
 
 p = inputParser;
-addParameter(p,'bistability',true,@islogical)
 addParameter(p,'timeparms',defaulttimeparms,@isstruct)
+addParameter(p,'inputparms',defaultinputparms,@isstruct)
+addParameter(p,'learningparms',defaultlearningparms,@isstruct)
+addParameter(p,'bistableramp',true,@islogical)
+addParameter(p,'defaultNeuronParams',true,@islogical)
 parse(p,varargin{:})
 
-bistability = p.Results.bistability;
-timeparms = p.Results.timeparms;
+timeparms               = p.Results.timeparms;
+inputparms              = p.Results.inputparms;
+learningparms           = p.Results.learningparms;
+bistableramp            = p.Results.bistableramp;
+defaultNeuronParams     = p.Results.defaultNeuronParams;
+
+%% Learning Parameters
+PopParams_in.LearningRate   = learningparms.LearningRate;
+PopParams_in.TargetRateE    = learningparms.TargetRateE;
+PopParams_in.TargetRateI    = learningparms.TargetRateI;
+PopParams_in.tauSTDP        = learningparms.tauSTDP;
+
+%% Input Parameters
+PopParams_in.starting_I_e = inputparms.starting_I_e;
+PopParams_in.sigma   = inputparms.sigma;
+PopParams_in.theta   = inputparms.theta;
 
 %% Set parameter spaces
 
 Ivals = linspace(Irange(1),Irange(2),numI);
 
-timeparms.onsettransient = 0; %Onset transient to ignore
-timeparms.simtime = timeparms.simtime;
-
-TimeParams.dt      = 0.05;
-
 %% Bistability check
 if ~bistableramp
-TimeParams.SimTime = timeparms.simtime; %High -> Low Current
+TimeParams.SimTime = timeparms.SimTime; %High -> Low Current
 else
-TimeParams.SimTime = timeparms.simtime+500; %Low -> High Current
+TimeParams.SimTime = timeparms.SimTime+500; %Low -> High Current
 end
 
 clear SimValues
@@ -60,11 +81,11 @@ parfor ii = 1:numI
     end
     
     if bistableramp
-    PopParamsAnalysis.I_e = @(t) (250 - Ivals(ii)).*heaviside(500 - t)+Ivals(ii);
+    PopParamsAnalysis.I_e = @(t) (PopParams_in.starting_I_e - Ivals(ii)).*heaviside(500 - t)+Ivals(ii);
     end
     
     SimValuesArray(ii) = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,...
-        'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false);
+        'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',defaultNeuronParams);
 
 end
 
