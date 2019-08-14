@@ -67,6 +67,10 @@ Ivals = linspace(150,300,20);
 bvals = 10.^(-2:0.5:4);
 
 %% Set Indices
+
+Iindex = 1:length(Ivals);
+bindex = 1:length(bvals);
+
 I_indices = zeros(1,5);
 b_indices = zeros(1,5);
 
