@@ -96,3 +96,5 @@ if mod(II,serverArraySize)+1 == modnum
         'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',defaultNeuronParams);
 
 end
+
+end

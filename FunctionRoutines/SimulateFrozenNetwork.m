@@ -6,7 +6,7 @@ function [SimValuesTest,PopParams_in] = SimulateFrozenNetwork(SimValues,PopParam
 %INPUTS                
 %   SimValues       Simulation values after a trained simulation
 %   PopParams_in    population parameters structure to pass through to the
-%                   simulation functionx
+%                   simulation function
 
 %% Default Parameters
 defaulttimeparms.dt         = 0.05; %ms, time step
@@ -25,13 +25,11 @@ p = inputParser;
 addParameter(p,'timeparms',defaulttimeparms,@isstruct)
 addParameter(p,'inputparms',defaultinputparms,@isstruct)
 addParameter(p,'learningparms',defaultlearningparms,@isstruct)
-addParameter(p,'showfig',false,@islogical)
 parse(p,varargin{:})
 
 timeparms       = p.Results.timeparms;
 inputparms      = p.Results.inputparms;
 learningparms   = p.Results.learningparms;
-SHOWFIG         = p.Results.showfig;
 
 %% Learning
 PopParams_in.LearningRate   = learningparms.LearningRate;

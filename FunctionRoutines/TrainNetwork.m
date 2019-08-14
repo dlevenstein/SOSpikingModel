@@ -26,12 +26,14 @@ p = inputParser;
 addParameter(p,'timeparms',defaulttimeparms,@isstruct)
 addParameter(p,'inputparms',defaultinputparms,@isstruct)
 addParameter(p,'learningparms',defaultlearningparms,@isstruct)
+addParameter(p,'useGPU',false,@islogical)
 addParameter(p,'showfig',false,@islogical)
 parse(p,varargin{:})
 
 timeparms       = p.Results.timeparms;
 inputparms      = p.Results.inputparms;
 learningparms   = p.Results.learningparms;
+useGPU          = p.Results.useGPU;
 SHOWFIG         = p.Results.showfig;
 
 %% Transfer values for Training
@@ -64,7 +66,7 @@ TimeParams.SimTime      = SimTime+RecordTime;
 
 SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',SimTime,'save_dt',5e2,...
-    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime],'train',true,'useGPU',true);
+    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime],'train',true,'useGPU',useGPU);
 
 SimValues.PopParams = PopParams_in;
 SimValues.TimeParams = TimeParams;

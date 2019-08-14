@@ -56,11 +56,3 @@ numI   = 20;
 modnum = 1;
 
 SimValuesArray = SimulateAdaptvCurrent(PopParams_in,II,modnum,Irange,numI,Aarray,'serverArraySize',1);
-
-
-
-
-
-
-
-
