@@ -1,4 +1,4 @@
-function CondAdLIF_iSTDP_Adaptation_Current(modnum)
+function CondAdLIF_iSTDP_Adaptation_Current()
 
 repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 
@@ -120,7 +120,6 @@ b_indices(8) = bb;
 
 %% Run loop
 for II = 1:8
-    if mod(II,5)+1 == modnum
     ii = I_indices(II);
     bb = b_indices(II);
 
@@ -139,8 +138,6 @@ for II = 1:8
         'save_weights',TimeParams.SimTime,'save_dt',10,'useGPU',false,'defaultNeuronParams',false);
 
     save(['/scratch/jmg1030/FIcurve/data/testingFolder/AdaptationVCurrent/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'-struct','SimValuesArray','-v7.3') 
-
-    end
 end
 
 end
