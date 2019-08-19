@@ -112,7 +112,7 @@ for fig = 1:8
     ii = I_indices(fig);
     bb = b_indices(fig);
     
-    NiceSave(['AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb)],'/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/testingFolder/AdaptationVCurrent/figures',[])
+    NiceSave(['AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb)],'/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/testingFolder/AdaptationVCurrent/figures/8-18-2019',[])
     close all
     
 end
