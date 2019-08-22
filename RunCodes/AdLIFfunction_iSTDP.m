@@ -110,7 +110,8 @@ if defaultNeuronParams
 
     %Adaptation Properties (No adaptation)
     PopParams.E_w     = -70;    %rev potential: adaptation (mV)
-    PopParams.a       = 0;   %adaptation decay timescale (1/ms)
+    PopParams.a       = 0;   %subthreshold adaptation
+    PopParams.b       = 0;   %superthreshold adaptation
     PopParams.tau_w   = 300;     %subthreshold adaptation steepness
     PopParams.gwnorm  = 0;       %magnitude of adaptation
 
@@ -233,6 +234,7 @@ E_w         = PopParams.E_w;     %Adaptation reversal potential, (mV)
 tau_w       = PopParams.tau_w;   %Adaptation Decay
 gwnorm      = PopParams.gwnorm;  %Adaptation norm (nS)
 a           = PopParams.a;       %Subthreshhold Adaptation (nS)
+b           = PopParams.b;       %Superthreshold Adaptation (nS)
 
 %--------------------------------------------------------------------------
 % Synapse Parameters
@@ -359,11 +361,11 @@ a         = transpose([a(1).*ones(1,EPopNum),     a(2).*ones(1,IPopNum)]);
 elseif length(a)==1
 a         = transpose([a.*ones(1,EPopNum),     a.*ones(1,IPopNum)]);  
 end
-% if length(b) == 2 
-% b           = transpose([b(1).*ones(1,EPopNum),       b(2).*ones(1,IPopNum)]);
-% elseif length(b) == 1
-% b           = transpose([b.*ones(1,EPopNum),       0.*ones(1,IPopNum)]);
-% end
+if length(b) == 2 
+b           = transpose([b(1).*ones(1,EPopNum),       b(2).*ones(1,IPopNum)]);
+elseif length(b) == 1
+b           = transpose([b.*ones(1,EPopNum),       0.*ones(1,IPopNum)]);
+end
 if length(tau_s) == 2 
 tau_s         = transpose([tau_s(1).*ones(1,EPopNum),     tau_s(2).*ones(1,IPopNum)]);
 end
@@ -552,7 +554,7 @@ for tt=1:SimTimeLength
         t_r(spikeneurons) = t_ref(spikeneurons);
 %         t_s(spikeneurons) = t_syn(spikeneurons);
         %Jump the adaptation
-        w(spikeneurons) = w(spikeneurons) + 1; 
+        w(spikeneurons) = w(spikeneurons) + b(spikeneurons); 
         
         %------------------------------------------------------------------
         
@@ -638,7 +640,7 @@ for tt=1:SimTimeLength
     end
        
     %Error catch
-    V(V < E_w) = E_w;
+    V(V < E_i) = E_i;
         
     %% Synaptic,Adaptaion Conductances for the next time step
         g_w = gwnorm.*w;

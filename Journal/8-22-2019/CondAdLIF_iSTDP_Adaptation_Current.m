@@ -1,4 +1,4 @@
-function CondAdLIF_iSTDP_Adaptation_Current()
+function CondAdLIF_iSTDP_Adaptation_Current(modnum)
 
 repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 
@@ -62,27 +62,36 @@ PopParams_in.w0 = 0;
 PopParams_in.s0 = SimValuesTest.s(:,end);
 
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 1e4;
+TimeParams.SimTime = 3e4;
 
 Ivals = linspace(150,300,20);
-avals = [0 10.^(-7:0.5:-4)];
+avals = [0 10.^(-4:0.5:-1)];
 
-%%
+for II = 1:(length(Ivals)*length(avals))
+    if mod(II,5)+1 == modnum
+    ii = mod(II,length(Ivals))+1;
+    aa = ceil(II/length(Ivals));
 
-ii = 14;
-aa = 1;
+    ii
+    aa 
 
-PopParamsAnalysis = PopParams_in;
+    PopParamsAnalysis = PopParams_in;
 
-I_e = Ivals(ii);
-a = avals(aa);
+    I_e = Ivals(ii);
+    a = avals(aa);
 
-PopParamsAnalysis.I_e       = I_e;
-PopParamsAnalysis.a         = a;
+    PopParamsAnalysis.I_e       = I_e;
+    PopParamsAnalysis.a         = a;
+    PopParamsAnalysis.b         = 0;
 
-SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
-    'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false);
+    SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
+        'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false);
 
-save(['/scratch/jmg1030/FIcurve/data/testingFolder/8-22-2019/AdaptationVCurrentSpikes_ii_' num2str(ii) '_aa_' num2str(aa) '.mat'],'-struct','SimValuesArray','-v7.3') 
+    spikes = SimValuesArray.spikes;
+
+    save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_UniformRates/Avals/AdaptationVCurrentSpikes_ii_' num2str(ii) '_aa_' num2str(aa) '.mat'],'spikes','-v7.3') 
+
+    end
+end
 
 end
