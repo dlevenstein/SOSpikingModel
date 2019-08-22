@@ -62,7 +62,7 @@ PopParams_in.w0 = 0;
 PopParams_in.s0 = SimValuesTest.s(:,end);
 
 TimeParams.dt      = 0.05;
-TimeParams.SimTime = 3e4;
+TimeParams.SimTime = 1e4;
 
 Ivals = linspace(150,300,20);
 avals = [0 10.^(-7:0.5:-4)];
