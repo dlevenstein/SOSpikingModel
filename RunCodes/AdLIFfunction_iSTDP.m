@@ -355,6 +355,8 @@ tau_w       = transpose([tau_w.*ones(1,EPopNum), tau_w.*ones(1,IPopNum)]);
 end
 if length(gwnorm) == 2 
 gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  gwnorm(2).*ones(1,IPopNum)]);
+elseif length(gwnorm) == 1
+gwnorm      = transpose([gwnorm(1).*ones(1,EPopNum),  zeros(1,IPopNum)]);
 end
 if length(a) == 2 
 a         = transpose([a(1).*ones(1,EPopNum),     a(2).*ones(1,IPopNum)]);
