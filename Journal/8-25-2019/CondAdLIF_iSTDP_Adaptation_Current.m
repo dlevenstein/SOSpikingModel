@@ -88,7 +88,7 @@ for II = 1:(length(Ivals)*length(bvals))
 
     spikes = SimValuesArray.spikes;
 
-    save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_UniformRates/Bvals/AdaptationVCurrentSpikes_ii_' num2str(ii) '_aa_' num2str(aa) '.mat'],'spikes','-v7.3') 
+    save(['/scratch/jmg1030/FIcurve/data/bistabilityTest/Adaptation/LognormalEE_UniformRates/Bvals/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
 
     end
 end
