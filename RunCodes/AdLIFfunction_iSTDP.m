@@ -642,7 +642,7 @@ for tt=1:SimTimeLength
     end
        
     %Error catch
-    V(V < E_i) = E_i;
+    V(V < E_w) = E_w;
         
     %% Synaptic,Adaptaion Conductances for the next time step
         g_w = gwnorm.*w;
