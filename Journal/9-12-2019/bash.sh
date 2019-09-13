@@ -8,6 +8,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
 #SBATCH --output=iSTDPTrainingLongClusters_%j.out
+#SBATCH --gres=gpu:1
 
 n=${SLURM_ARRAY_TASK_ID}
 

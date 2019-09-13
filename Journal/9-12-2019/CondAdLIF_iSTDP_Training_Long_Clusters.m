@@ -103,7 +103,7 @@ TimeParams.SimTime = SimTime+RecordTime;
 %%
 SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',SimTime,'save_dt',5e2,...
-    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime],'train',true,'useGPU',false);
+    'recordInterval',[0:SimTime:SimTime;(0:SimTime:SimTime) + RecordTime],'train',true,'useGPU',true);
 
 SimValues.PopParams = PopParams;
 
