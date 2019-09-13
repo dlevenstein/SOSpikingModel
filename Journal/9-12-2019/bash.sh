@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --array=1-2
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=10
 #SBATCH --time=100:00:00
 #SBATCH --mem=62GB
 #SBATCH --job-name=iSTDPTrainingLongClusters
