@@ -1,5 +1,6 @@
 function [dynamicVals,kvals] = AnalyzeDynamics(SimValuesArray)
 
+%%
 KweightE = zeros(2500,1);
 KweightI = zeros(2500,1);
 Kweight = zeros(2500,1);
@@ -11,13 +12,13 @@ for ii = 1:length(SimValuesArray)
        
     for jj = 1:2500
         
-        KweightE(jj) = sum(SimValuesArray(ii).WeightMat(jj,1:2000,2));
-        KweightI(jj) = sum(SimValuesArray(ii).WeightMat(jj,2001:2500,2));
+        KweightE(jj) = sum(SimValuesArray(ii).WeightMat(jj,1:2000,end));
+        KweightI(jj) = sum(SimValuesArray(ii).WeightMat(jj,2001:2500,end));
         Kweight(jj)  = KweightE(jj)/KweightI(jj);
         
         spikes = SimValuesArray(ii).spikesbycell{jj};
         
-        Krate(jj) = length(spikes)./(1000.*SimValuesArray(ii).t(end));
+        Krate(jj) = length(spikes).*(1000./SimValuesArray(ii).t(end));
         
     end
     
@@ -26,6 +27,7 @@ for ii = 1:length(SimValuesArray)
 
 end
 
+%%
 for ii = 1:length(SimValuesArray)
         
     S = find(SimValuesArray(ii).spikes(:,1) > 1e3);
@@ -45,16 +47,13 @@ for ii = 1:length(SimValuesArray)
         
     end
     
-    bins = linspace(0,4,50);
-    
-    ISImapE = hist(log10(ISI_E),bins);
-    ISImapI = hist(log10(ISI_I),bins);
+    bins = linspace(0,4,30);
     
     rateDistE = hist(log10(1000./ISI_E),bins);
     rateDistI = hist(log10(1000./ISI_I),bins);
     
     %ISI distirbutions
-    ISIdist.bins = linspace(0,3.5,50);
+    ISIdist.bins = linspace(0,4,30);
     ISIs = cellfun(@diff,SimValuesArray(ii).spikesbycell,'uniformoutput',false);
     ISIdist.E = hist(log10(cat(1,ISIs{SimValuesArray(ii).EcellIDX})),ISIdist.bins);
     ISIdist.E = ISIdist.E./sum(ISIdist.E);
@@ -74,6 +73,9 @@ for ii = 1:length(SimValuesArray)
     ISIstats.CVdist.E = hist(ISIstats.CV(SimValuesArray(ii).EcellIDX),ISIstats.CVdist.bins);
     ISIstats.CVdist.I = hist(ISIstats.CV(SimValuesArray(ii).IcellIDX),ISIstats.CVdist.bins);
 
+    ISImapE = mean(ISIdist.all(SimValuesArray(ii).EcellIDX,:));
+    ISImapI = mean(ISIdist.all(SimValuesArray(ii).IcellIDX,:));
+    
     Espikes = cat(1,SimValuesArray(ii).spikesbycell{SimValuesArray(ii).EcellIDX});
     Ispikes = cat(1,SimValuesArray(ii).spikesbycell{SimValuesArray(ii).IcellIDX});
     [ccg,t_ccg] = CCG({double(Espikes./1000),double(Ispikes./1000)},[],'binSize',0.001,'duration',0.1,'norm','rate');
@@ -99,6 +101,7 @@ for ii = 1:length(SimValuesArray)
     dynamicVals(ii).ccg = ccg;
     
     dynamicVals(ii).ISIdist = ISIdist;
+    dynamicVals(ii).ISIstats = ISIstats;
     
     dynamicVals(ii).bins = bins;
     dynamicVals(ii).ISImapE = ISImapE;

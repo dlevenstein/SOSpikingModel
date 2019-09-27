@@ -3,10 +3,12 @@ function makeISI(dynamicVals,SimValuesArray,indices,network,path)
 %%
 figure
 
-ww = indices(1);
-
 pos = [0.1,0.7,0.25,0.25];
 subplot('Position',pos)
+
+box off 
+
+ww = indices(1);
 
 A = repmat(1,size(dynamicVals(ww).ISIdist.all(dynamicVals(ww).sortrate.ratetype,:)));
 A(dynamicVals(ww).ISIdist.all(dynamicVals(ww).sortrate.ratetype,:) == 0) = 0; 
@@ -22,10 +24,17 @@ imagesc(dynamicVals(ww).ISIdist.bins,[0 max(SimValuesArray(ww).IcellIDX)],log10(
     ylabel(h,'log P(ISI)')
     %caxis([0 1])
     
-xlabel('ISI (ms)','fontsize',15);ylabel('Neuron (Rate)','fontsize',15);title('ISI','fontsize',20)
+    AX = get(gca,'XAxis');
+    set(AX,'FontSize', 16)
+    AX = get(gca,'YAxis');
+    set(AX,'FontSize', 16)
+
+ylabel('Neuron (Rate)','fontsize',15);title('ISI','fontsize',20)
 
 pos = [0.1,0.4,0.25,0.25];
 subplot('Position',pos)
+
+box off 
 
 ww = indices(2);
 
@@ -43,10 +52,17 @@ imagesc(dynamicVals(ww).ISIdist.bins,[0 max(SimValuesArray(ww).IcellIDX)],log10(
     ylabel(h,'log P(ISI)')
     %caxis([0 1])
     
+    AX = get(gca,'XAxis');
+    set(AX,'FontSize', 16)
+    AX = get(gca,'YAxis');
+    set(AX,'FontSize', 16)
+    
 ylabel('Neuron (Rate)','fontsize',15)
 
 pos = [0.1,0.1,0.25,0.25];
 subplot('Position',pos)
+
+box off 
 
 ww = indices(3);
 
@@ -64,7 +80,12 @@ imagesc(dynamicVals(ww).ISIdist.bins,[0 max(SimValuesArray(ww).IcellIDX)],log10(
     ylabel(h,'log P(ISI)')
     %caxis([0 1])
     
-ylabel('Neuron (Rate)','fontsize',15)
+    AX = get(gca,'XAxis');
+    set(AX,'FontSize', 16)
+    AX = get(gca,'YAxis');
+    set(AX,'FontSize', 16)
+
+xlabel('ISI (ms)','fontsize',15);ylabel('Neuron (Rate)','fontsize',15)
 
 NiceSave([network 'ISIdist'],path,[])
 

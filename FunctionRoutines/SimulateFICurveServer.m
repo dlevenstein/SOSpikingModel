@@ -5,12 +5,12 @@ defaulttimeparms.simtime = 2000; %ms, time to simulate each "trial"
 defaulttimeparms.onsettransient = 0; %ms, onsiet transient time to ignore
 
 p = inputParser;
-addParameter(p,'up',true,@islogical)
-addParameter(p,'SaveALL',true,@islogical)
+addParameter(p,'bistability',true,@islogical)
+addParameter(p,'SaveALL',false,@islogical)
 addParameter(p,'timeparms',defaulttimeparms,@isstruct)
 parse(p,varargin{:})
 
-UP = p.Results.up;
+bistable = p.Results.bistability;
 SaveALL = p.Results.SaveALL;
 timeparms = p.Results.timeparms;
 
@@ -21,10 +21,10 @@ timeparms.simtime = timeparms.simtime;
 
 TimeParams.dt      = 0.05;
 
-if UP
+if ~bistable
 TimeParams.SimTime = timeparms.simtime;
 else
-TimeParams.SimTime = timeparms.simtime+1e3;
+TimeParams.SimTime = timeparms.simtime+500;
 end
 
 clear SimValues
@@ -35,30 +35,24 @@ parfor ii = 1:numI
     
     PopParamsAnalysis = PopParams_in;
      
-    if UP
-    PopParamsAnalysis.I_e = Ivals(ii);
+    if ~bistable
+    PopParamsAnalysis.I_e = @(t) Ivals(ii).*heaviside(t - 500);
     end
     
-    if UP == false
-    PopParamsAnalysis.I_e = @(t) (250 - Ivals(ii)).*heaviside(1000 - t)+Ivals(ii);
+    if bistable
+    PopParamsAnalysis.I_e = @(t) (250 - Ivals(ii)).*heaviside(500 - t)+Ivals(ii);
     end
     
-    SimValuesArray(ii) = AdLIFfunction_STDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',1,'save_weights',TimeParams.SimTime);
-    
-end
+    SimValuesArray(ii) = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',false,'showfig',false,...
+        'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false);
 
-lastSpikeTimes = nan(numI,1);
+end
 
 for ii = 1:numI
     
-    %V = SimValuesArray(ii).V;
-    %spikes = SimValuesArray(ii).spikes;
-    
-    disp([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat']);
-    %disp([datafolder dataname '_ii_' char(num2str(ii)) '_voltages.mat']);
-    
+    spikes = SimValuesArray(ii).spikes;
+    disp([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat']);    
     save([datafolder dataname '_ii_' char(num2str(ii)) '_spikes.mat'],'spikes','-v7.3');
-    %save([datafolder dataname '_ii_' char(num2str(ii)) '_voltages.mat'],'V','-v7.3');
     
 end
 

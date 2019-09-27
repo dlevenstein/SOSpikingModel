@@ -8,8 +8,11 @@ repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
 %%
-names = ["ExperimentRate_s_001.mat","ExperimentRate_s_01.mat","ExperimentRate_s_1.mat","ExperimentRate_s_10.mat",];
-weightNames = ["001","01","1","10"];
+% names = ["ExperimentRate_s_001.mat","ExperimentRate_s_01.mat","ExperimentRate_s_1.mat","ExperimentRate_s_10.mat",];
+% weightNames = ["001","01","1","10"];
+
+names = ["ExperimentRate_s_01.mat","ExperimentRate_s_1.mat","ExperimentRate_s_10.mat",];
+weightNames = ["01","1","10"];
 
 %%
 numI = 20;
@@ -28,7 +31,7 @@ disp(['index: ' char(num2str(index))]);
 disp(['Sim Number: ' char(num2str(simnum))]);
 disp(['File Name: ' char(names(LL))]);
 
-load(['/scratch/jmg1030/FIcurve/data/trainedWeights/' char(names(LL))]);
+load(['/scratch/jmg1030/FIcurve/data/trainedWeights/ExperimentRate/' char(names(LL))]);
 
 rng(simnum,'twister');
 

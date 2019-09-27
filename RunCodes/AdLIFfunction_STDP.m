@@ -167,6 +167,7 @@ V_th        = PopParams.V_th;    %spike threshhold (mV)
 V_reset     = PopParams.V_reset; %reset value (mV)
 
 t_ref       = PopParams.t_ref;   %refractory period (ms)
+t_syn       = PopParams.t_syn;   %refractory period (ms)
 
 sigma       = PopParams.sigma;   %Standard deviation of noise
 theta       = PopParams.theta;   %Strength to mean (time scale of noise, ms^-1)
@@ -217,6 +218,7 @@ s            = zeros(PopNum,1); %synapse
 w            = zeros(PopNum,1); %adaptation
 X_t          = zeros(PopNum,1); %OU noise
 t_r = zeros(PopNum,1);
+t_s = -dt.*ones(PopNum,1);
 
 x            = zeros(PopNum,1); %Synaptic trace
 
@@ -268,6 +270,11 @@ if length(t_ref) == 2
 t_ref       = transpose([t_ref(1).*ones(1,EPopNum),   t_ref(2).*ones(1,IPopNum)]);
 elseif length(t_ref) == 1
 t_ref       = transpose([t_ref.*ones(1,EPopNum),   t_ref.*ones(1,IPopNum)]);
+end
+if length(t_syn) == 2 
+t_syn       = transpose([t_syn(1).*ones(1,EPopNum),   t_syn(2).*ones(1,IPopNum)]);
+elseif length(t_syn) == 1
+t_syn       = transpose([t_syn.*ones(1,EPopNum),   t_syn.*ones(1,IPopNum)]);
 end
 if length(sigma) == 2 
 sigma       = transpose([sigma(1).*ones(1,EPopNum),   sigma(2).*ones(1,IPopNum)]);
@@ -333,10 +340,6 @@ for tt=1:SimTimeLength
     %% Time Counter
     if SHOWPROGRESS && mod(tt,round(SimTimeLength./10))==0
         display([num2str(round(100.*tt./SimTimeLength)),'% Done!']) %clearly, this needs improvement
-        if isempty(intersave) == false
-            trainedWeight = EE_mat+II_mat+EI_mat+IE_mat;
-            save(intersave,'trainedWeight','-v7.3');
-        end
     end
     %% Dynamics: update noise, V,s,w based on values in previous timestep
     
@@ -381,38 +384,49 @@ for tt=1:SimTimeLength
         
         spikecounter = spikecounter+numspikers;
         
-        %Jump the conductance
-        s(spikeneurons) = 1;
-        %Set spiking neurons refractory period 
+
+        %Set spiking neurons refractory period and synaptic delay counters
         t_r(spikeneurons) = t_ref(spikeneurons);
+        t_s(spikeneurons) = t_syn(spikeneurons);
         %Jump the adaptation
         w(spikeneurons) = w(spikeneurons) + b(spikeneurons); 
-        %Jump the synaptic trace
-        x(spikeneurons) = x(spikeneurons) + 1;
+  
+    end
+
+    %%  Refractory period Countdowns
+    if any(t_r > 0) || any(t_s >= 0)
+        refractoryneurons = t_r > 0;
+        delayneurons = t_s >= 0;
+        
+        %Count down the refractory periods
+        t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
+        t_s(delayneurons) = t_s(delayneurons) - dt;
+        
+        %Hold voltage, synaptic/adaptation rates at spike levels
+        V(refractoryneurons) = V_reset(refractoryneurons);
+        
+        
+        activatedsynapses = delayneurons & (t_s < 0);
+            
+        %Jump the postsynaptic conductance
+        s(activatedsynapses) = 1; %Do this later... after delay
+        %Jump the postsynaptic trace
+        x(activatedsynapses) = x(activatedsynapses) + 1;  %Do this later... after delay
+        
         
         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
-        %Presynaptic I Cells
+        %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
         %PreIspikes = intersect(spikeneurons,Icells);
-        PreIspikes = spikeneurons(spikeneurons > EPopNum);
+        PreIspikes = activatedsynapses(activatedsynapses > EPopNum);
         EI_mat(EcellIDX,PreIspikes) = EI_mat(EcellIDX,PreIspikes) + LearningRate.*(x(EcellIDX)-alpha);
-        %Postsynaptic E cells
+        %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
-        PostEspikes = spikeneurons(spikeneurons <= EPopNum);
+        PostEspikes = activatedsynapses(activatedsynapses <= EPopNum);
         EI_mat(PostEspikes,IcellIDX) = EI_mat(PostEspikes,IcellIDX) + LearningRate.*(x(IcellIDX)');
         
         EI_mat = EI_mat.*isconnected; %Keep only connected pairs
         EI_mat(EI_mat<=0) = 0; %Get rid of any negative synapses...
         
-    end
-
-    %%  Refractory period Countdowns
-    if any(t_r > 0)
-        refractoryneurons = t_r > 0;
-        
-        %Hold voltage, synaptic/adaptation rates at spike levels
-        V(refractoryneurons) = V_reset(refractoryneurons);
-        %Count down the refractory period
-        t_r(refractoryneurons) = t_r(refractoryneurons) - dt;
     end
         
     %% Synaptic,Adaptaion Conductances for the next time step
@@ -444,6 +458,7 @@ for tt=1:SimTimeLength
          SimValues.Input(:,savecounter)           = I_e(timecounter) + X_t;
         
          savecounter = savecounter+1;
+         
         end
     end
     

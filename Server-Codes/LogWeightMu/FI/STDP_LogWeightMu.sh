@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=Matlab
 #SBATCH --nodes=1
-#SBATCH --array=1-500
+#SBATCH --array=1-300
 #SBATCH --cpus-per-task=10
 #SBATCH --time=100:00:00
-#SBATCH --mem=62GB
-#SBATCH --job-name=ExperimentRate
-#SBATCH --output=ExperimentRate_%j.out
+#SBATCH --mem=20GB
+#SBATCH --job-name=LogWeightMu
+#SBATCH --output=LogWeightMu_%j.out
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jmg1030@nyu.edu
 
