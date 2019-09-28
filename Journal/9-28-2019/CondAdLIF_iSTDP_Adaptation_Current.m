@@ -71,6 +71,7 @@ TimeParams.SimTime = SimTime+RecordTime;
 Ivals = linspace(150,300,20);
 bvals = 10.^(-2:0.5:4);
 
+%%
 for II = 1:(length(Ivals)*length(bvals))
     if mod(II,5)+1 == modnum
     ii = mod(II,length(Ivals))+1;
@@ -89,7 +90,7 @@ for II = 1:(length(Ivals)*length(bvals))
 
     SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
         'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false,...
-        'recordInterval',[(0:RecordTime:RecordTime) + (TimeParams.SimTime - RecordTime)]);
+        'recordInterval',[(0:RecordTime:RecordTime) + (TimeParams.SimTime - RecordTime)]');
 
     spikes = SimValuesArray.spikes;
 
