@@ -47,25 +47,25 @@ rate = movmean(rate,overlap);
 
 ISI = [diff(spikes(:,1));0];
 
-thresh = 10.^1.3617;
+thresh = 50;%98.9473;%10.^1.3617;
 
 DOWNstates = ISI > thresh;
-
-for dd = 1:length(DOWNstates)
-    
-    if DOWNstates(dd)
-        if dd+1 < length(DOWNstates) && dd-1 > 0
-            if DOWNstates(dd-1) == 0
-                DOWNstates(dd+1) = 1;
-            end
-        end
-    elseif dd+1 < length(DOWNstates) && dd-1 > 0
-        if DOWNstates(dd+1) && DOWNstates(dd-1)
-            DOWNstates(dd)=1;
-        end
-    end
-    
-end
+% 
+% for dd = 1:length(DOWNstates)
+%     
+%     if DOWNstates(dd)
+%         if dd+1 < length(DOWNstates) && dd-1 > 0
+%             if DOWNstates(dd-1) == 0
+%                 DOWNstates(dd+1) = 1;
+%             end
+%         end
+%     elseif dd+1 < length(DOWNstates) && dd-1 > 0
+%         if DOWNstates(dd+1) && DOWNstates(dd-1)
+%             DOWNstates(dd)=1;
+%         end
+%     end
+%     
+% end
 
 DOWN_mean_duration = mean(ISI(DOWNstates));
 DOWN_std_duration = std(ISI(DOWNstates));

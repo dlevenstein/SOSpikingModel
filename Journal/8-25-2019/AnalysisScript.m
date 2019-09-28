@@ -199,38 +199,38 @@ b_indices(8) = bb;
 figure
 subplot(2,2,1)
 imagesc(Iindex,bindex,DOWN_CV');colorbar
-hold on
-plot(Iindex(I_indices(1)),bindex(b_indices(1)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(2)),bindex(b_indices(2)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(3)),bindex(b_indices(3)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(4)),bindex(b_indices(4)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(5)),bindex(b_indices(5)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(6)),bindex(b_indices(6)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(7)),bindex(b_indices(7)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(8)),bindex(b_indices(8)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-text(Iindex(I_indices(1)),bindex(b_indices(1)),'A','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(2)),bindex(b_indices(2)),'B','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(3)),bindex(b_indices(3)),'C','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(4)),bindex(b_indices(4)),'D','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(5)),bindex(b_indices(5)),'E','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(6)),bindex(b_indices(6)),'F','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(7)),bindex(b_indices(7)),'G','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(8)),bindex(b_indices(8)),'H','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% plot(Iindex(I_indices(1)),bindex(b_indices(1)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(2)),bindex(b_indices(2)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(3)),bindex(b_indices(3)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(4)),bindex(b_indices(4)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(5)),bindex(b_indices(5)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(6)),bindex(b_indices(6)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(7)),bindex(b_indices(7)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(8)),bindex(b_indices(8)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% text(Iindex(I_indices(1)),bindex(b_indices(1)),'A','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(2)),bindex(b_indices(2)),'B','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(3)),bindex(b_indices(3)),'C','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(4)),bindex(b_indices(4)),'D','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(5)),bindex(b_indices(5)),'E','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(6)),bindex(b_indices(6)),'F','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(7)),bindex(b_indices(7)),'G','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(8)),bindex(b_indices(8)),'H','FontSize',10,'HorizontalAlignment','center')
 
 xlabel('Current (pA)','FontSize',16);ylabel('Adaptation b','FontSize',16)
 h = colorbar;
@@ -241,38 +241,38 @@ xticklabels({'150','200','250','300'})
 
 subplot(2,2,2)
 imagesc(Iindex,bindex,dip_stat');colorbar
-hold on
-plot(Iindex(I_indices(1)),bindex(b_indices(1)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(2)),bindex(b_indices(2)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(3)),bindex(b_indices(3)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(4)),bindex(b_indices(4)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(5)),bindex(b_indices(5)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(6)),bindex(b_indices(6)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(7)),bindex(b_indices(7)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(8)),bindex(b_indices(8)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-text(Iindex(I_indices(1)),bindex(b_indices(1)),'A','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(2)),bindex(b_indices(2)),'B','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(3)),bindex(b_indices(3)),'C','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(4)),bindex(b_indices(4)),'D','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(5)),bindex(b_indices(5)),'E','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(6)),bindex(b_indices(6)),'F','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(7)),bindex(b_indices(7)),'G','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(8)),bindex(b_indices(8)),'H','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% plot(Iindex(I_indices(1)),bindex(b_indices(1)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(2)),bindex(b_indices(2)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(3)),bindex(b_indices(3)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(4)),bindex(b_indices(4)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(5)),bindex(b_indices(5)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(6)),bindex(b_indices(6)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(7)),bindex(b_indices(7)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(8)),bindex(b_indices(8)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% text(Iindex(I_indices(1)),bindex(b_indices(1)),'A','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(2)),bindex(b_indices(2)),'B','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(3)),bindex(b_indices(3)),'C','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(4)),bindex(b_indices(4)),'D','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(5)),bindex(b_indices(5)),'E','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(6)),bindex(b_indices(6)),'F','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(7)),bindex(b_indices(7)),'G','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(8)),bindex(b_indices(8)),'H','FontSize',10,'HorizontalAlignment','center')
 
 xlabel('Current (pA)','FontSize',16);ylabel('Adaptation b','FontSize',16)
 h = colorbar;
@@ -282,38 +282,38 @@ xticklabels({'150','200','250','300'})
 
 subplot(2,2,3)
 imagesc(Iindex,bindex,UP_CV');colorbar
-hold on
-plot(Iindex(I_indices(1)),bindex(b_indices(1)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(2)),bindex(b_indices(2)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(3)),bindex(b_indices(3)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(4)),bindex(b_indices(4)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(5)),bindex(b_indices(5)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(6)),bindex(b_indices(6)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(7)),bindex(b_indices(7)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(8)),bindex(b_indices(8)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-text(Iindex(I_indices(1)),bindex(b_indices(1)),'A','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(2)),bindex(b_indices(2)),'B','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(3)),bindex(b_indices(3)),'C','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(4)),bindex(b_indices(4)),'D','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(5)),bindex(b_indices(5)),'E','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(6)),bindex(b_indices(6)),'F','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(7)),bindex(b_indices(7)),'G','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(8)),bindex(b_indices(8)),'H','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% plot(Iindex(I_indices(1)),bindex(b_indices(1)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(2)),bindex(b_indices(2)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(3)),bindex(b_indices(3)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(4)),bindex(b_indices(4)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(5)),bindex(b_indices(5)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(6)),bindex(b_indices(6)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(7)),bindex(b_indices(7)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(8)),bindex(b_indices(8)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% text(Iindex(I_indices(1)),bindex(b_indices(1)),'A','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(2)),bindex(b_indices(2)),'B','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(3)),bindex(b_indices(3)),'C','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(4)),bindex(b_indices(4)),'D','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(5)),bindex(b_indices(5)),'E','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(6)),bindex(b_indices(6)),'F','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(7)),bindex(b_indices(7)),'G','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(8)),bindex(b_indices(8)),'H','FontSize',10,'HorizontalAlignment','center')
 
 xlabel('Current (pA)','FontSize',16);ylabel('Adaptation b','FontSize',16)
 h = colorbar;
@@ -324,38 +324,38 @@ xticklabels({'150','200','250','300'})
 
 subplot(2,2,4)
 imagesc(Iindex,bindex,meanRateMap');colorbar
-hold on
-plot(Iindex(I_indices(1)),bindex(b_indices(1)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(2)),bindex(b_indices(2)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(3)),bindex(b_indices(3)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(4)),bindex(b_indices(4)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(5)),bindex(b_indices(5)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(6)),bindex(b_indices(6)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(7)),bindex(b_indices(7)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-plot(Iindex(I_indices(8)),bindex(b_indices(8)),'sk','MarkerSize',20,'LineWidth',2)
-hold on
-text(Iindex(I_indices(1)),bindex(b_indices(1)),'A','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(2)),bindex(b_indices(2)),'B','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(3)),bindex(b_indices(3)),'C','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(4)),bindex(b_indices(4)),'D','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(5)),bindex(b_indices(5)),'E','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(6)),bindex(b_indices(6)),'F','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(7)),bindex(b_indices(7)),'G','FontSize',10,'HorizontalAlignment','center')
-hold on
-text(Iindex(I_indices(8)),bindex(b_indices(8)),'H','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% plot(Iindex(I_indices(1)),bindex(b_indices(1)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(2)),bindex(b_indices(2)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(3)),bindex(b_indices(3)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(4)),bindex(b_indices(4)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(5)),bindex(b_indices(5)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(6)),bindex(b_indices(6)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(7)),bindex(b_indices(7)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% plot(Iindex(I_indices(8)),bindex(b_indices(8)),'sk','MarkerSize',20,'LineWidth',2)
+% hold on
+% text(Iindex(I_indices(1)),bindex(b_indices(1)),'A','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(2)),bindex(b_indices(2)),'B','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(3)),bindex(b_indices(3)),'C','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(4)),bindex(b_indices(4)),'D','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(5)),bindex(b_indices(5)),'E','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(6)),bindex(b_indices(6)),'F','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(7)),bindex(b_indices(7)),'G','FontSize',10,'HorizontalAlignment','center')
+% hold on
+% text(Iindex(I_indices(8)),bindex(b_indices(8)),'H','FontSize',10,'HorizontalAlignment','center')
 
 xlabel('Current (pA)','FontSize',16);ylabel('Adaptation b','FontSize',16)
 h = colorbar;
@@ -365,7 +365,7 @@ yticklabels({'0.1','1','10','100','1e3','1e4'})
 xticklabels({'150','200','250','300'})
 
 %NiceSave('Maps','/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/Adaptation/LognormalEE_LognormalRates/figures',[])
-NiceSave('Maps','/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/Adaptation/LognormalEE_UniformRates/figures',[])
+%NiceSave('Maps','/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/Adaptation/LognormalEE_UniformRates/figures',[])
 
 %%
 figure
