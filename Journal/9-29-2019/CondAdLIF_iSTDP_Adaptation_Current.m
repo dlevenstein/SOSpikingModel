@@ -72,7 +72,7 @@ Ivals = linspace(150,300,20);
 avals = [0 10.^(-4:0.5:-1)];
 
 %%
-for II = 1:(length(Ivals)*length(bvals))
+for II = 1:(length(Ivals)*length(avals))
     if mod(II,5)+1 == modnum
     ii = mod(II,length(Ivals))+1;
     aa = ceil(II/length(Ivals));
