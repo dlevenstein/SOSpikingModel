@@ -83,12 +83,12 @@ PopParamsAnalysis.p0spike = 0.05;
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 2e3;                       %Recording Time (end of simulation)
+RecordTime = 2.5e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-Ivals = linspace(150,250,11); %Current Values (pA)
+Ivals = linspace(50,250,9); %Current Values (pA)
 sigvals = linspace(0,40,9);
 %bvals = 10.^(-2:0.5:4);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
