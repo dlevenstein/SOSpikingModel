@@ -503,7 +503,7 @@ for tt=1:SimTimeLength
     
     if gpuAvail
         if sigma~=0
-            dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*gpuArray.randn(PopNum,1).*sqrt(dt);
+            dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma*gpuArray.randn(PopNum,1).*sqrt(dt);
         end
 
         %V - Voltage Equation
@@ -513,7 +513,7 @@ for tt=1:SimTimeLength
                  + I_e(tt) + X_t)./C;           %External input
     else
         if sigma~=0
-            dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma.*randn(PopNum,1).*sqrt(dt);
+            dX = -theta.*X_t.*dt + sqrt(2.*theta).*sigma*randn(PopNum,1).*sqrt(dt);
         end
 
         %V - Voltage Equation
