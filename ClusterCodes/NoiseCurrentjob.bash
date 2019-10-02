@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH -p cpu_short
 #SBATCH --nodes=1
-#SBATCH --tasks-per-node=25
+#SBATCH --tasks-per-node=40
 #SBATCH --time=12:00:00
-#SBATCH --mem-per-cpu=12G
+#SBATCH --mem-per-cpu=8G
 echo $1
 module load matlab/R2018a
 
