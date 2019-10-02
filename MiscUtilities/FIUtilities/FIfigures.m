@@ -113,7 +113,9 @@ for dd = 1:length(dinfo)
     set(gca,'Ytick',[])
     xlabel('Time (ms)','FontSize',14)
     
-    NiceSave(['Bistability_Raster_II_' num2str(II) '_num_' num2str(numfig)],[path '/Rasters'],[]);
+    saveas(gcf,[path '/Rasters/' 'Bistability_Raster_II_' num2str(II) '_num_' num2str(numfig)],'epsc')
+    
+    %NiceSave(['Bistability_Raster_II_' num2str(II) '_num_' num2str(numfig)],[path '/Rasters'],[]);
     close all
     numfig = numfig+1;
     

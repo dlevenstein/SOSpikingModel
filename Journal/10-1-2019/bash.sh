@@ -14,7 +14,7 @@ n=${SLURM_ARRAY_TASK_ID}
 module purge
 module load matlab/2018a
 
-echo "CondAdLIF_Training_STDPLogWeightSigmaM1(${n})" | matlab
+echo "CondAdLIF_iSTDP_Training(${n})" | matlab
 
 echo "done"
 
