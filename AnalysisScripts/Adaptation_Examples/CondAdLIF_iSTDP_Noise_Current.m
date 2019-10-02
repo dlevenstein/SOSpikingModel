@@ -83,12 +83,12 @@ PopParamsAnalysis.p0spike = 0.05;
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 1e3;                       %Recording Time (end of simulation)
+RecordTime = 2e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-Ivals = linspace(100,300,11); %Current Values (pA)
+Ivals = linspace(150,250,11); %Current Values (pA)
 sigvals = linspace(0,50,11);
 %bvals = 10.^(-2:0.5:4);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
@@ -138,8 +138,15 @@ parfor II = 1:numsims
     %end
 end
 
+try
 save(fullfile(savedatafolder,'NoiseVCurrentSpikes.mat'),'spikes','-v7.3')
-
+catch
+    try
+    save(fullfile(figfolder,'NoiseVCurrentSpikes.mat'),'spikes','-v7.3')
+    catch
+        save(pwd,'spikes','-v7.3')
+    end
+end
 % display('Saving')
 % for II = 1:(length(Ivals)*length(sigvals))
 %     %if mod(II,5)+1 == cluster_number %cluster_number is the cluster ID used (2 clusters give cluster IDs 1 and 2)
