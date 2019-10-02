@@ -22,7 +22,7 @@ for bb = 1:13
         VARmap(ii,bb) = nanvar(ISI);
         CVmap(ii,bb) = nanstd(ISI)/nanmean(ISI);
         
-        ISItotal = [ISItotal;ISI];
+        %ISItotal = [ISItotal;ISI];
             
     end
 end
@@ -32,19 +32,19 @@ MAXmap(MAXmap == 0) = nan;
 %%
 figure
 subplot(2,2,1)
-imagesc(MEANmap)
+imagesc(MEANmap')
 colorbar
 %set(gca,'colorscale','log')
 subplot(2,2,2)
-imagesc(VARmap)
+imagesc(VARmap')
 colorbar
 %set(gca,'colorscale','log')
 subplot(2,2,3)
-imagesc(CVmap)
+imagesc(CVmap')
 colorbar
 %set(gca,'colorscale','log')
 subplot(2,2,4)
-imagesc(MAXmap)
+imagesc(MAXmap')
 colorbar
 set(gca,'colorscale','log')
 

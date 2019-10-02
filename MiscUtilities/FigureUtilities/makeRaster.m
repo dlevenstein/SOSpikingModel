@@ -3,6 +3,7 @@ function makeRaster(SimValuesArray,w,name,folder,sort)
 if sort 
 
 poprate.dt = 1;   overlap = 6;   winsize = poprate.dt.*overlap;
+t_rate = 0:poprate.dt:1e4;
 
 figure
 
@@ -16,9 +17,15 @@ SimValuesArray(ww).spikesbycell = spikeSorter(SimValuesArray(ww).spikes,1,2500);
 
 [Espikes,Ispikes] = RasterSorter(SimValuesArray(ww));
 
-[spikemat,t_rate,~] = SpktToSpkmat(SimValuesArray(ww).spikesbycell, [], poprate.dt,overlap);
-poprate.E = sum(spikemat(:,SimValuesArray(ww).EcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).EcellIDX);
-poprate.I = sum(spikemat(:,SimValuesArray(ww).IcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).IcellIDX);
+poprate.E = hist(Espikes(:,1),t_rate);
+poprate.E = movmean(poprate.E,overlap);
+
+poprate.I = hist(Ispikes(:,1),t_rate);
+poprate.I = movmean(poprate.I,overlap);
+
+% [spikemat,t_rate,~] = SpktToSpkmat(SimValuesArray(ww).spikesbycell, [], poprate.dt,overlap);
+% poprate.E = sum(spikemat(:,SimValuesArray(ww).EcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).EcellIDX);
+% poprate.I = sum(spikemat(:,SimValuesArray(ww).IcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).IcellIDX);
 
 plot(Espikes(:,1),Espikes(:,2),'.b','markersize',1)
 hold on
@@ -52,9 +59,15 @@ SimValuesArray(ww).spikesbycell = spikeSorter(SimValuesArray(ww).spikes,1,2500);
 
 [Espikes,Ispikes] = RasterSorter(SimValuesArray(ww));
 
-[spikemat,t_rate,~] = SpktToSpkmat(SimValuesArray(ww).spikesbycell, [], poprate.dt,overlap);
-poprate.E = sum(spikemat(:,SimValuesArray(ww).EcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).EcellIDX);
-poprate.I = sum(spikemat(:,SimValuesArray(ww).IcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).IcellIDX);
+poprate.E = hist(Espikes(:,1),t_rate);
+poprate.E = movmean(poprate.E,overlap);
+
+poprate.I = hist(Ispikes(:,1),t_rate);
+poprate.I = movmean(poprate.I,overlap);
+
+% [spikemat,t_rate,~] = SpktToSpkmat(SimValuesArray(ww).spikesbycell, [], poprate.dt,overlap);
+% poprate.E = sum(spikemat(:,SimValuesArray(ww).EcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).EcellIDX);
+% poprate.I = sum(spikemat(:,SimValuesArray(ww).IcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).IcellIDX);
 
 plot(Espikes(:,1),Espikes(:,2),'.b','markersize',1)
 hold on
@@ -86,9 +99,15 @@ SimValuesArray(ww).spikesbycell = spikeSorter(SimValuesArray(ww).spikes,1,2500);
 
 [Espikes,Ispikes] = RasterSorter(SimValuesArray(ww));
 
-[spikemat,t_rate,~] = SpktToSpkmat(SimValuesArray(ww).spikesbycell, [], poprate.dt,overlap);
-poprate.E = sum(spikemat(:,SimValuesArray(ww).EcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).EcellIDX);
-poprate.I = sum(spikemat(:,SimValuesArray(ww).IcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).IcellIDX);
+poprate.E = hist(Espikes(:,1),t_rate);
+poprate.E = movmean(poprate.E,overlap);
+
+poprate.I = hist(Ispikes(:,1),t_rate);
+poprate.I = movmean(poprate.I,overlap);
+
+% [spikemat,t_rate,~] = SpktToSpkmat(SimValuesArray(ww).spikesbycell, [], poprate.dt,overlap);
+% poprate.E = sum(spikemat(:,SimValuesArray(ww).EcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).EcellIDX);
+% poprate.I = sum(spikemat(:,SimValuesArray(ww).IcellIDX),2)./(winsize./1000)./length(SimValuesArray(ww).IcellIDX);
 
 plot(Espikes(:,1),Espikes(:,2),'.b','markersize',1)
 hold on
