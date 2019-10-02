@@ -83,13 +83,13 @@ PopParamsAnalysis.p0spike = 0.05;
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 0.5e3;                       %Recording Time (end of simulation)
+RecordTime = 1e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-Ivals = linspace(100,300,6); %Current Values (pA)
-sigvals = linspace(0,50,6);
+Ivals = linspace(100,300,11); %Current Values (pA)
+sigvals = linspace(0,50,11);
 %bvals = 10.^(-2:0.5:4);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
 
@@ -105,14 +105,16 @@ parpool(pc, str2num(getenv('SLURM_NTASKS_PER_NODE'))-1);
 %% Loop 
 
 spikes = cell(length(Ivals),length(sigvals));
+numsims = (length(Ivals)*length(sigvals));
 %Once running: parfor on cluster.
-parfor II = 1:(length(Ivals)*length(sigvals))
+parfor II = 1:numsims
     %if mod(II,5)+1 == cluster_number %cluster_number is the cluster ID used (2 clusters give cluster IDs 1 and 2)
     ii = mod(II,length(Ivals))+1;
     nn = ceil(II/length(Ivals));
-
-    ii
-    nn 
+    
+    display(['Starting Sim: ',num2str(II),' of ',num2str(numsims)])
+    %ii
+    %nn 
     
     %Set Current and adaptation value
 
