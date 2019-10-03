@@ -1,4 +1,4 @@
-function CondAdLIF_iSTDP_Noise_Current(repopath)
+function CondAdLIF_iSTDP_Noise_Current_LogN(repopath)
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
 
@@ -14,10 +14,10 @@ savedatafolder = fullfile(repopath,'SimData');
 
 netfolder = fullfile(repopath,'TrainedNets/');
 
- load([netfolder 'Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat']);
+% load([netfolder 'Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat']);
 % load([netfolder 'Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250_starting_values.mat']);
 
-%load([netfolder 'Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat']);
+load([netfolder 'Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat']);
 %load([netfolder 'Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250_initial_values.mat']);
 %load([netfolder 'Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250_starting_values.mat']);
 
@@ -83,7 +83,7 @@ PopParamsAnalysis.p0spike = 0.05;
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 5e3;                       %Recording Time (end of simulation)
+RecordTime = 3e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
