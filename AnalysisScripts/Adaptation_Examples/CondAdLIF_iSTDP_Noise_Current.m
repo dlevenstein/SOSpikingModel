@@ -1,4 +1,4 @@
-function CondAdLIF_iSTDP_Noise_Current(repopath)
+function CondAdLIF_iSTDP_Noise_Current(repopath,whichnet)
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
 
@@ -14,10 +14,15 @@ savedatafolder = fullfile(repopath,'SimData');
 
 netfolder = fullfile(repopath,'TrainedNets/');
 
- load([netfolder 'Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat']);
+switch whichnet
+    case 'Uniform'
+        load([netfolder 'Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat']);
+        savefilename = 'NoiseVCurrentSpikes.mat';
 % load([netfolder 'Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250_starting_values.mat']);
-
-%load([netfolder 'Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat']);
+    case 'LogN'
+        savefilename = 'NoiseVCurrentSpikes_LogN.mat';
+        load([netfolder 'Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat']);
+end
 %load([netfolder 'Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250_initial_values.mat']);
 %load([netfolder 'Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250_starting_values.mat']);
 
@@ -134,20 +139,26 @@ parfor II = 1:numsims
     
     spikes{II} = SimValuesArray.spikes;
     
+    switch whichnet
+        case 'Uniform'
     simname = ['Input',round(num2str(Ivals(ii))),'_Noise',round(num2str(sigvals(nn)))];
+        case 'LogN'
+    simname = ['LogN_Input',round(num2str(Ivals(ii))),'_Noise',round(num2str(sigvals(nn)))];
+ 
+    end
     NiceSave('SimFig',figfolder,simname,'figtype','jpg')
+    
     
     %end
 end
 
+
 try
-save(fullfile(savedatafolder,'NoiseVCurrentSpikes.mat'),'spikes','-v7.3')
+save(fullfile(savedatafolder,savefilename),'spikes','-v7.3')
 catch
-    try
-    save(fullfile(figfolder,'NoiseVCurrentSpikes.mat'),'spikes','-v7.3')
-    catch
-        save(pwd,'spikes','-v7.3')
-    end
+    
+    save(fullfile(figfolder,savefilename),'spikes','-v7.3')
+
 end
 % display('Saving')
 % for II = 1:(length(Ivals)*length(sigvals))
