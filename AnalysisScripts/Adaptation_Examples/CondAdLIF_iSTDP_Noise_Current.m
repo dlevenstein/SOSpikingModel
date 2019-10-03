@@ -78,12 +78,14 @@ PopParamsAnalysis.t_syn        = 0;%rand(PopParams.EPopNum+PopParams.IPopNum,1)*
 %PopParamsAnalysis.V0 = PopParams_in.V0;
 %PopParamsAnalysis.w0 = PopParams_in.w0;
 %PopParamsAnalysis.s0 = PopParams_in.s0;
-PopParamsAnalysis.p0spike = 0.05;
+
+%PopParamsAnalysis.p0spike = 0.05; %start ON
+PopParamsAnalysis.p0spike = 0.00; %start OFF
 
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 5e3;                       %Recording Time (end of simulation)
+RecordTime = 10e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
