@@ -85,18 +85,18 @@ PopParamsAnalysis.t_syn        = 0;%rand(PopParams.EPopNum+PopParams.IPopNum,1)*
 %PopParamsAnalysis.s0 = PopParams_in.s0;
 
 %PopParamsAnalysis.p0spike = 0.05; %start ON
-PopParamsAnalysis.p0spike = 0.00; %start OFF
+PopParamsAnalysis.p0spike = -0.5; %start OFF (V random halfway to threshold)
 
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 10e3;                       %Recording Time (end of simulation)
+RecordTime = 5e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-Ivals = linspace(50,250,9); %Current Values (pA)
-sigvals = linspace(0,40,9);
+Ivals = linspace(0,225,10); %Current Values (pA)
+sigvals = linspace(0,100,16);
 %bvals = 10.^(-2:0.5:4);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
 
@@ -154,10 +154,12 @@ end
 
 
 try
-save(fullfile(savedatafolder,savefilename),'spikes','-v7.3')
+save(fullfile(savedatafolder,savefilename),'spikes','Ivals','sigvals',...
+    'SimTime','-v7.3')
 catch
     
-    save(fullfile(figfolder,savefilename),'spikes','-v7.3')
+    save(fullfile(figfolder,savefilename),'spikes','Ivals','sigvals',...
+        'SimTime','-v7.3')
 
 end
 % display('Saving')
@@ -167,4 +169,75 @@ end
 %     nn = ceil(II/length(Ivals))
 %     save(fullfile(savedatafolder,['NoiseVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(nn) '.mat']),'spikes','-v7.3') 
 % end
+
+%%
+load(fullfile(figfolder,savefilename))
+
+%%
+numsims = (length(Ivals)*length(sigvals));
+for II = 1:numsims
+    ii = mod(II,length(Ivals))+1;
+    nn = ceil(II/length(Ivals));
+    bz_Counter(II,numsims,'DOWN Detection')
+    % Detect UP/DOWN states
+    switch whichnet
+        case 'Uniform'
+    simname = ['Input',round(num2str(Ivals(ii))),'_Noise',round(num2str(sigvals(nn)))];
+        case 'LogN'
+    simname = ['LogN_Input',round(num2str(Ivals(ii))),'_Noise',round(num2str(sigvals(nn)))];
+ 
+    end
+    close all
+    UPDOWNstuff(ii,nn) = DOWNdetection( spikes{II},'simdur',SimTime,...
+        'SHOWFIG',simname,'savefolder',figfolder );
+    
+    %Fraction of time DOWN
+    UPDOWNstats.pDOWN(ii,nn) = sum(UPDOWNstuff(ii,nn).dur.DOWN)./sum(UPDOWNstuff(ii,nn).dur.UP);
+    %Duraiton of DOWN
+    UPDOWNstats.durDOWN(ii,nn) = mean(UPDOWNstuff(ii,nn).dur.DOWN);
+    %Mean Rate of UP
+    UPDOWNstats.UPrate(ii,nn) = mean(UPDOWNstuff(ii,nn).UPrate);
+    %Duration of UP
+    UPDOWNstats.durUP(ii,nn) = mean(UPDOWNstuff(ii,nn).dur.UP);
+    
 end
+
+%%
+figure
+subplot(2,2,1)
+imagesc(Ivals,sigvals,log10(UPDOWNstats.pDOWN)')
+colorbar
+caxis([-2 2])
+axis xy
+title('UP/DOWN Ratio')
+xlabel('Input');ylabel('Noise')
+
+subplot(2,2,3)
+imagesc(Ivals,sigvals,log10(UPDOWNstats.durUP)');
+alpha(single(~isnan(UPDOWNstats.durUP))')
+colorbar
+LogScale('c',10)
+axis xy
+title('Mean UP Duration')
+xlabel('Input');ylabel('Noise')
+
+subplot(2,2,2)
+imagesc(Ivals,sigvals,(UPDOWNstats.UPrate)');
+alpha(single(~isnan(UPDOWNstats.durUP))')
+colorbar
+%LogScale('c',10)
+caxis([0 50])
+axis xy
+title('Mean UP Rate')
+xlabel('Input');ylabel('Noise')
+
+subplot(2,2,4)
+a = imagesc(Ivals,sigvals,log10(UPDOWNstats.durDOWN)');
+alpha(single(~isnan(UPDOWNstats.durDOWN))')
+colorbar
+LogScale('c',10)
+axis xy
+title('Mean DOWN Duration')
+xlabel('Input');ylabel('Noise')
+
+NiceSave('InputNoiseMap',figfolder,whichnet,'figtype','pdf')

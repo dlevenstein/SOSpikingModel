@@ -6,6 +6,9 @@ function [ UPDOWN,ratehist,durhist ] = DOWNdetection( spikes,varargin )
 %   'threshold'     Rate threshold - below this is DOWN state (default: 0.5Hz)
 %   'binsize'       (Gaussian) Binning window for calculating rate (default: 25 ms)
 %   'SHOWFIG'       show the figure (default: true)
+%                   if you want to save the figure, put a name for the
+%                   figure here
+%   'savefolder'    default: pwd. Folder where to save if using 'SHOWFIG',figname
 %   'numcells'      this is to account for simulations in which not all
 %                   cells spike. However, this should be updated to 
 %                   should put in cell array form instead
@@ -42,6 +45,9 @@ spikemat = bz_SpktToSpkmat(spikes,'dt',1,'binsize',binsize,...
     'bintype','gaussian','units','rate','win',[0 simdur]);
 spikemat.allrate = mean(spikemat.data,2)*1000;
 
+if isempty(spikemat.data)
+    error('No Spikes. You need to enter a simdur')
+end
 %Rate histogram
 ratehist.hist = hist(log10(spikemat.allrate),ratehist.bins);
 
@@ -83,6 +89,8 @@ ratehist.summstats.meanUPrate = ratehist.summstats.meanUPrate.*1000./numcells; %
 if SHOWFIG
 DOWNcolor = [0 0 0.8];
 
+exwin = bz_RandomWindowInIntervals(spikemat.timestamps([1 end]),5000);
+
 figure
     subplot(3,1,1)
     plot(spikes(:,1),spikes(:,2),'.')
@@ -110,18 +118,18 @@ figure
         DOWNcolor,'FaceAlpha',0.2,'EdgeColor','none');
     %plot(get(gca,'xlim'
     box off
-    xlim([10000 15000])
+    xlim(exwin)
     bz_ScaleBar('ms')
     title('Example Window')
 
 
 subplot(3,3,7)
-plot(log10(UPDOWN.dur.UP),log10(UPDOWN.UPrate),'.')
+plot(log10(UPDOWN.dur.UP),log10(UPDOWN.UPrate),'r.')
 axis tight
 box off
 hold on
-plot(durhist.bins,bz_NormToRange(durhist.DOWN))
-plot(durhist.bins,bz_NormToRange(durhist.UP))
+plot(durhist.bins,bz_NormToRange(durhist.DOWN),'b')
+plot(durhist.bins,bz_NormToRange(durhist.UP),'r')
 LogScale('xy',10)
 xlabel('UP/DOWN Dur (ms)');ylabel('UP Rate')
 legend('UP States','UP','DOWN')

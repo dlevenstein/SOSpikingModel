@@ -808,6 +808,7 @@ exspiketimes = spikes(spikes(:,2)==exneuron,1);
 % poprate.I = sum(spikemat(:,SimValues.IcellIDX),2)./(winsize./1000)./length(SimValues.IcellIDX);
 
 figure
+subplot(2,1,1)
 plot(Espikes(:,1),Espikes(:,2),'.b','markersize',1)
 hold on
 plot(Ispikes(:,1),Ispikes(:,2),'.r','markersize',1)
