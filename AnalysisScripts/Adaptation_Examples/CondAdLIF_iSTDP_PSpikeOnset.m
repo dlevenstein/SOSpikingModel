@@ -1,6 +1,6 @@
-function CondAdLIF_iSTDP_Noise_Current(repopath)
+function CondAdLIF_iSTDP_PSpikeOnset(repopath)
 
-%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
 
 addpath(genpath(repopath))
 
@@ -83,14 +83,14 @@ PopParamsAnalysis.p0spike = 0.05;
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 0.2e3;                       %Recording Time (end of simulation)
+RecordTime = 0.25e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
 %Ivals = linspace(50,250,9); %Current Values (pA)
 %sigvals = linspace(0,40,9);
-p0vals = logspace(-2.5,-0.5,21);
+p0vals = linspace(0,0.2,21);
 %bvals = 10.^(-2:0.5:4);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
 PopParamsAnalysis.I_e = 150;
@@ -104,7 +104,7 @@ PopParamsAnalysis.sigma = 0;
 % % we use SLURM_NTASKS_PER_NODE - 1, because one of these tasks is the original MATLAB script itself
 % parpool(pc, str2num(getenv('SLURM_NTASKS_PER_NODE'))-1);
 
-%% Loop 
+%% Loop: p0 
 numsims = length(p0vals);
 clear spikes
 %spikes = cell(length(Ivals),length(sigvals));
@@ -142,22 +142,27 @@ end
 clear meanrate
 lastspike = zeros(size(p0vals));
 for II = 1:numsims
-    lastspike(II) = spikes{II}(end,1);
+    lastspike(II) = max(spikes{II}(:,1));
     
     spikemat = bz_SpktToSpkmat(spikes{II},'dt',1,'binsize',5,...
-        'bintype','gaussian','win',[0 TimeParams.SimTime]);
-    meanrate(:,II) = mean(spikemat.data,2);
+        'bintype','gaussian','win',[0 TimeParams.SimTime],'Units','rate');
+    meanrate(:,II) = 1000*sum(spikemat.data,2)./(PopParams.IPopNum+PopParams.EPopNum);
 end
 %%
 figure
 subplot(2,2,1)
-plot(p0vals,lastspike)
+plot((p0vals),lastspike,'k','linewidth',1)
 box off
+%LogScale('x',10)
+xlabel('Onset Synchrony');
+ylabel('Last Spike time (ms)')
 
 subplot(2,2,2)
-imagesc(spikemat.timestamps,p0vals,  meanrate')
+imagesc(spikemat.timestamps,log10(p0vals),meanrate')
 axis xy
-
+LogScale('y',10)
+ColorbarWithAxis([0 10],'Mean Rate (Hz)')
+xlabel('t (ms)');ylabel('Onset Synchrony')
 % display('Saving')
 % for II = 1:(length(Ivals)*length(sigvals))
 %     %if mod(II,5)+1 == cluster_number %cluster_number is the cluster ID used (2 clusters give cluster IDs 1 and 2)
@@ -165,4 +170,83 @@ axis xy
 %     nn = ceil(II/length(Ivals))
 %     save(fullfile(savedatafolder,['NoiseVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(nn) '.mat']),'spikes','-v7.3') 
 % end
+NiceSave('OnsetSynch',figfolder,[])
+
+%%
+UnRecordedTime = 0;                   %Unrecorded time
+RecordTime = 2e3;                       %Recording Time (end of simulation)
+SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
+
+TimeParams.SimTime = SimTime;
+
+sigvals = linspace(0,50,21);
+%% Loop: Noise
+numsims = length(sigvals);
+clear spikes
+%spikes = cell(length(Ivals),length(sigvals));
+%Once running: parfor on cluster.
+parfor II = 1:numsims
+    %if mod(II,5)+1 == cluster_number %cluster_number is the cluster ID used (2 clusters give cluster IDs 1 and 2)
+    %II
+    display(['Starting Sim: ',num2str(II),' of ',num2str(numsims)])
+    %ii
+    %nn 
+    
+    %Set Current and adaptation value
+
+    inloopPopParams = PopParamsAnalysis;
+    inloopPopParams.sigma = sigvals(II);
+
+    
+    %Run Simulation
+    tic
+    SimValuesArray = AdLIFfunction_iSTDP(inloopPopParams,TimeParams,'cellout',true,...
+        'showprogress',true,'showfig',true,'save_weights',TimeParams.SimTime,...
+        'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false,...
+        'recordInterval',[(0:RecordTime:RecordTime) + (TimeParams.SimTime - RecordTime)]');
+    
+    spikes_noise{II} = SimValuesArray.spikes;
+    
+    %spkmat = bz_SpktToSpkmat(SimValuesArray.spikes,'dt',1,'winsize',5
+    simname = ['sigma',num2str(sigvals(II))];
+    NiceSave('SimFig',figfolder,simname,'figtype','jpg')
+    
+    %end
+end
+
+
+%%
+clear meanrate
+lastspike = zeros(size(sigvals));
+for II = 1:numsims
+    lastspike(II) = max(spikes_noise{II}(:,1));
+    
+    spikemat = bz_SpktToSpkmat(spikes_noise{II},'dt',1,'binsize',5,...
+        'bintype','gaussian','win',[0 TimeParams.SimTime],'Units','rate');
+    meanrate(:,II) = 1000*sum(spikemat.data,2)./(PopParams.IPopNum+PopParams.EPopNum);
+end
+%%
+figure
+subplot(2,2,1)
+plot((sigvals),lastspike,'k','linewidth',1)
+box off
+%LogScale('x',10)
+xlabel('Onset Synchrony');
+ylabel('Last Spike time (ms)')
+
+subplot(2,2,2)
+imagesc(spikemat.timestamps,sigvals,meanrate')
+axis xy
+%LogScale('y',10)
+ColorbarWithAxis([0 10],'Mean Rate (Hz)')
+xlabel('t (ms)');ylabel('Noise')
+% display('Saving')
+% for II = 1:(length(Ivals)*length(sigvals))
+%     %if mod(II,5)+1 == cluster_number %cluster_number is the cluster ID used (2 clusters give cluster IDs 1 and 2)
+%     ii = mod(II,length(Ivals))+1;
+%     nn = ceil(II/length(Ivals))
+%     save(fullfile(savedatafolder,['NoiseVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(nn) '.mat']),'spikes','-v7.3') 
+% end
+NiceSave('NoiseOffset',figfolder,[])
+
 end
