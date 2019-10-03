@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -p cpu_short
 #SBATCH --nodes=1
-#SBATCH --tasks-per-node=41
+#SBATCH --tasks-per-node=31
 #SBATCH --time=12:00:00
 #SBATCH --mem-per-cpu=8G
 echo $1
