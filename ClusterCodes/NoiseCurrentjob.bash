@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -p cpu_medium
+#SBATCH -p cpu_short
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=41
 #SBATCH --time=12:00:00
