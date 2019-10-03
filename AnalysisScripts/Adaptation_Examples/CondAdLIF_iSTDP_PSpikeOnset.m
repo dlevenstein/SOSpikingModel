@@ -342,5 +342,5 @@ xlabel('t (ms)');ylabel('Noise')
 %     nn = ceil(II/length(Ivals))
 %     save(fullfile(savedatafolder,['NoiseVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(nn) '.mat']),'spikes','-v7.3') 
 % end
-NiceSave('Input',num2str(I_e),'_NoiseOffset',figfolder,[])
+NiceSave(['Input',num2str(I_e),'_NoiseOffset'],figfolder,[])
 end
