@@ -158,12 +158,12 @@ xlabel('Onset Synchrony');
 ylabel('Last Spike time (ms)')
 
 subplot(2,2,2)
-imagesc(spikemat.timestamps,log10(p0vals),meanrate')
+imagesc(spikemat.timestamps,(p0vals),meanrate')
 axis xy
-LogScale('y',10)
+ %LogScale('y',10)
 ColorbarWithAxis([0 10],'Mean Rate (Hz)')
 xlabel('t (ms)');ylabel('Onset Synchrony')
-% display('Saving')
+% display('Saving')    
 % for II = 1:(length(Ivals)*length(sigvals))
 %     %if mod(II,5)+1 == cluster_number %cluster_number is the cluster ID used (2 clusters give cluster IDs 1 and 2)
 %     ii = mod(II,length(Ivals))+1;
@@ -174,12 +174,14 @@ NiceSave('OnsetSynch',figfolder,[])
 
 %%
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 2e3;                       %Recording Time (end of simulation)
+RecordTime = 1e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-sigvals = linspace(0,50,21);
+PopParamsAnalysis.I_e = 100;
+
+sigvals = linspace(0,50,41);
 %% Loop: Noise
 numsims = length(sigvals);
 clear spikes

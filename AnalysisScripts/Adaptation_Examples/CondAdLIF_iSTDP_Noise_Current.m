@@ -20,7 +20,7 @@ switch whichnet
         savefilename = 'NoiseVCurrentSpikes.mat';
 % load([netfolder 'Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250_starting_values.mat']);
     case 'LogN'
-        savefilename = 'NoiseVCurrentSpikes_LogN.mat';
+        savefilename = 'LogN_NoiseVCurrentSpikes.mat';
         load([netfolder 'Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat']);
 end
 %load([netfolder 'Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250_initial_values.mat']);
