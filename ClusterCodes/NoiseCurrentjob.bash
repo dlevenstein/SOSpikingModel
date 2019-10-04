@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -p cpu_short
 #SBATCH --nodes=1
-#SBATCH --tasks-per-node=36
+#SBATCH --tasks-per-node=41
 #SBATCH --time=12:00:00
 #SBATCH --mem-per-cpu=8G
 echo $1
@@ -11,6 +11,6 @@ export SCRATCH=/gpfs/scratch/dl2820
 mkdir -p $SCRATCH/$SLURM_JOB_ID
 
 #matlab -nodisplay -nodesktop -singleCompThread -r "cd('/gpfs/data/buzsakilab/DL/NeuronalHeterogeneity/ClusterCodes');addPaths;bz_RunAnalysis('OptimizeSleepScoreParms','$1','basePath',true);exit;"
-matlab -nodisplay -nodesktop -singleCompThread -r "cd('/gpfs/data/buzsakilab/DL/SOSpikingModel/ClusterCodes');addPaths;CondAdLIF_iSTDP_Noise_Current('/gpfs/data/buzsakilab/DL/SOSpikingModel','Uniform');exit;"
+matlab -nodisplay -nodesktop -singleCompThread -r "cd('/gpfs/data/buzsakilab/DL/SOSpikingModel/ClusterCodes');addPaths;CondAdLIF_iSTDP_Noise_Current('/gpfs/data/buzsakilab/DL/SOSpikingModel','LogN');exit;"
 
 rm -rf $SCRATCH/$SLURM_JOB_ID

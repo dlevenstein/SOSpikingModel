@@ -23,6 +23,7 @@ addParameter(p,'SHOWFIG',true);
 addParameter(p,'numcells',2500);
 addParameter(p,'simdur',Inf);
 addParameter(p,'savefolder',pwd);
+addParameter(p,'winsize',2000);
 
 
 
@@ -34,6 +35,7 @@ SHOWFIG = p.Results.SHOWFIG;
 numcells = p.Results.numcells;
 simdur = p.Results.simdur;
 savefolder = p.Results.savefolder;
+winsize = p.Results.winsize;
 %%
 
 ratehist.numbins = 150;
@@ -89,7 +91,11 @@ ratehist.summstats.meanUPrate = ratehist.summstats.meanUPrate.*1000./numcells; %
 if SHOWFIG
 DOWNcolor = [0 0 0.8];
 
-exwin = bz_RandomWindowInIntervals(spikemat.timestamps([1 end]),5000);
+try
+exwin = bz_RandomWindowInIntervals(spikemat.timestamps([1 end]),winsize);
+catch
+    exwin = [0 winsize];
+end
 
 figure
     subplot(3,1,1)
