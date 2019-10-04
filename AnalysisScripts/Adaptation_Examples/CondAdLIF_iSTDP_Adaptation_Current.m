@@ -90,14 +90,14 @@ PopParamsAnalysis.p0spike = -0.5; %start OFF (V random halfway to threshold)
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 1e3;                       %Recording Time (end of simulation)
+RecordTime = 5e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-Ivals = linspace(0,100,6); %Current Values (pA)
+Ivals = linspace(0,50,6); %Current Values (pA)
 %sigvals = linspace(0,100,11);
-bvals = 10.^(-2:1:2);       %spike-based Adaptation values (nS)
+bvals = 10.^(-2:0.5:2);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
 
 %% Set up for parallel in cluster
