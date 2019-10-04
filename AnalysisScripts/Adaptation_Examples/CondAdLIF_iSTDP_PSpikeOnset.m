@@ -1,11 +1,15 @@
-function CondAdLIF_iSTDP_PSpikeOnset(repopath,I_e)
+function CondAdLIF_iSTDP_PSpikeOnset(repopath,I_e,delay)
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
 
 addpath(genpath(repopath))
 
+if delay
+    figfolder = fullfile(repopath,'Figures','SpikeOnset','WithDelay');
 
-figfolder = fullfile(repopath,'Figures','SpikeOnset');
+else
+    figfolder = fullfile(repopath,'Figures','SpikeOnset');
+end
 %savedatafolder = fullfile(repopath,'SimData');
 %% Set Cluster Number
 %numClusters = 5; %This is if you have 5 clusters, so cluster_number inputs are 1-5 
@@ -52,7 +56,11 @@ PopParams.b       = 0;              %adaptation activation rate (1/ms)
 PopParams.tau_w   = 300;            %adaptation decay (ms)
 PopParams.gwnorm  = 0;              %magnitude of adaptation
 
-PopParams.t_syn = 0;                %Synaptic Delay
+if delay
+    PopParams.t_syn = rand(PopParams.EPopNum+PopParams.IPopNum,1)*0.4+0.05;   
+else
+    PopParams.t_syn = 0;                %Synaptic Delay
+end
 
 PopParams.LearningRate = 0;
 PopParams.TargetRateI = nan; %Target E rate nan Hz (Turns off plasticity)
