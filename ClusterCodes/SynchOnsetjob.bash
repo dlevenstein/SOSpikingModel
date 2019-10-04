@@ -11,6 +11,6 @@ export SCRATCH=/gpfs/scratch/dl2820
 mkdir -p $SCRATCH/$SLURM_JOB_ID
 
 #matlab -nodisplay -nodesktop -singleCompThread -r "cd('/gpfs/data/buzsakilab/DL/NeuronalHeterogeneity/ClusterCodes');addPaths;bz_RunAnalysis('OptimizeSleepScoreParms','$1','basePath',true);exit;"
-matlab -nodisplay -nodesktop -singleCompThread -r "cd('/gpfs/data/buzsakilab/DL/SOSpikingModel/ClusterCodes');addPaths;CondAdLIF_iSTDP_PSpikeOnset('/gpfs/data/buzsakilab/DL/SOSpikingModel',150,true);exit;"
+matlab -nodisplay -nodesktop -singleCompThread -r "cd('/gpfs/data/buzsakilab/DL/SOSpikingModel/ClusterCodes');addPaths;CondAdLIF_iSTDP_PSpikeOnset('/gpfs/data/buzsakilab/DL/SOSpikingModel',75,true);exit;"
 
 rm -rf $SCRATCH/$SLURM_JOB_ID
