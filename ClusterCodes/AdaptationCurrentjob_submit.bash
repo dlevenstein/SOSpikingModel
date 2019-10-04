@@ -1,5 +1,5 @@
 #!/bin/bash
-sbatch ./AdaptaitonCurrentjob.bash
+sbatch ./AdaptationCurrentjob.bash
 
 
 
