@@ -195,16 +195,18 @@ for II = 1:numsims
     UPDOWNstats.pDOWN(ii,nn) = sum(UPDOWNstuff(ii,nn).dur.DOWN)./sum(UPDOWNstuff(ii,nn).dur.UP);
     %Duraiton of DOWN
     UPDOWNstats.durDOWN(ii,nn) = mean(UPDOWNstuff(ii,nn).dur.DOWN);
+    UPDOWNstats.CVDOWN(ii,nn) = std(UPDOWNstuff(ii,nn).dur.DOWN)./mean(UPDOWNstuff(ii,nn).dur.DOWN);
     %Mean Rate of UP
     UPDOWNstats.UPrate(ii,nn) = mean(UPDOWNstuff(ii,nn).UPrate);
     %Duration of UP
     UPDOWNstats.durUP(ii,nn) = mean(UPDOWNstuff(ii,nn).dur.UP);
+    UPDOWNstats.CVUP(ii,nn) = std(UPDOWNstuff(ii,nn).dur.UP)./mean(UPDOWNstuff(ii,nn).dur.UP);
     
 end
 
 %%
 figure
-subplot(2,2,1)
+subplot(3,3,1)
 imagesc(Ivals,bvals,log10(UPDOWNstats.pDOWN)')
 colorbar
 caxis([-2 2])
@@ -212,7 +214,7 @@ axis xy
 title('UP/DOWN Ratio')
 xlabel('Input');ylabel('Adaptation')
 
-subplot(2,2,3)
+subplot(3,3,4)
 imagesc(Ivals,bvals,log10(UPDOWNstats.durUP)');
 alpha(single(~isnan(UPDOWNstats.durUP))')
 colorbar
@@ -221,7 +223,7 @@ axis xy
 title('Mean UP Duration')
 xlabel('Input');ylabel('Adaptation')
 
-subplot(2,2,2)
+subplot(3,3,2)
 imagesc(Ivals,bvals,(UPDOWNstats.UPrate)');
 alpha(single(~isnan(UPDOWNstats.durUP))')
 colorbar
@@ -231,13 +233,33 @@ axis xy
 title('Mean UP Rate')
 xlabel('Input');ylabel('Adaptation')
 
-subplot(2,2,4)
+subplot(3,3,5)
 a = imagesc(Ivals,bvals,log10(UPDOWNstats.durDOWN)');
 alpha(single(~isnan(UPDOWNstats.durDOWN))')
 colorbar
 LogScale('c',10)
 axis xy
 title('Mean DOWN Duration')
+xlabel('Input');ylabel('Adaptation')
+
+subplot(3,3,7)
+a = imagesc(Ivals,bvals,(UPDOWNstats.CVUP)');
+alpha(single(~isnan(UPDOWNstats.durUP))')
+colorbar
+caxis([0 2])
+%LogScale('c',10)
+axis xy
+title('CV UP Duration')
+xlabel('Input');ylabel('Adaptation')
+
+subplot(3,3,8)
+a = imagesc(Ivals,bvals,(UPDOWNstats.CVDOWN)');
+alpha(single(~isnan(UPDOWNstats.durDOWN))')
+colorbar
+caxis([0 2])
+%LogScale('c',10)
+axis xy
+title('CV DOWN Duration')
 xlabel('Input');ylabel('Adaptation')
 
 NiceSave('InputAdaptMap',figfolder,whichnet,'figtype','pdf')
