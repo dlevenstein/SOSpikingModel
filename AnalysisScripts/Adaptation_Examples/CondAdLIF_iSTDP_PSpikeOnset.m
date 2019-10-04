@@ -75,7 +75,6 @@ PopParamsAnalysis.tau_w        = 300;                    %adaptation decay (ms)
 PopParamsAnalysis.sigma        = 10;                     %Noise variance (pA) (Set to Covariance Matrix to add covariance
 PopParamsAnalysis.W            = SimValues.WeightMat(:,:,end); %Synaptic Weights
 PopParamsAnalysis.gwnorm       = 1;                      %Adaptation norm
-PopParamsAnalysis.t_syn        = 0;%rand(PopParams.EPopNum+PopParams.IPopNum,1)*0.5;                      %Synaptic Delay (ms)
 
 %% Note Adaptation Equation
 %dwdt =  (- w + a.*(V - E_w))./tau_w; (Line 529)
