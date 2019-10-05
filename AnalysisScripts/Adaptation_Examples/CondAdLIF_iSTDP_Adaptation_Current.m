@@ -250,7 +250,7 @@ subplot(3,3,7)
 a = imagesc(Ivals,log10(bvals),(UPDOWNstats.CVUP)');
 alpha(single(~isnan(UPDOWNstats.durUP))')
 colorbar
-caxis([0 1,5])
+caxis([0 1.5])
 %LogScale('c',10)
 axis xy
 LogScale('y',10)
