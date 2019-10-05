@@ -68,8 +68,8 @@ PopParams.tauSTDP = 20;
 
 PopParamsAnalysis              = PopParams;
 PopParamsAnalysis.LearningRate = 0;                      %Learning rate
-PopParamsAnalysis.tau_w        = 300;                    %adaptation decay (ms)
-PopParamsAnalysis.sigma        = 100;                     %Noise variance (pA) (Set to Covariance Matrix to add covariance
+PopParamsAnalysis.tau_w        = 500;    %300                %adaptation decay (ms)
+PopParamsAnalysis.sigma        = 90;     %100               %Noise variance (pA) (Set to Covariance Matrix to add covariance
 PopParamsAnalysis.W            = SimValues.WeightMat(:,:,end); %Synaptic Weights
 PopParamsAnalysis.gwnorm       = 1;                      %Adaptation norm
 PopParamsAnalysis.t_syn        = 0;%rand(PopParams.EPopNum+PopParams.IPopNum,1)*0.5;                      %Synaptic Delay (ms)
@@ -90,14 +90,14 @@ PopParamsAnalysis.p0spike = -0.5; %start OFF (V random halfway to threshold)
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 5e3;                       %Recording Time (end of simulation)
+RecordTime = 10e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
 Ivals = linspace(0,50,6); %Current Values (pA)
 %sigvals = linspace(0,100,11);
-bvals = 10.^(-2:0.5:2);       %spike-based Adaptation values (nS)
+bvals = 10.^(-2.5:0.5:1);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
 
 %% Set up for parallel in cluster
@@ -207,58 +207,64 @@ end
 %%
 figure
 subplot(3,3,1)
-imagesc(Ivals,bvals,log10(UPDOWNstats.pDOWN)')
+imagesc(Ivals,log10(bvals),log10(UPDOWNstats.pDOWN)')
 colorbar
 caxis([-2 2])
 axis xy
+LogScale('y',10)
 title('UP/DOWN Ratio')
 xlabel('Input');ylabel('Adaptation')
 
 subplot(3,3,4)
-imagesc(Ivals,bvals,log10(UPDOWNstats.durUP)');
+imagesc(Ivals,log10(bvals),log10(UPDOWNstats.durUP)');
 alpha(single(~isnan(UPDOWNstats.durUP))')
 colorbar
 LogScale('c',10)
+LogScale('y',10)
 axis xy
 title('Mean UP Duration')
 xlabel('Input');ylabel('Adaptation')
 
 subplot(3,3,2)
-imagesc(Ivals,bvals,(UPDOWNstats.UPrate)');
+imagesc(Ivals,log10(bvals),(UPDOWNstats.UPrate)');
 alpha(single(~isnan(UPDOWNstats.durUP))')
 colorbar
 %LogScale('c',10)
 caxis([0 50])
 axis xy
+LogScale('y',10)
 title('Mean UP Rate')
 xlabel('Input');ylabel('Adaptation')
 
 subplot(3,3,5)
-a = imagesc(Ivals,bvals,log10(UPDOWNstats.durDOWN)');
+a = imagesc(Ivals,log10(bvals),log10(UPDOWNstats.durDOWN)');
 alpha(single(~isnan(UPDOWNstats.durDOWN))')
 colorbar
 LogScale('c',10)
 axis xy
+LogScale('y',10)
 title('Mean DOWN Duration')
 xlabel('Input');ylabel('Adaptation')
 
 subplot(3,3,7)
-a = imagesc(Ivals,bvals,(UPDOWNstats.CVUP)');
+a = imagesc(Ivals,log10(bvals),(UPDOWNstats.CVUP)');
 alpha(single(~isnan(UPDOWNstats.durUP))')
 colorbar
-caxis([0 2])
+caxis([0 1,5])
 %LogScale('c',10)
 axis xy
+LogScale('y',10)
 title('CV UP Duration')
 xlabel('Input');ylabel('Adaptation')
 
 subplot(3,3,8)
-a = imagesc(Ivals,bvals,(UPDOWNstats.CVDOWN)');
+a = imagesc(Ivals,log10(bvals),(UPDOWNstats.CVDOWN)');
 alpha(single(~isnan(UPDOWNstats.durDOWN))')
 colorbar
-caxis([0 2])
+caxis([0 1.5])
 %LogScale('c',10)
 axis xy
+LogScale('y',10)
 title('CV DOWN Duration')
 xlabel('Input');ylabel('Adaptation')
 
