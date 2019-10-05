@@ -95,7 +95,7 @@ SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-Ivals = linspace(0,50,6); %Current Values (pA)
+Ivals = linspace(0,50,11); %Current Values (pA)
 %sigvals = linspace(0,100,11);
 bvals = 10.^(-2.5:0.5:1);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
