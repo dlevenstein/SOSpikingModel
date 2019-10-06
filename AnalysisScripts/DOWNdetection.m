@@ -1,6 +1,7 @@
 function [ UPDOWN,ratehist,durhist ] = DOWNdetection( spikes,varargin )
 %mean, CV, UP/DOWN times,
 %option: try multiple rate bins, thresholds
+%SPIKES IN UNITS OF MS.
 %
 %OPTIONS
 %   'threshold'     Rate threshold - below this is DOWN state (default: 0.5Hz)
@@ -17,13 +18,14 @@ function [ UPDOWN,ratehist,durhist ] = DOWNdetection( spikes,varargin )
 
 %% Options
 p = inputParser;
-addParameter(p,'threshold',0.2);
-addParameter(p,'binsize',25);
+addParameter(p,'threshold',0.3);
+addParameter(p,'binsize',20);
 addParameter(p,'SHOWFIG',true);
 addParameter(p,'numcells',2500);
 addParameter(p,'simdur',Inf);
 addParameter(p,'savefolder',pwd);
 addParameter(p,'winsize',2000);
+addParameter(p,'minDOWN',30);
 
 
 
@@ -36,6 +38,7 @@ numcells = p.Results.numcells;
 simdur = p.Results.simdur;
 savefolder = p.Results.savefolder;
 winsize = p.Results.winsize;
+minDOWN = p.Results.minDOWN;
 %%
 
 ratehist.numbins = 150;
@@ -57,12 +60,27 @@ ratehist.hist = hist(log10(spikemat.allrate),ratehist.bins);
 %% UP/DOWN detection
 
 IDX.timestamps = spikemat.timestamps;
-IDX.statenames = {'UP','DOWN'};
-IDX.states = single(spikemat.allrate>threshold);
-IDX.states(spikemat.allrate<=threshold)=2;
+IDX.statenames = {'DOWN'};
+IDX.states = single(spikemat.allrate<=threshold);
+%IDX.states(spikemat.allrate<=threshold)=2;
 UPDOWN.ints = bz_IDXtoINT(IDX);
-UPDOWN.dur.UP = diff(UPDOWN.ints.UPstate,[],2);
+
 UPDOWN.dur.DOWN = diff(UPDOWN.ints.DOWNstate,[],2);
+
+shortdown = InIntervals(IDX.timestamps,UPDOWN.ints.DOWNstate(UPDOWN.dur.DOWN<minDOWN,:));
+%UPDOWN.ints.DOWNstate(UPDOWN.dur.DOWN<minDOWN,:) = [];
+IDX.states(shortdown) = 0;
+IDX.states(IDX.states==0) = 2;
+IDX.statenames = {'DOWN','UP'};
+UPDOWN.ints = bz_IDXtoINT(IDX);
+%Remove DOWN states that are too short
+
+UPDOWN.dur.DOWN = diff(UPDOWN.ints.DOWNstate,[],2);
+UPDOWN.dur.UP = diff(UPDOWN.ints.UPstate,[],2);
+
+
+
+
     
 [UPspikes,inUP] = InIntervals(spikes(:,1),UPDOWN.ints.UPstate);
 UPDOWN.UPrate = [];

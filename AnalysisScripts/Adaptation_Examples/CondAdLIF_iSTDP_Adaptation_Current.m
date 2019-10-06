@@ -69,10 +69,10 @@ PopParams.tauSTDP = 20;
 PopParamsAnalysis              = PopParams;
 PopParamsAnalysis.LearningRate = 0;                      %Learning rate
 PopParamsAnalysis.tau_w        = 500;    %300                %adaptation decay (ms)
-PopParamsAnalysis.sigma        = 90;     %100               %Noise variance (pA) (Set to Covariance Matrix to add covariance
+PopParamsAnalysis.sigma        = 80;     %100               %Noise variance (pA) (Set to Covariance Matrix to add covariance
 PopParamsAnalysis.W            = SimValues.WeightMat(:,:,end); %Synaptic Weights
 PopParamsAnalysis.gwnorm       = 1;                      %Adaptation norm
-PopParamsAnalysis.t_syn        = 0;%rand(PopParams.EPopNum+PopParams.IPopNum,1)*0.5;                      %Synaptic Delay (ms)
+PopParamsAnalysis.t_syn        = rand(PopParams.EPopNum+PopParams.IPopNum,1)*0.4+0.05;                      %Synaptic Delay (ms)
 
 %% Note Adaptation Equation
 %dwdt =  (- w + a.*(V - E_w))./tau_w; (Line 529)
@@ -90,12 +90,12 @@ PopParamsAnalysis.p0spike = -0.5; %start OFF (V random halfway to threshold)
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 10e3;                       %Recording Time (end of simulation)
+RecordTime = 20e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-Ivals = linspace(0,100,21); %Current Values (pA)
+Ivals = linspace(0,80,17); %Current Values (pA)
 %sigvals = linspace(0,100,11);
 bvals = 10.^(-2.5:0.5:1);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
@@ -250,7 +250,7 @@ subplot(3,3,7)
 a = imagesc(Ivals,log10(bvals),(UPDOWNstats.CVUP)');
 alpha(single(~isnan(UPDOWNstats.durUP))')
 colorbar
-caxis([0 1.5])
+caxis([0.2 1.2])
 %LogScale('c',10)
 axis xy
 LogScale('y',10)
@@ -261,7 +261,7 @@ subplot(3,3,8)
 a = imagesc(Ivals,log10(bvals),(UPDOWNstats.CVDOWN)');
 alpha(single(~isnan(UPDOWNstats.durDOWN))')
 colorbar
-caxis([0 1.5])
+caxis([0.2 1.2])
 %LogScale('c',10)
 axis xy
 LogScale('y',10)
