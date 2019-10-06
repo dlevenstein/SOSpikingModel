@@ -69,7 +69,7 @@ PopParams.tauSTDP = 20;
 PopParamsAnalysis              = PopParams;
 PopParamsAnalysis.LearningRate = 0;                      %Learning rate
 PopParamsAnalysis.tau_w        = 500;    %300                %adaptation decay (ms)
-PopParamsAnalysis.sigma        = 80;     %100               %Noise variance (pA) (Set to Covariance Matrix to add covariance
+PopParamsAnalysis.sigma        = 90;     %100               %Noise variance (pA) (Set to Covariance Matrix to add covariance
 PopParamsAnalysis.W            = SimValues.WeightMat(:,:,end); %Synaptic Weights
 PopParamsAnalysis.gwnorm       = 1;                      %Adaptation norm
 PopParamsAnalysis.t_syn        = rand(PopParams.EPopNum+PopParams.IPopNum,1)*0.4+0.05;                      %Synaptic Delay (ms)
@@ -90,12 +90,12 @@ PopParamsAnalysis.p0spike = -0.5; %start OFF (V random halfway to threshold)
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 20e3;                       %Recording Time (end of simulation)
+RecordTime = 10e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-Ivals = linspace(0,80,17); %Current Values (pA)
+Ivals = linspace(0,75,16); %Current Values (pA)
 %sigvals = linspace(0,100,11);
 bvals = 10.^(-2.5:0.5:1);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
