@@ -248,9 +248,9 @@ xlabel('Input');ylabel('Adaptation')
 
 subplot(3,3,7)
 a = imagesc(Ivals,log10(bvals),(UPDOWNstats.CVUP)');
-alpha(single(~isnan(UPDOWNstats.durUP))')
+alpha(single(~isnan(UPDOWNstats.durUP)&~isnan(UPDOWNstats.durDOWN))')
 colorbar
-caxis([0.4 1.2])
+caxis([0.2 1.2])
 crameri('berlin','pivot',1)
 %LogScale('c',10)
 axis xy
@@ -262,7 +262,7 @@ subplot(3,3,8)
 a = imagesc(Ivals,log10(bvals),(UPDOWNstats.CVDOWN)');
 alpha(single(~isnan(UPDOWNstats.durDOWN))')
 colorbar
-caxis([0.4 1.2])
+caxis([0.2 1.2])
 crameri('berlin','pivot',1)
 %LogScale('c',10)
 axis xy

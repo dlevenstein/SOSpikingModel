@@ -18,8 +18,8 @@ function [ UPDOWN,ratehist,durhist ] = DOWNdetection( spikes,varargin )
 
 %% Options
 p = inputParser;
-addParameter(p,'threshold',0.3);
-addParameter(p,'binsize',20);
+addParameter(p,'threshold',0.5);
+addParameter(p,'binsize',10);
 addParameter(p,'SHOWFIG',true);
 addParameter(p,'numcells',2500);
 addParameter(p,'simdur',Inf);
@@ -159,7 +159,7 @@ xlabel('UP/DOWN Dur (ms)');ylabel('UP Rate')
 legend('UP States','UP','DOWN','Location','eastoutside')
 
 subplot(3,2,6)
-plot(ratehist.bins,(ratehist.hist))
+plot(ratehist.bins,(ratehist.hist),'k','linewidth',1)
 axis tight
 hold on
 plot(log10(threshold).*[1 1],get(gca,'ylim'),'r')
