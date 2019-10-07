@@ -147,7 +147,7 @@ figure
     title('Example Window')
 
 
-subplot(3,3,7)
+subplot(3,2,5)
 plot(log10(UPDOWN.dur.UP),log10(UPDOWN.UPrate),'r.')
 axis tight
 box off
@@ -156,9 +156,9 @@ plot(durhist.bins,bz_NormToRange(durhist.DOWN),'b')
 plot(durhist.bins,bz_NormToRange(durhist.UP),'r')
 LogScale('xy',10)
 xlabel('UP/DOWN Dur (ms)');ylabel('UP Rate')
-legend('UP States','UP','DOWN')
+legend('UP States','UP','DOWN','Location','eastoutside')
 
-subplot(3,3,8)
+subplot(3,2,6)
 plot(ratehist.bins,(ratehist.hist))
 axis tight
 hold on

@@ -69,7 +69,7 @@ PopParams.tauSTDP = 20;
 PopParamsAnalysis              = PopParams;
 PopParamsAnalysis.LearningRate = 0;                      %Learning rate
 PopParamsAnalysis.tau_w        = 500;    %300                %adaptation decay (ms)
-PopParamsAnalysis.sigma        = 90;     %100               %Noise variance (pA) (Set to Covariance Matrix to add covariance
+PopParamsAnalysis.sigma        = 100;     %100               %Noise variance (pA) (Set to Covariance Matrix to add covariance
 PopParamsAnalysis.W            = SimValues.WeightMat(:,:,end); %Synaptic Weights
 PopParamsAnalysis.gwnorm       = 1;                      %Adaptation norm
 PopParamsAnalysis.t_syn        = rand(PopParams.EPopNum+PopParams.IPopNum,1)*0.4+0.05;                      %Synaptic Delay (ms)
@@ -90,7 +90,7 @@ PopParamsAnalysis.p0spike = -0.5; %start OFF (V random halfway to threshold)
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 10e3;                       %Recording Time (end of simulation)
+RecordTime = 15e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
@@ -250,7 +250,8 @@ subplot(3,3,7)
 a = imagesc(Ivals,log10(bvals),(UPDOWNstats.CVUP)');
 alpha(single(~isnan(UPDOWNstats.durUP))')
 colorbar
-caxis([0.2 1.2])
+caxis([0.4 1.2])
+crameri('berlin','pivot',1)
 %LogScale('c',10)
 axis xy
 LogScale('y',10)
@@ -261,7 +262,8 @@ subplot(3,3,8)
 a = imagesc(Ivals,log10(bvals),(UPDOWNstats.CVDOWN)');
 alpha(single(~isnan(UPDOWNstats.durDOWN))')
 colorbar
-caxis([0.2 1.2])
+caxis([0.4 1.2])
+crameri('berlin','pivot',1)
 %LogScale('c',10)
 axis xy
 LogScale('y',10)
