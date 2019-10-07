@@ -18,7 +18,7 @@ function [ UPDOWN,ratehist,durhist ] = DOWNdetection( spikes,varargin )
 
 %% Options
 p = inputParser;
-addParameter(p,'threshold',0.5);
+addParameter(p,'threshold',0.25);
 addParameter(p,'binsize',10);
 addParameter(p,'SHOWFIG',true);
 addParameter(p,'numcells',2500);
