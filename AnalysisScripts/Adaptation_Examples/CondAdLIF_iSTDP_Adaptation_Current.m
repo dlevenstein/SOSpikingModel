@@ -1,7 +1,7 @@
 function CondAdLIF_iSTDP_Adaptation_Current(repopath,whichnet)
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-%whichnet = 'Uniform';
+%whichnet = 'LogN';
 addpath(genpath(repopath))
 
 
