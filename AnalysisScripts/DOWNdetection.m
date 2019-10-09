@@ -18,14 +18,14 @@ function [ UPDOWN,ratehist,durhist ] = DOWNdetection( spikes,varargin )
 
 %% Options
 p = inputParser;
-addParameter(p,'threshold',0.25);
+addParameter(p,'threshold',0.5);
 addParameter(p,'binsize',10);
 addParameter(p,'SHOWFIG',true);
 addParameter(p,'numcells',2500);
 addParameter(p,'simdur',Inf);
 addParameter(p,'savefolder',pwd);
 addParameter(p,'winsize',2000);
-addParameter(p,'minDOWN',30);
+addParameter(p,'minDOWN',25);
 
 
 
@@ -43,11 +43,12 @@ minDOWN = p.Results.minDOWN;
 
 ratehist.numbins = 150;
 ratehist.bins = linspace(-2,1.5,ratehist.numbins);
+ratehist.linbins = linspace(0,10,50);
 
 
 
 spikemat = bz_SpktToSpkmat(spikes,'dt',1,'binsize',binsize,...
-    'bintype','gaussian','units','rate','win',[0 simdur]);
+    'bintype','boxcar','units','rate','win',[0 simdur]);
 spikemat.allrate = mean(spikemat.data,2)*1000;
 
 if isempty(spikemat.data)
@@ -55,13 +56,22 @@ if isempty(spikemat.data)
 end
 %Rate histogram
 ratehist.hist = hist(log10(spikemat.allrate),ratehist.bins);
+ratehist.linhist = hist((spikemat.allrate),ratehist.linbins);
 
-
+%if setthresh = true
 %% UP/DOWN detection
 
+[threshold,cross,bihist,ratehist.diptest,overthresh] = bz_BimodalThresh(spikemat.allrate,...
+    '0Inf',true,'Schmidt',false,'pcheck',false,'setthresh',threshold);%'maxthresh',2);
+%ratehist.diptest = bz_hartigansdiptest(spikemat.allrate);
+
+if all(isnan(overthresh))
+    overthresh = true(size(overthresh));
+end
 IDX.timestamps = spikemat.timestamps;
 IDX.statenames = {'DOWN'};
-IDX.states = single(spikemat.allrate<=threshold);
+%IDX.states = single(spikemat.allrate<=threshold);
+IDX.states = single(~overthresh);
 %IDX.states(spikemat.allrate<=threshold)=2;
 UPDOWN.ints = bz_IDXtoINT(IDX);
 
@@ -75,6 +85,8 @@ IDX.statenames = {'DOWN','UP'};
 UPDOWN.ints = bz_IDXtoINT(IDX);
 %Remove DOWN states that are too short
 
+ 
+%end
 UPDOWN.dur.DOWN = diff(UPDOWN.ints.DOWNstate,[],2);
 UPDOWN.dur.UP = diff(UPDOWN.ints.UPstate,[],2);
 
@@ -114,8 +126,11 @@ exwin = bz_RandomWindowInIntervals(spikemat.timestamps([1 end]),winsize);
 catch
     exwin = [0 winsize];
 end
-
-figure
+if ~islogical(SHOWFIG)
+    figure('visible','off')
+else
+    figure
+end
     subplot(3,1,1)
     plot(spikes(:,1),spikes(:,2),'.')
     ylim([0 2500])
@@ -147,25 +162,34 @@ figure
     title('Example Window')
 
 
-subplot(3,2,5)
-plot(log10(UPDOWN.dur.UP),log10(UPDOWN.UPrate),'r.')
-axis tight
-box off
-hold on
-plot(durhist.bins,bz_NormToRange(durhist.DOWN),'b')
-plot(durhist.bins,bz_NormToRange(durhist.UP),'r')
-LogScale('xy',10)
-xlabel('UP/DOWN Dur (ms)');ylabel('UP Rate')
-legend('UP States','UP','DOWN','Location','eastoutside')
+subplot(3,3,7)
+    plot(log10(UPDOWN.dur.UP),log10(UPDOWN.UPrate),'r.')
+    axis tight
+    box off
+    hold on
+    plot(durhist.bins,bz_NormToRange(durhist.DOWN),'b')
+    plot(durhist.bins,bz_NormToRange(durhist.UP),'r')
+    LogScale('xy',10)
+    xlabel('UP/DOWN Dur (ms)');ylabel('UP Rate')
+    %legend('UP States','UP','DOWN','Location','eastoutside')
 
-subplot(3,2,6)
-plot(ratehist.bins,(ratehist.hist),'k','linewidth',1)
-axis tight
-hold on
-plot(log10(threshold).*[1 1],get(gca,'ylim'),'r')
-LogScale('x',10)
-box off
-xlabel('Pop Rate (Hz)')
+subplot(3,3,8)
+    plot(ratehist.bins,(ratehist.hist),'k','linewidth',1)
+    axis tight
+    hold on
+    plot(log10(threshold).*[1 1],get(gca,'ylim'),'r')
+    LogScale('x',10)
+    box off
+    xlabel('Pop Rate (Hz)')
+
+subplot(3,3,9)
+    plot(ratehist.linbins,(ratehist.linhist),'k','linewidth',1)
+    axis tight
+    hold on
+    plot((threshold).*[1 1],get(gca,'ylim'),'r')
+    %LogScale('x',10)
+    box off
+    xlabel('Pop Rate (Hz)')
 
     if ~islogical(SHOWFIG)
         NiceSave('UPDOWNDetection',savefolder,SHOWFIG,'figtype','jpeg')

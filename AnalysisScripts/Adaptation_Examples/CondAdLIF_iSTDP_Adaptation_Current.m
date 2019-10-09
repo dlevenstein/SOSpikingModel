@@ -188,9 +188,11 @@ for II = 1:numsims
  
     end
     close all
-    UPDOWNstuff(ii,nn) = DOWNdetection( spikes{II},'simdur',SimTime,...
+    [UD,RH,DH] = DOWNdetection( spikes{II},'simdur',SimTime,...
         'SHOWFIG',simname,'savefolder',figfolder );
-    
+    UPDOWNstuff(ii,nn) = UD;
+    ratehist(ii,nn) = RH;
+    durhist(ii,nn) = DH;
     %Fraction of time DOWN
     UPDOWNstats.pDOWN(ii,nn) = sum(UPDOWNstuff(ii,nn).dur.DOWN)./sum(UPDOWNstuff(ii,nn).dur.UP);
     %Duraiton of DOWN
@@ -201,9 +203,54 @@ for II = 1:numsims
     %Duration of UP
     UPDOWNstats.durUP(ii,nn) = mean(UPDOWNstuff(ii,nn).dur.UP);
     UPDOWNstats.CVUP(ii,nn) = std(UPDOWNstuff(ii,nn).dur.UP)./mean(UPDOWNstuff(ii,nn).dur.UP);
-    
+    UPDOWNstats.diptest(ii,nn) = ratehist(ii,nn).diptest.dip;
+    UPDOWNstats.dipP(ii,nn) = ratehist(ii,nn).diptest.p_value;
 end
 
+%%
+for bb =1:length(bvals)
+FI.rates(bb) = bz_CollapseStruct(ratehist(:,bb),1);
+FI.durs(bb) = bz_CollapseStruct(durhist(:,bb),1);
+end
+
+%%
+plotFI = [8 6 4 2];
+figure
+for bb = 1:length(plotFI)
+    thisB = plotFI(bb);
+    
+    subplot(4,3,(bb-1)*3+1)
+        imagesc(Ivals,FI.rates(thisB).linbins(1,:),FI.rates(thisB).linhist')
+        alpha(single(FI.rates(thisB).linhist'>050)) %ms threshold of time in bin
+        nonzero = (FI.rates(thisB).linhist(:,2:end));
+        caxis([0 max(nonzero(:))])
+        axis xy
+        xlabel('Input (pA)')
+        %crameri bilbao
+        ylabel({['b = ',num2str(bvals(thisB))],'Pop Rate (Hz)'})
+        
+    subplot(4,3,(bb-1)*3+2)
+        imagesc(Ivals,FI.durs(thisB).bins(1,:),FI.durs(thisB).DOWN')
+        alpha(single(FI.durs(thisB).DOWN'~=0 & ~isnan(FI.durs(thisB).DOWN'))) %ms threshold of time in bin
+        %nonzero = (FI(thisB).linhist(:,2:end));
+        %caxis([0 max(nonzero(:))])
+        axis xy
+        xlabel('Input (pA)')
+        %crameri bilbao
+        ylabel({['b = ',num2str(bvals(thisB))],'Pop Rate (Hz)'})
+        
+    subplot(4,3,(bb-1)*3+3)
+        imagesc(Ivals,FI.durs(thisB).bins(1,:),FI.durs(thisB).UP')
+        alpha(single(FI.durs(thisB).UP'~=0)) %ms threshold of time in bin
+        %nonzero = (FI(thisB).linhist(:,2:end));
+        %caxis([0 max(nonzero(:))])
+        axis xy
+        xlabel('Input (pA)')
+        %crameri bilbao
+        ylabel({['b = ',num2str(bvals(thisB))],'Pop Rate (Hz)'})
+        
+end
+NiceSave('FICurves',figfolder,whichnet,'figtype','pdf')
 %%
 figure
 subplot(3,3,1)
@@ -235,6 +282,28 @@ axis xy
 LogScale('y',10)
 title('Mean UP Rate')
 xlabel('Input');ylabel('Adaptation')
+
+subplot(3,3,3)
+imagesc(Ivals,log10(bvals),(UPDOWNstats.diptest)');
+%alpha(single(~isnan(UPDOWNstats.durUP))')
+colorbar
+%LogScale('c',10)
+%caxis([0 50])
+axis xy
+LogScale('y',10)
+title('Dip Test (bimodality)')
+xlabel('Input');ylabel('Adaptation')
+
+% subplot(3,3,6)
+% imagesc(Ivals,log10(bvals),(UPDOWNstats.dipP<0.05)');
+% %alpha(single(~isnan(UPDOWNstats.durUP))')
+% colorbar
+% %LogScale('c',10)
+% %caxis([0 50])
+% axis xy
+% LogScale('y',10)
+% title('Dip Test (pval)')
+% xlabel('Input');ylabel('Adaptation')
 
 subplot(3,3,5)
 a = imagesc(Ivals,log10(bvals),log10(UPDOWNstats.durDOWN)');
