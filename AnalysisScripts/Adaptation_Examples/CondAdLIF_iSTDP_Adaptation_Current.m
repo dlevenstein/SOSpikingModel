@@ -54,7 +54,7 @@ PopParams.tau_s   = [5 5];          %synaptic decay timescale (1/ms)
 PopParams.E_w     = -70;            %rev potential: adaptation (mV)
 PopParams.a       = 0;              %adaptation decay timescale (1/ms)
 PopParams.b       = 0;              %adaptation activation rate (1/ms)
-PopParams.tau_w   = 300;            %adaptation decay (ms)
+%PopParams.tau_w   = 300;            %adaptation decay (ms)
 PopParams.gwnorm  = 0;              %magnitude of adaptation
 
 PopParams.t_syn = 0;                %Synaptic Delay
@@ -68,7 +68,7 @@ PopParams.tauSTDP = 20;
 
 PopParamsAnalysis              = PopParams;
 PopParamsAnalysis.LearningRate = 0;                      %Learning rate
-PopParamsAnalysis.tau_w        = 500;    %300                %adaptation decay (ms)
+PopParamsAnalysis.tau_w        = 1000;    %300                %adaptation decay (ms)
 PopParamsAnalysis.sigma        = 100;     %100               %Noise variance (pA) (Set to Covariance Matrix to add covariance
 PopParamsAnalysis.W            = SimValues.WeightMat(:,:,end); %Synaptic Weights
 PopParamsAnalysis.gwnorm       = 1;                      %Adaptation norm
@@ -155,11 +155,11 @@ end
 
 try
 save(fullfile(savedatafolder,savefilename),'spikes','Ivals','bvals',...
-    'SimTime','-v7.3')
+    'SimTime','PopParamsAnalysis','-v7.3')
 catch
     
     save(fullfile(figfolder,savefilename),'spikes','Ivals','bvals',...
-        'SimTime','-v7.3')
+        'SimTime','PopParamsAnalysis','-v7.3')
 
 end
 % display('Saving')
