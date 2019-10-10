@@ -1,7 +1,7 @@
 function CondAdLIF_iSTDP_SubAdaptation_Current(repopath,whichnet)
 
-repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-whichnet = 'Uniform';
+%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+%whichnet = 'Uniform';
 addpath(genpath(repopath))
 
 
