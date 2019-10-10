@@ -12,10 +12,6 @@ addpath(genpath(repopath))
 names = ["logWeight_m_1_s_01.mat","logWeight_m_1_s_1.mat","logWeight_m_1_s_10.mat"];
 weightNames = ["01","1","10"];
 
-%%
-
-for simnum = 1:100
-    
 LL = index;
 
 disp(['index: ' char(num2str(index))]);
@@ -25,14 +21,21 @@ disp(['File Name: ' char(names(LL))]);
 
 load(['/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigmaM1/' char(names(LL))]);
 
+%%
+
+for simnum = 1:100
+   
 rng(simnum,'twister');
 
-PopParamsAnalysis = PopParams;
+PopParamsAnalysis = SimValues.PopParams;
 PopParamsAnalysis.LearningRate = 0;
 PopParamsAnalysis.sigma = 0;
 PopParamsAnalysis.W = SimValues.WeightMat(:,:,end);
 
-PopParamsAnalysis.V0 = min(PopParamsAnalysis.E_L) + (min(PopParamsAnalysis.V_th)-min(PopParamsAnalysis.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
+PopParams.E_L     = [-65 -67];    %rev potential: leak (mV)
+PopParams.V_th    = [-45 -47];    %spike threshold (mV)
+
+PopParamsAnalysis.V0 = min(PopParams.E_L) + (min(PopParams.V_th)-min(PopParams.E_L)).*rand(PopParamsAnalysis.EPopNum + PopParamsAnalysis.IPopNum,1);
 
 datafolder = '/scratch/jmg1030/FIcurve/data/bistabilityTest/DOWN/LogWeightSigmaM1/';
 dataname = ['logSigmaWeight_m_1_' char(weightNames(LL)) '_sim_' char(num2str(simnum))];
