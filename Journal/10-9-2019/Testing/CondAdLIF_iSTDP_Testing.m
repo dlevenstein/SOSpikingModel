@@ -9,7 +9,7 @@ sNames = ["01","1","10"];
     
 %%
 
-load(['/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigmaM1/logWeight_m_1_s_' char(sVals(modnum)) '.mat']);
+load(['/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigmaM1/logWeight_m_1_s_' char(sNames(modnum)) '.mat']);
 
 %%
 clear PopParams
