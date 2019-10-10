@@ -91,7 +91,7 @@ PopParamsAnalysis.p0spike = -0.5; %start OFF (V random halfway to threshold)
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 20e3;                       %Recording Time (end of simulation)
+RecordTime = 15e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
