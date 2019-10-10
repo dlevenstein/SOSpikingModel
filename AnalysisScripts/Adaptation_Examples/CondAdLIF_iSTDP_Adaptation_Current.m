@@ -1,7 +1,7 @@
 function CondAdLIF_iSTDP_Adaptation_Current(repopath,whichnet)
 
 %repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-%whichnet = 'LogN';
+%whichnet = 'Uniform';
 addpath(genpath(repopath))
 
 
@@ -236,8 +236,9 @@ for bb = 1:length(plotFI)
         %caxis([0 max(nonzero(:))])
         axis xy
         xlabel('Input (pA)')
+        LogScale('y',10)
         %crameri bilbao
-        ylabel({['b = ',num2str(bvals(thisB))],'Pop Rate (Hz)'})
+        ylabel('DOWN Dur (ms)')
         
     subplot(4,3,(bb-1)*3+3)
         imagesc(Ivals,FI.durs(thisB).bins(1,:),FI.durs(thisB).UP')
@@ -246,8 +247,9 @@ for bb = 1:length(plotFI)
         %caxis([0 max(nonzero(:))])
         axis xy
         xlabel('Input (pA)')
+        LogScale('y',10)
         %crameri bilbao
-        ylabel({['b = ',num2str(bvals(thisB))],'Pop Rate (Hz)'})
+        ylabel('UP Dur (ms)')
         
 end
 NiceSave('FICurves',figfolder,whichnet,'figtype','pdf')
