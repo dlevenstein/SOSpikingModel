@@ -4,7 +4,7 @@
 #SBATCH --array=1-3
 #SBATCH --cpus-per-task=20
 #SBATCH --time=100:00:00
-#SBATCH --mem=10GB
+#SBATCH --mem=62GB
 #SBATCH --job-name=LogWeightSigmaM1
 #SBATCH --output=LogWeightSigmaM1_%j.out
 #SBATCH --mail-type=END
