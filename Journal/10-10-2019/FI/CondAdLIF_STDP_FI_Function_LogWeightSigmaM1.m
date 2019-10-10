@@ -14,7 +14,11 @@ weightNames = ["01","1","10"];
 
 LL = index;
 
-load(['/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigmaM1/' char(names(LL))]);
+file = ['/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigmaM1/' char(names(LL))];
+
+disp(file);
+
+load(file);
 
 %%
 
