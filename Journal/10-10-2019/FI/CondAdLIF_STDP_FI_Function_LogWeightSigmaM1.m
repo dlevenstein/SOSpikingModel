@@ -14,11 +14,6 @@ weightNames = ["01","1","10"];
 
 LL = index;
 
-disp(['index: ' char(num2str(index))]);
-
-disp(['Sim Number: ' char(num2str(simnum))]);
-disp(['File Name: ' char(names(LL))]);
-
 load(['/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigmaM1/' char(names(LL))]);
 
 %%
