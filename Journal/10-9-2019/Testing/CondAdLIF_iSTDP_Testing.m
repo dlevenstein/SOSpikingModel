@@ -5,7 +5,7 @@ repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 addpath(genpath(repopath))
 
 %%
-sVals = ["01","1","10"];
+sNames = ["01","1","10"];
     
 %%
 
@@ -67,6 +67,6 @@ PopParams_in.I_e       = 250;
 SimValues = AdLIFfunction_iSTDP(PopParams_in,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
     'save_weights',TimeParams.SimTime,'save_dt',1,'useGPU',false,'defaultNeuronParams',false);
 
-save(['/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigmaM1/Testing_logWeight_m_1_s_' char(sVals(modnum)) '.mat'],'SimValues','-v7.3') 
+save(['/scratch/jmg1030/FIcurve/data/trainedWeights/LogWeightSigmaM1/Testing_logWeight_m_1_s_' char(sNames(modnum)) '.mat'],'SimValues','-v7.3') 
 
 end
