@@ -6,8 +6,8 @@ addpath(genpath(repopath))
 
 %%
 
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250.mat');
-load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_LognormalRates_Noise_10ms_50pA_K_IE_250_initial_values.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250.mat');
+load('/scratch/jmg1030/FIcurve/data/iSTDPTrainedWeights/Lognormal_m_1_s_10_EE_UniformRates_Noise_10ms_50pA_K_IE_250_initial_values.mat');
 
 %%
 clear PopParams
@@ -68,12 +68,12 @@ RecordTime = 1e4;
 
 TimeParams.SimTime = SimTime+RecordTime;
 
-Ivals = linspace(0,150,16);
-bvals = 10.^(-2:0.5:4);
+Ivals = 0:20:160;
+bvals = 10.^(1.5:0.5:4);
 
 %%
 for II = 1:(length(Ivals)*length(bvals))
-    if mod(II,5)+1 == modnum
+    if mod(II,10)+1 == modnum
     ii = mod(II,length(Ivals))+1;
     bb = ceil(II/length(Ivals));
 
