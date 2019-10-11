@@ -74,7 +74,7 @@ PopParamsAnalysis.W            = SimValues.WeightMat(:,:,end); %Synaptic Weights
 PopParamsAnalysis.gwnorm       = 1;                      %Adaptation norm
 PopParamsAnalysis.t_syn        = rand(PopParams.EPopNum+PopParams.IPopNum,1)*0.4+0.05;                      %Synaptic Delay (ms)
 PopParamsAnalysis.I_e          = 100;
-PopParamsAnalysis.a            = 0.1;
+PopParamsAnalysis.a            = 0.03;
 %% Note Adaptation Equation
 %dwdt =  (- w + a.*(V - E_w))./tau_w; (Line 529)
 %w(spikeneurons) = w(spikeneurons) + b(spikeneurons); at time of spike (Line 559)
@@ -101,7 +101,7 @@ TimeParams.SimTime = SimTime;
 %avals = 10.^(-4:0.5:-1);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
 %taus = 100:100:2000;
-taus = [100 1000];
+taus = [500];
 %% Set up for parallel in cluster
 pc = parcluster('local');
 % store temporary files in the 'scratch' drive on the cluster, labeled by job ID

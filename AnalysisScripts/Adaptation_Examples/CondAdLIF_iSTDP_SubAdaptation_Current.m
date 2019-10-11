@@ -68,7 +68,7 @@ PopParams.tauSTDP = 20;
 
 PopParamsAnalysis              = PopParams;
 PopParamsAnalysis.LearningRate = 0;                      %Learning rate
-PopParamsAnalysis.tau_w        = 1000;    %300                %adaptation decay (ms)
+PopParamsAnalysis.tau_w        = 500;    %300                %adaptation decay (ms)
 PopParamsAnalysis.sigma        = 100;     %100               %Noise variance (pA) (Set to Covariance Matrix to add covariance
 PopParamsAnalysis.W            = SimValues.WeightMat(:,:,end); %Synaptic Weights
 PopParamsAnalysis.gwnorm       = 1;                      %Adaptation norm
@@ -128,7 +128,7 @@ parfor II = 1:numsims
     %Set Current and adaptation value
 
     inloopPopParams = PopParamsAnalysis;
-    inloopPopParams.I_e       = [Ivals(ii) 0];
+    inloopPopParams.I_e       = Ivals(ii);
     inloopPopParams.a         = avals(bb);
     %inloopPopParams.sigma = sigvals(nn);
     
