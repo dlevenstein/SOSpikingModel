@@ -808,22 +808,46 @@ exspiketimes = spikes(spikes(:,2)==exneuron,1);
 % poprate.I = sum(spikemat(:,SimValues.IcellIDX),2)./(winsize./1000)./length(SimValues.IcellIDX);
 
 figure
-subplot(2,1,1)
-plot(Espikes(:,1),Espikes(:,2),'.b','markersize',1)
-hold on
-plot(Ispikes(:,1),Ispikes(:,2),'.r','markersize',1)
-box off
-% hold on
-% plot(t_rate,50.*poprate.E,'b','linewidth',2)
-% hold on
-% plot(t_rate,50.*poprate.I,'r','linewidth',2)
-% hold on
-% plot([0.8650.*TimeParams.SimTime TimeParams.SimTime],[500 500],'k','LineWidth',2) 
-% hold on
-% text(TimeParams.SimTime+0.05, 510,'10 Hz','FontSize',16)
+subplot(3,1,1)
+    plot(Espikes(:,1),Espikes(:,2),'.b','markersize',1)
+    hold on
+    plot(Ispikes(:,1),Ispikes(:,2),'.r','markersize',1)
+    box off
+    % hold on
+    % plot(t_rate,50.*poprate.E,'b','linewidth',2)
+    % hold on
+    % plot(t_rate,50.*poprate.I,'r','linewidth',2)
+    % hold on
+    % plot([0.8650.*TimeParams.SimTime TimeParams.SimTime],[500 500],'k','LineWidth',2) 
+    % hold on
+    % text(TimeParams.SimTime+0.05, 510,'10 Hz','FontSize',16)
+    xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
+    xlim([-onsettime SimTime]);ylim([0 PopNum+1]);
 
-xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
-xlim([-onsettime SimTime]);ylim([0 PopNum+1]);
+    excell = 2;
+subplot(6,1,4)
+    plot(SimValues.t,mean(SimValues.V(EcellIDX,:),1),'k')
+    hold on
+    plot(SimValues.t,mean(SimValues.V(IcellIDX,:),1),'r')
+    box off
+    ylabel('Mean Voltage')
+subplot(6,1,5)
+    plot(SimValues.t,mean(g_L(EcellIDX).*SimValues.g_w(EcellIDX,:),1),'b')
+    hold on
+    plot(SimValues.t,mean(SimValues.g_e(EcellIDX,:),1),'k')
+    plot(SimValues.t,mean(SimValues.g_i(EcellIDX,:),1),'r')
+    ylabel('Mean g')
+    
+    %ylabel('Mean g_w');
+    
+subplot(6,1,6)
+    plot(SimValues.t,...
+        mean((SimValues.V(EcellIDX,:)-E_w).*g_L(EcellIDX).*SimValues.g_w(EcellIDX,:),1),'b')
+    hold on
+    plot(SimValues.t,mean((SimValues.V(EcellIDX,:)-E_e).*SimValues.g_e(EcellIDX,:),1),'k')
+    plot(SimValues.t,mean((SimValues.V(EcellIDX,:)-E_i).*SimValues.g_i(EcellIDX,:),1),'r')
+    ylabel('Mean Currents')
+    
     
 if train
     

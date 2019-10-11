@@ -95,9 +95,9 @@ SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-Ivals = linspace(0,75,16); %Current Values (pA)
+Ivals = linspace(0,100,21); %Current Values (pA)
 %sigvals = linspace(0,100,11);
-avals = 10.^(-4:0.5:-1);       %spike-based Adaptation values (nS)
+avals = 10.^(-2:(1/3):0);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
 
 %% Set up for parallel in cluster
@@ -128,7 +128,7 @@ parfor II = 1:numsims
     %Set Current and adaptation value
 
     inloopPopParams = PopParamsAnalysis;
-    inloopPopParams.I_e       = Ivals(ii);
+    inloopPopParams.I_e       = [Ivals(ii) 0];
     inloopPopParams.a         = avals(bb);
     %inloopPopParams.sigma = sigvals(nn);
     
@@ -154,16 +154,16 @@ parfor II = 1:numsims
     %end
 end
 
-
-try
-save(fullfile(savedatafolder,savefilename),'spikes','Ivals','avals',...
-    'SimTime','PopParamsAnalysis','-v7.3')
-catch
+% 
+% try
+% save(fullfile(savedatafolder,savefilename),'spikes','Ivals','avals',...
+%     'SimTime','PopParamsAnalysis','-v7.3')
+% catch
     
     save(fullfile(figfolder,savefilename),'spikes','Ivals','avals',...
         'SimTime','PopParamsAnalysis','-v7.3')
 
-end
+%end
 % display('Saving')
 % for II = 1:(length(Ivals)*length(sigvals))
 %     %if mod(II,5)+1 == cluster_number %cluster_number is the cluster ID used (2 clusters give cluster IDs 1 and 2)

@@ -1,7 +1,7 @@
 function CondAdLIF_iSTDP_TauAdapt(repopath,whichnet)
 
-%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-%whichnet = 'Uniform';
+repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+whichnet = 'Uniform';
 addpath(genpath(repopath))
 
 
@@ -73,8 +73,8 @@ PopParamsAnalysis.sigma        = 100;     %100               %Noise variance (pA
 PopParamsAnalysis.W            = SimValues.WeightMat(:,:,end); %Synaptic Weights
 PopParamsAnalysis.gwnorm       = 1;                      %Adaptation norm
 PopParamsAnalysis.t_syn        = rand(PopParams.EPopNum+PopParams.IPopNum,1)*0.4+0.05;                      %Synaptic Delay (ms)
-PopParamsAnalysis.I_e          = 10;
-PopParamsAnalysis.a            = 0.01;
+PopParamsAnalysis.I_e          = 100;
+PopParamsAnalysis.a            = 0.1;
 %% Note Adaptation Equation
 %dwdt =  (- w + a.*(V - E_w))./tau_w; (Line 529)
 %w(spikeneurons) = w(spikeneurons) + b(spikeneurons); at time of spike (Line 559)
@@ -91,7 +91,7 @@ PopParamsAnalysis.p0spike = -0.5; %start OFF (V random halfway to threshold)
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 15e3;                       %Recording Time (end of simulation)
+RecordTime = 1e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
@@ -100,7 +100,8 @@ TimeParams.SimTime = SimTime;
 %sigvals = linspace(0,100,11);
 %avals = 10.^(-4:0.5:-1);       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
-taus = 100:100:2000;
+%taus = 100:100:2000;
+taus = [100 1000];
 %% Set up for parallel in cluster
 pc = parcluster('local');
 % store temporary files in the 'scratch' drive on the cluster, labeled by job ID
@@ -115,7 +116,7 @@ parpool(pc, str2num(getenv('SLURM_NTASKS_PER_NODE'))-1);
 spikes = cell(length(taus));
 numsims = (length(taus));
 %Once running: parfor on cluster.
-parfor II = 1:numsims
+for II = 1:numsims
     %%
     %if mod(II,5)+1 == cluster_number %cluster_number is the cluster ID used (2 clusters give cluster IDs 1 and 2)
     %ii = mod(II,length(Ivals))+1;
@@ -131,12 +132,13 @@ parfor II = 1:numsims
     inloopPopParams = PopParamsAnalysis;
     inloopPopParams.tau_w       = taus(II);
     %inloopPopParams.sigma = sigvals(nn);
-    
+    save_dt = TimeParams.SimTime;
+    save_dt = 5;
     %Run Simulation
     tic
     SimValuesArray = AdLIFfunction_iSTDP(inloopPopParams,TimeParams,'cellout',true,...
         'showprogress',true,'showfig',true,'save_weights',TimeParams.SimTime,...
-        'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false,...
+        'save_dt',save_dt,'useGPU',false,'defaultNeuronParams',false,...
         'recordInterval',[(0:RecordTime:RecordTime) + (TimeParams.SimTime - RecordTime)]');
     %%
     spikes{II} = SimValuesArray.spikes;
@@ -148,7 +150,7 @@ parfor II = 1:numsims
     simname = ['LogN_Tau',round(num2str(taus(II)))];
  
     end
-    NiceSave('SimFig',figfolder,simname,'figtype','jpg')
+   % NiceSave('SimFig',figfolder,simname,'figtype','jpg')
     
     
     %end
@@ -226,7 +228,7 @@ figure
         nonzero = (FI.rates.linhist(:,2:end));
         caxis([0 max(nonzero(:))])
         axis xy
-        xlabel('Input (pA)')
+        xlabel('Tau_w (ms)')
         %crameri bilbao
         ylabel({['b = ',num2str(thisB)],'Pop Rate (Hz)'})
         
@@ -236,7 +238,7 @@ figure
         %nonzero = (FI.linhist(:,2:end));
         %caxis([0 max(nonzero(:))])
         axis xy
-        xlabel('Input (pA)')
+        xlabel('Tau_w (ms)')
         LogScale('y',10)
         %crameri bilbao
         ylabel('DOWN Dur (ms)')
@@ -247,7 +249,7 @@ figure
         %nonzero = (FI.linhist(:,2:end));
         %caxis([0 max(nonzero(:))])
         axis xy
-        xlabel('Input (pA)')
+        xlabel('Tau_w (ms)')
         LogScale('y',10)
         %crameri bilbao
         ylabel('UP Dur (ms)')
