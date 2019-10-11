@@ -824,12 +824,16 @@ subplot(3,1,1)
     xlabel('Time (ms)');ylabel('Neuron ID');title('Raster Plot');
     xlim([-onsettime SimTime]);ylim([0 PopNum+1]);
 
-    excell = 2;
+    excells = randsample(Ecells,10);
+    
 subplot(6,1,4)
+    plot(SimValues.t,(SimValues.V(excells,:)),'k','linewidth',0.1,'color',0.9*[1 1 1])
+hold on
     plot(SimValues.t,mean(SimValues.V(EcellIDX,:),1),'k')
     hold on
     plot(SimValues.t,mean(SimValues.V(IcellIDX,:),1),'r')
     box off
+    ylim([min(E_L) max(V_th)])
     ylabel('Mean Voltage')
 subplot(6,1,5)
     plot(SimValues.t,mean(g_L(EcellIDX).*SimValues.g_w(EcellIDX,:),1),'b')

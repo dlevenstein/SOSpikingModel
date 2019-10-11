@@ -1,11 +1,11 @@
-function CondAdLIF_iSTDP_TauAdapt(repopath,whichnet)
+function CondAdLIF_iSTDP_SubAdaptation_Current(repopath,whichnet)
 
-repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
-whichnet = 'Uniform';
+%repopath = '/Users/dlevenstein/Project Repos/SOSpikingModel'; 
+%whichnet = 'Uniform';
 addpath(genpath(repopath))
 
 
-figfolder = fullfile(repopath,'Figures','TauAdaptation');
+figfolder = fullfile(repopath,'Figures','SubAdaptationCurrent');
 savedatafolder = fullfile(repopath,'SimData');
 %% Set Cluster Number
 %numClusters = 5; %This is if you have 5 clusters, so cluster_number inputs are 1-5 
@@ -68,13 +68,12 @@ PopParams.tauSTDP = 20;
 
 PopParamsAnalysis              = PopParams;
 PopParamsAnalysis.LearningRate = 0;                      %Learning rate
-%PopParamsAnalysis.tau_w        = 1000;    %300                %adaptation decay (ms)
+PopParamsAnalysis.tau_w        = 500;    %300                %adaptation decay (ms)
 PopParamsAnalysis.sigma        = 100;     %100               %Noise variance (pA) (Set to Covariance Matrix to add covariance
 PopParamsAnalysis.W            = SimValues.WeightMat(:,:,end); %Synaptic Weights
 PopParamsAnalysis.gwnorm       = 1;                      %Adaptation norm
 PopParamsAnalysis.t_syn        = rand(PopParams.EPopNum+PopParams.IPopNum,1)*0.4+0.05;                      %Synaptic Delay (ms)
-PopParamsAnalysis.I_e          = 30;
-PopParamsAnalysis.a            = 0.05;
+
 %% Note Adaptation Equation
 %dwdt =  (- w + a.*(V - E_w))./tau_w; (Line 529)
 %w(spikeneurons) = w(spikeneurons) + b(spikeneurons); at time of spike (Line 559)
@@ -91,17 +90,16 @@ PopParamsAnalysis.p0spike = -0.5; %start OFF (V random halfway to threshold)
 TimeParams.dt      = 0.05;
 
 UnRecordedTime = 0;                   %Unrecorded time
-RecordTime = 1e3;                       %Recording Time (end of simulation)
+RecordTime = 15e3;                       %Recording Time (end of simulation)
 SimTime  = UnRecordedTime+RecordTime;   %Total Simulation time
 
 TimeParams.SimTime = SimTime;
 
-%Ivals = linspace(0,75,16); %Current Values (pA)
+Ivals = linspace(0,100,21); %Current Values (pA)
 %sigvals = linspace(0,100,11);
-%avals = 10.^(-4:0.5:-1);       %spike-based Adaptation values (nS)
+avals = 0:0.1:1;       %spike-based Adaptation values (nS)
 %avals = [0 10.^(-4:0.5:-1)];  %subthreshold-based Adaptation values (nS)
-%taus = 100:100:2000;
-taus = [500];
+
 %% Set up for parallel in cluster
 pc = parcluster('local');
 % store temporary files in the 'scratch' drive on the cluster, labeled by job ID
@@ -113,14 +111,14 @@ parpool(pc, str2num(getenv('SLURM_NTASKS_PER_NODE'))-1);
 
 %% Loop 
 
-spikes = cell(length(taus));
-numsims = (length(taus));
+spikes = cell(length(Ivals),length(avals));
+numsims = (length(Ivals)*length(avals));
 %Once running: parfor on cluster.
-for II = 1:numsims
+parfor II = 1:numsims
     %%
     %if mod(II,5)+1 == cluster_number %cluster_number is the cluster ID used (2 clusters give cluster IDs 1 and 2)
-    %ii = mod(II,length(Ivals))+1;
-    %bb = ceil(II/length(Ivals));
+    ii = mod(II,length(Ivals))+1;
+    bb = ceil(II/length(Ivals));
     
     display(['Starting Sim: ',num2str(II),' of ',num2str(numsims)])
     %ii
@@ -130,39 +128,39 @@ for II = 1:numsims
     %Set Current and adaptation value
 
     inloopPopParams = PopParamsAnalysis;
-    inloopPopParams.tau_w       = taus(II);
+    inloopPopParams.I_e       = Ivals(ii);
+    inloopPopParams.a         = avals(bb);
     %inloopPopParams.sigma = sigvals(nn);
-    save_dt = TimeParams.SimTime;
-    save_dt = 5;
+    
     %Run Simulation
     tic
     SimValuesArray = AdLIFfunction_iSTDP(inloopPopParams,TimeParams,'cellout',true,...
         'showprogress',true,'showfig',true,'save_weights',TimeParams.SimTime,...
-        'save_dt',save_dt,'useGPU',false,'defaultNeuronParams',false,...
+        'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false,...
         'recordInterval',[(0:RecordTime:RecordTime) + (TimeParams.SimTime - RecordTime)]');
     %%
     spikes{II} = SimValuesArray.spikes;
     
     switch whichnet
         case 'Uniform'
-    simname = ['Tau',round(num2str(taus(II)))];
+    simname = ['Input',round(num2str(Ivals(ii))),'_Adapt',round(num2str(avals(bb)))];
         case 'LogN'
-    simname = ['LogN_Tau',round(num2str(taus(II)))];
+    simname = ['LogN_Input',round(num2str(Ivals(ii))),'_Adapt',round(num2str(avals(bb)))];
  
     end
-   % NiceSave('SimFig',figfolder,simname,'figtype','jpg')
+    NiceSave('SimFig',figfolder,simname,'figtype','jpg')
     
     
     %end
 end
-%%
 
+% 
 % try
-% save(fullfile(savedatafolder,savefilename),'spikes','taus',...
+% save(fullfile(savedatafolder,savefilename),'spikes','Ivals','avals',...
 %     'SimTime','PopParamsAnalysis','-v7.3')
 % catch
     
-    save(fullfile(figfolder,savefilename),'spikes','taus',...
+    save(fullfile(figfolder,savefilename),'spikes','Ivals','avals',...
         'SimTime','PopParamsAnalysis','-v7.3')
 
 %end
@@ -178,170 +176,171 @@ end
 load(fullfile(figfolder,savefilename))
 
 %%
-numsims = (length(taus));
+numsims = (length(Ivals)*length(avals));
 for II = 1:numsims
-%     ii = mod(II,length(Ivals))+1;
-%     nn = ceil(II/length(Ivals));
+    ii = mod(II,length(Ivals))+1;
+    nn = ceil(II/length(Ivals));
     bz_Counter(II,numsims,'DOWN Detection')
     % Detect UP/DOWN states
     switch whichnet
         case 'Uniform'
-    simname = ['Tau',round(num2str(taus(II)))];
+    simname = ['Input',round(num2str(Ivals(ii))),'_Adapt',round(num2str(avals(nn)))];
         case 'LogN'
-    simname = ['LogN_Tau',round(num2str(taus(II)))];
+    simname = ['LogN_Input',round(num2str(Ivals(ii))),'_Adapt',round(num2str(avals(nn)))];
  
     end
     close all
     [UD,RH,DH] = DOWNdetection( spikes{II},'simdur',SimTime,...
         'SHOWFIG',simname,'savefolder',figfolder );
-    UPDOWNstuff(II) = UD;
-    ratehist(II) = RH;
-    durhist(II) = DH;
+    UPDOWNstuff(ii,nn) = UD;
+    ratehist(ii,nn) = RH;
+    durhist(ii,nn) = DH;
     %Fraction of time DOWN
-    UPDOWNstats.pDOWN(II) = sum(UPDOWNstuff(II).dur.DOWN)./sum(UPDOWNstuff(II).dur.UP);
+    UPDOWNstats.pDOWN(ii,nn) = sum(UPDOWNstuff(ii,nn).dur.DOWN)./sum(UPDOWNstuff(ii,nn).dur.UP);
     %Duraiton of DOWN
-    UPDOWNstats.durDOWN(II) = mean(UPDOWNstuff(II).dur.DOWN);
-    UPDOWNstats.CVDOWN(II) = std(UPDOWNstuff(II).dur.DOWN)./mean(UPDOWNstuff(II).dur.DOWN);
+    UPDOWNstats.durDOWN(ii,nn) = mean(UPDOWNstuff(ii,nn).dur.DOWN);
+    UPDOWNstats.CVDOWN(ii,nn) = std(UPDOWNstuff(ii,nn).dur.DOWN)./mean(UPDOWNstuff(ii,nn).dur.DOWN);
     %Mean Rate of UP
-    UPDOWNstats.UPrate(II) = mean(UPDOWNstuff(II).UPrate);
+    UPDOWNstats.UPrate(ii,nn) = mean(UPDOWNstuff(ii,nn).UPrate);
     %Duration of UP
-    UPDOWNstats.durUP(II) = mean(UPDOWNstuff(II).dur.UP);
-    UPDOWNstats.CVUP(II) = std(UPDOWNstuff(II).dur.UP)./mean(UPDOWNstuff(II).dur.UP);
-    UPDOWNstats.diptest(II) = ratehist(II).diptest.dip;
-    UPDOWNstats.dipP(II) = ratehist(II).diptest.p_value;
+    UPDOWNstats.durUP(ii,nn) = mean(UPDOWNstuff(ii,nn).dur.UP);
+    UPDOWNstats.CVUP(ii,nn) = std(UPDOWNstuff(ii,nn).dur.UP)./mean(UPDOWNstuff(ii,nn).dur.UP);
+    UPDOWNstats.diptest(ii,nn) = ratehist(ii,nn).diptest.dip;
+    UPDOWNstats.dipP(ii,nn) = ratehist(ii,nn).diptest.p_value;
 end
 
 %%
-
-FI.rates = bz_CollapseStruct(ratehist,1);
-FI.durs = bz_CollapseStruct(durhist,1);
-
+for bb =1:length(avals)
+FI.rates(bb) = bz_CollapseStruct(ratehist(:,bb),1);
+FI.durs(bb) = bz_CollapseStruct(durhist(:,bb),1);
+end
 
 %%
-bb = 1
+plotFI = [7 5 3 1];
 figure
-    thisB = PopParamsAnalysis.a ;
+for bb = 1:length(plotFI)
+    thisB = plotFI(bb);
     
     subplot(4,3,(bb-1)*3+1)
-        imagesc(taus,FI.rates.linbins(1,:),FI.rates.linhist')
-        alpha(single(FI.rates.linhist'>050)) %ms threshold of time in bin
-        nonzero = (FI.rates.linhist(:,2:end));
+        imagesc(Ivals,FI.rates(thisB).linbins(1,:),FI.rates(thisB).linhist')
+        alpha(single(FI.rates(thisB).linhist'>050)) %ms threshold of time in bin
+        nonzero = (FI.rates(thisB).linhist(:,2:end));
         caxis([0 max(nonzero(:))])
         axis xy
-        xlabel('Tau_w (ms)')
+        xlabel('Input (pA)')
         %crameri bilbao
-        ylabel({['b = ',num2str(thisB)],'Pop Rate (Hz)'})
+        ylabel({['b = ',num2str(avals(thisB))],'Pop Rate (Hz)'})
         
     subplot(4,3,(bb-1)*3+2)
-        imagesc(taus,FI.durs.bins(1,:),FI.durs.DOWN')
-        alpha(single(FI.durs.DOWN'~=0 & ~isnan(FI.durs.DOWN'))) %ms threshold of time in bin
-        %nonzero = (FI.linhist(:,2:end));
+        imagesc(Ivals,FI.durs(thisB).bins(1,:),FI.durs(thisB).DOWN')
+        alpha(single(FI.durs(thisB).DOWN'~=0 & ~isnan(FI.durs(thisB).DOWN'))) %ms threshold of time in bin
+        %nonzero = (FI(thisB).linhist(:,2:end));
         %caxis([0 max(nonzero(:))])
         axis xy
-        xlabel('Tau_w (ms)')
+        xlabel('Input (pA)')
         LogScale('y',10)
         %crameri bilbao
         ylabel('DOWN Dur (ms)')
         
     subplot(4,3,(bb-1)*3+3)
-        imagesc(taus,FI.durs.bins(1,:),FI.durs.UP')
-        alpha(single(FI.durs.UP'~=0)) %ms threshold of time in bin
-        %nonzero = (FI.linhist(:,2:end));
+        imagesc(Ivals,FI.durs(thisB).bins(1,:),FI.durs(thisB).UP')
+        alpha(single(FI.durs(thisB).UP'~=0)) %ms threshold of time in bin
+        %nonzero = (FI(thisB).linhist(:,2:end));
         %caxis([0 max(nonzero(:))])
         axis xy
-        xlabel('Tau_w (ms)')
+        xlabel('Input (pA)')
         LogScale('y',10)
         %crameri bilbao
         ylabel('UP Dur (ms)')
         
-
+end
 NiceSave('FICurves',figfolder,whichnet,'figtype','pdf')
 %%
-% figure
-% subplot(3,3,1)
-% imagesc(Ivals,log10(avals),log10(UPDOWNstats.pDOWN)')
-% colorbar
-% caxis([-2 2])
-% axis xy
-% LogScale('y',10)
-% title('UP/DOWN Ratio')
-% xlabel('Input');ylabel('Adaptation')
-% 
-% subplot(3,3,4)
-% imagesc(Ivals,log10(avals),log10(UPDOWNstats.durUP)');
-% alpha(single(~isnan(UPDOWNstats.durUP))')
-% colorbar
-% LogScale('c',10)
-% LogScale('y',10)
-% axis xy
-% title('Mean UP Duration')
-% xlabel('Input');ylabel('Adaptation')
-% 
-% subplot(3,3,2)
-% imagesc(Ivals,log10(avals),(UPDOWNstats.UPrate)');
-% alpha(single(~isnan(UPDOWNstats.durUP))')
-% colorbar
-% %LogScale('c',10)
-% caxis([0 50])
-% axis xy
-% LogScale('y',10)
-% title('Mean UP Rate')
-% xlabel('Input');ylabel('Adaptation')
-% 
-% subplot(3,3,3)
-% imagesc(Ivals,log10(avals),(UPDOWNstats.diptest)');
+figure
+subplot(3,3,1)
+imagesc(Ivals,log10(avals),log10(UPDOWNstats.pDOWN)')
+colorbar
+caxis([-2 2])
+axis xy
+LogScale('y',10)
+title('UP/DOWN Ratio')
+xlabel('Input');ylabel('Adaptation')
+
+subplot(3,3,4)
+imagesc(Ivals,log10(avals),log10(UPDOWNstats.durUP)');
+alpha(single(~isnan(UPDOWNstats.durUP))')
+colorbar
+LogScale('c',10)
+LogScale('y',10)
+axis xy
+title('Mean UP Duration')
+xlabel('Input');ylabel('Adaptation')
+
+subplot(3,3,2)
+imagesc(Ivals,log10(avals),(UPDOWNstats.UPrate)');
+alpha(single(~isnan(UPDOWNstats.durUP))')
+colorbar
+%LogScale('c',10)
+caxis([0 50])
+axis xy
+LogScale('y',10)
+title('Mean UP Rate')
+xlabel('Input');ylabel('Adaptation')
+
+subplot(3,3,3)
+imagesc(Ivals,log10(avals),(UPDOWNstats.diptest)');
+%alpha(single(~isnan(UPDOWNstats.durUP))')
+colorbar
+%LogScale('c',10)
+%caxis([0 50])
+axis xy
+LogScale('y',10)
+title('Dip Test (bimodality)')
+xlabel('Input');ylabel('Adaptation')
+
+% subplot(3,3,6)
+% imagesc(Ivals,log10(avals),(UPDOWNstats.dipP<0.05)');
 % %alpha(single(~isnan(UPDOWNstats.durUP))')
 % colorbar
 % %LogScale('c',10)
 % %caxis([0 50])
 % axis xy
 % LogScale('y',10)
-% title('Dip Test (bimodality)')
+% title('Dip Test (pval)')
 % xlabel('Input');ylabel('Adaptation')
-% 
-% % subplot(3,3,6)
-% % imagesc(Ivals,log10(avals),(UPDOWNstats.dipP<0.05)');
-% % %alpha(single(~isnan(UPDOWNstats.durUP))')
-% % colorbar
-% % %LogScale('c',10)
-% % %caxis([0 50])
-% % axis xy
-% % LogScale('y',10)
-% % title('Dip Test (pval)')
-% % xlabel('Input');ylabel('Adaptation')
-% 
-% subplot(3,3,5)
-% a = imagesc(Ivals,log10(avals),log10(UPDOWNstats.durDOWN)');
-% alpha(single(~isnan(UPDOWNstats.durDOWN))')
-% colorbar
-% LogScale('c',10)
-% axis xy
-% LogScale('y',10)
-% title('Mean DOWN Duration')
-% xlabel('Input');ylabel('Adaptation')
-% 
-% subplot(3,3,7)
-% a = imagesc(Ivals,log10(avals),(UPDOWNstats.CVUP)');
-% alpha(single(~isnan(UPDOWNstats.durUP)&~isnan(UPDOWNstats.durDOWN))')
-% colorbar
-% caxis([0.2 1.2])
-% crameri('berlin','pivot',1)
-% %LogScale('c',10)
-% axis xy
-% LogScale('y',10)
-% title('CV UP Duration')
-% xlabel('Input');ylabel('Adaptation')
-% 
-% subplot(3,3,8)
-% a = imagesc(Ivals,log10(avals),(UPDOWNstats.CVDOWN)');
-% alpha(single(~isnan(UPDOWNstats.durDOWN))')
-% colorbar
-% caxis([0.2 1.2])
-% crameri('berlin','pivot',1)
-% %LogScale('c',10)
-% axis xy
-% LogScale('y',10)
-% title('CV DOWN Duration')
-% xlabel('Input');ylabel('Adaptation')
-% 
-% NiceSave('InputAdaptMap',figfolder,whichnet,'figtype','pdf')
+
+subplot(3,3,5)
+a = imagesc(Ivals,log10(avals),log10(UPDOWNstats.durDOWN)');
+alpha(single(~isnan(UPDOWNstats.durDOWN))')
+colorbar
+LogScale('c',10)
+axis xy
+LogScale('y',10)
+title('Mean DOWN Duration')
+xlabel('Input');ylabel('Adaptation')
+
+subplot(3,3,7)
+a = imagesc(Ivals,log10(avals),(UPDOWNstats.CVUP)');
+alpha(single(~isnan(UPDOWNstats.durUP)&~isnan(UPDOWNstats.durDOWN))')
+colorbar
+caxis([0.2 1.2])
+crameri('berlin','pivot',1)
+%LogScale('c',10)
+axis xy
+LogScale('y',10)
+title('CV UP Duration')
+xlabel('Input');ylabel('Adaptation')
+
+subplot(3,3,8)
+a = imagesc(Ivals,log10(avals),(UPDOWNstats.CVDOWN)');
+alpha(single(~isnan(UPDOWNstats.durDOWN))')
+colorbar
+caxis([0.2 1.2])
+crameri('berlin','pivot',1)
+%LogScale('c',10)
+axis xy
+LogScale('y',10)
+title('CV DOWN Duration')
+xlabel('Input');ylabel('Adaptation')
+
+NiceSave('InputAdaptMap',figfolder,whichnet,'figtype','pdf')
