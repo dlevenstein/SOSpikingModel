@@ -34,11 +34,11 @@ PopParams.E_i     = -80;    %rev potential: I (mV)
 PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
 
 %Adaptation Properties (No adaptation)
-PopParams.E_w     = PopParams.E_L(1);    %rev potential: adaptation (mV)
+PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.a       = 0;   %adaptation decay timescale (1/ms)
 PopParams.b       = 0;    %adaptation activation rate (1/ms)
 PopParams.tau_w   = 300;     %subthreshold adaptation steepness
-PopParams.gwnorm  = PopParams.g_L(1);       %magnitude of adaptation
+PopParams.gwnorm  = 1;       %magnitude of adaptation
 
 %Network Properties
 PopParams.Wee   = 0;        %E->E weight (nS)
@@ -60,6 +60,8 @@ PopParams.TargetRateI = nan; %Target E rate 1Hz
 PopParams.TargetRateE = nan; %Target E rate 1Hz
 PopParams.tauSTDP = 20;
 
+PopParams.t_syn = 0;
+
 %%
 
 PopParams.tau_w   = 300;
@@ -68,7 +70,7 @@ TimeParams.SimTime = 3e3;
 
 PopParams.I_e = @(t) 250.*(heaviside(t-5e2)-heaviside(t-(TimeParams.SimTime-5e2)));
 PopParams.b = 0;
-PopParams.a = 0.03;
+PopParams.a = 0.01;
 
 SimValues = AdLIFfunction_iSTDP(PopParams,TimeParams,'cellout',true,'showprogress',false,'showfig',false,'save_dt',TimeParams.dt,'defaultNeuronParams',false);
 
@@ -323,6 +325,7 @@ plot(bvals,CurrentAdaptation(:,16),'k')
 
 %%
 TimeParams.SimTime = 1e4;
+Ivals = linspace(150,250,51);
 
 avals = 0:0.01:0.1;
 
