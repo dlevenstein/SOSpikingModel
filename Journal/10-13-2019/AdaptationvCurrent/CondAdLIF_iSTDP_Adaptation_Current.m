@@ -65,12 +65,12 @@ PopParams_in.t_syn = 0;
 
 TimeParams.dt      = 0.05;
 
-SimTime = 5e4;
+SimTime = 2.5e4;
 
 TimeParams.SimTime = SimTime;
 
-Ivals = 0:5:100;
-bvals = 10.^(-2:0.1:1);
+Ivals = 0:10:100;
+bvals = 10.^(-2:0.2:1);
 
 %%
 for II = 1:(length(Ivals)*length(bvals))
