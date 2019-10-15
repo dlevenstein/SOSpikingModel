@@ -78,8 +78,8 @@ bindices = [16,12,2,11,16];
 %%
 II = modnum;
 
-    ii = Ivals(Iindices(II));
-    bb = bvals(bindices(II));
+    ii = Iindices(II);
+    bb = bindices(II);
 
     ii
     bb 

@@ -78,8 +78,8 @@ aindices = [2,6,6,6];
 %%
 II = modnum;
 
-    ii = Ivals(Iindices(II));
-    aa = avals(aindices(II));
+    ii = Iindices(II);
+    aa = aindices(II);
 
     ii
     aa 
