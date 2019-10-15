@@ -1,5 +1,8 @@
 function [Espikes,Ispikes] = RasterSorter(SimValues)
 
+SimValues.EcellIDX = 1:2000;
+SimValues.IcellIDX = 2001:2500;
+
 spikesbycell = SimValues.spikesbycell;
 
 Espikes = SimValues.spikes(find(SimValues.spikes(:,2) <= SimValues.EcellIDX(end)),:);
