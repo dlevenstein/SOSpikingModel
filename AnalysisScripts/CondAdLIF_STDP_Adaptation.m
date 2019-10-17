@@ -37,7 +37,7 @@ PopParams.tau_s   = [5 5];      %synaptic decay timescale (1/ms)
 PopParams.E_w     = -70;    %rev potential: adaptation (mV)
 PopParams.a       = 0;   %adaptation decay timescale (1/ms)
 PopParams.b       = 0;    %adaptation activation rate (1/ms)
-PopParams.tau_w   = 300;     %subthreshold adaptation steepness
+PopParams.tau_w   = 500;     %subthreshold adaptation steepness
 PopParams.gwnorm  = 1;       %magnitude of adaptation
 
 %Network Properties
@@ -64,7 +64,7 @@ PopParams.t_syn = 0;
 
 %%
 
-PopParams.tau_w   = 300;
+PopParams.tau_w   = 500;
 
 TimeParams.SimTime = 3e3;
 
@@ -128,11 +128,15 @@ xlabel('Time (sec)','FontSize',16);
 
 box OFF
 
-NiceSave('Subthreshold-Based_AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
+folder = '/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/SfNPoster/SVGFigures/';
+
+saveas(gcf,[folder 'Subthreshold Adaptation'],'epsc')
+
+%NiceSave('Subthreshold-Based_AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 
 %%
 
-PopParams.tau_w   = 300;
+PopParams.tau_w   = 500;
 
 TimeParams.SimTime = 3e3;
 
@@ -195,6 +199,10 @@ set(AX,'FontSize', 12)
 xlabel('Time (sec)','FontSize',16);
 
 box OFF
+
+folder = '/Users/jonathangornet/Google Drive/Computational_Neuroscience/STDPData/SfNPoster/SVGFigures/';
+
+saveas(gcf,[folder 'Spike-BasedAdaptation'],'epsc')
 
 %NiceSave('Spike-Based_AdaptationExample','/Users/jonathangornet/Google Drive/Computational_Neuroscience/Report/Figures/Adaptation',[])
 

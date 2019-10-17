@@ -1,4 +1,4 @@
-function CondAdLIF_iSTDP_Adaptation_CurrentAvals(modnum)
+function CondAdLIF_iSTDP_Adaptation_CurrentBvals(modnum)
 
 repopath = '/scratch/jmg1030/FIcurve/SOSpikingModel';
 
@@ -70,33 +70,33 @@ SimTime = 1e5;
 TimeParams.SimTime = SimTime;
 
 Ivals = 0:10:100;
-avals = 0:0.01:0.1;
+bvals = 10.^(-2:0.2:1);
 
-Iindices = [2,2,7,8];
-aindices = [2,6,6,6];
+Iindices = [5,1,6];
+bindices = [8,6,16];
 
 %%
 II = modnum;
 
     ii = Iindices(II);
-    aa = aindices(II);
+    bb = bindices(II);
 
     ii
-    aa 
+    bb 
 
     PopParamsAnalysis = PopParams_in;
 
     I_e = Ivals(ii);
-    a = avals(aa);
+    b = bvals(bb);
 
     PopParamsAnalysis.I_e       = I_e;
-    PopParamsAnalysis.a         = a;
+    PopParamsAnalysis.b         = b;
 
     SimValuesArray = AdLIFfunction_iSTDP(PopParamsAnalysis,TimeParams,'cellout',true,'showprogress',true,'showfig',false,...
         'save_weights',TimeParams.SimTime,'save_dt',TimeParams.SimTime,'useGPU',false,'defaultNeuronParams',false);
 
     spikes = SimValuesArray.spikes;
 
-    save(['/scratch/jmg1030/FIcurve/data/testingFolder/10-14-2019/Avals/AdaptationVCurrentSpikes_ii_' num2str(ii) '_aa_' num2str(aa) '.mat'],'spikes','-v7.3') 
+    save(['/scratch/jmg1030/FIcurve/data/testingFolder/10-17-2019/AdaptationVCurrentSpikes_ii_' num2str(ii) '_bb_' num2str(bb) '.mat'],'spikes','-v7.3') 
 
 end

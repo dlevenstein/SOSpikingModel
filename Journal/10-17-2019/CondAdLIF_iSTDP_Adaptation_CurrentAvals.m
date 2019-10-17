@@ -72,8 +72,8 @@ TimeParams.SimTime = SimTime;
 Ivals = 0:10:100;
 avals = 0:0.01:0.1;
 
-Iindices = [2,2,7,8];
-aindices = [2,6,6,6];
+Iindices = [4,3,9];
+aindices = [3,5,11];
 
 %%
 II = modnum;
@@ -97,6 +97,6 @@ II = modnum;
 
     spikes = SimValuesArray.spikes;
 
-    save(['/scratch/jmg1030/FIcurve/data/testingFolder/10-14-2019/Avals/AdaptationVCurrentSpikes_ii_' num2str(ii) '_aa_' num2str(aa) '.mat'],'spikes','-v7.3') 
+    save(['/scratch/jmg1030/FIcurve/data/testingFolder/10-17-2019/AdaptationVCurrentSpikes_ii_' num2str(ii) '_aa_' num2str(aa) '.mat'],'spikes','-v7.3') 
 
 end
