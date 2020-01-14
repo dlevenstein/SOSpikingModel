@@ -301,7 +301,7 @@ end
 
 if length(recordIntervals) == 0
 recordVALs = ones(1,SimTimeLength);
-spikes = nan(PopNum.*(SimTime+onsettime).*20,2,'single'); %assume mean rate 20Hz
+spikes = nan(PopNum.*(SimTime+onsettime).*5,2,'single'); %assume mean rate 20Hz
 else
 spikes = nan(PopNum.*(round(length(find(recordVALs~=0)).*TimeParams.dt)+onsettime).*20,2,'single'); %assume mean rate 20Hz
 end
@@ -494,6 +494,7 @@ savecounter = 1;
 weightcounter = 1;
 timecounter = -onsettime-gather(dt);
 spikecounter = 0;
+spikewarnswitch = false;
 tic
 for tt=1:SimTimeLength
     %% Time Counter
@@ -549,6 +550,10 @@ for tt=1:SimTimeLength
         numspikers = length(spikeneurons);
         
         if recordVALs(tt)
+            if ((spikecounter+numspikers)>length(spikes(:,1)) & ~spikewarnswitch)
+                spikewarnswitch = true;
+                display('More spikes than anticipated. Slowing down...')
+            end
             spikes(spikecounter+1:spikecounter+numspikers,:) = ...
                 [timecounter.*ones(numspikers,1),gather(spikeneurons)];
         end
@@ -638,10 +643,10 @@ for tt=1:SimTimeLength
         %Implement STDP (Vogels 2011 SuppEqn 4/5) I->E only
         %Presynaptic I Cells - adjust synapses postsynaptic to spiking I cells
         %PreIspikes = intersect(spikeneurons,Icells);
-        PreIspikes = activatedsynapses(activatedsynapses > EPopNum);
+        PreIspikes = activatedsynapses & IcellIDX;
         %Postsynaptic E cells - adjust synapses presynaptic to spiking E cells
         %PostEspikes = intersect(spikeneurons,Ecells);
-        PostEspikes = activatedsynapses(activatedsynapses <= EPopNum);
+        PostEspikes = activatedsynapses & & EcellIDX;
         PostIspikes = PreIspikes;
         
         if ~all(isnan(alphaE))
