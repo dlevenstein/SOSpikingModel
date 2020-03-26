@@ -301,9 +301,9 @@ end
 
 if length(recordIntervals) == 0
 recordVALs = ones(1,SimTimeLength);
-spikes = nan(PopNum.*(SimTime+onsettime).*5,2,'single'); %assume mean rate 20Hz
+spikes = nan(PopNum.*(SimTime+onsettime).*5./1000,2,'single'); %assume mean rate 20Hz
 else
-spikes = nan(PopNum.*(round(length(find(recordVALs~=0)).*TimeParams.dt)+onsettime).*20,2,'single'); %assume mean rate 20Hz
+spikes = nan(PopNum.*(round(length(find(recordVALs~=0)).*TimeParams.dt)+onsettime).*20./1000,2,'single'); %assume mean rate 20Hz
 end
 
 %% EI Parameter Adjustments (ugly. needs cleaning)
